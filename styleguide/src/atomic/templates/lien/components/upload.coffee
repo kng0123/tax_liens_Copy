@@ -146,6 +146,14 @@ Templates.lien_upload = React.createClass
         when "Search Fee" then "search_fee"
         when "Flat Rate" then "flat_rate"
         when "Cert Int" then "cert_int"
+        when "2013 YEP" then "2013_yep"
+        when "YEP Int" then "yep_int"
+        when "Picture" then "picture"
+        when "Redemption Date" then "redemption_date"
+        when "Redemption" then "redemption_amt"
+        when "Total Cash Out" then "total_cash_out"
+        when "Total Int Due" then "total_int_due"
+        when "MZ Check" then "mz_check"
         else undefined
 
       if tag
