@@ -2,8 +2,8 @@
   "name": "client",
   "version": "0.0.1",
   "scripts": {
-    "start": "watchify components/index.js -v -t coffeeify -t [ reactify --extension coffee ]     -o public/js/bundle.js",
-    "prod": "browserify components/index.js -v -t coffeeify -t [ reactify --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
+    "start": "watchify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
+    "prod": "browserify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
   },
   "browserify": {
     "transform": [
@@ -11,6 +11,7 @@
     ]
   },
   "dependencies": {
+    "accounting": "^0.4.1",
     "babelify": "^6.3.0",
     "body-parser": "^1.0.0",
     "browserify": "^4.1.5",
@@ -50,6 +51,7 @@
     "sha256": "^0.2.0",
     "static-favicon": "^1.0.1",
     "tv4": "^1.2.7",
+    "uuid4": "^1.0.0",
     "watchify": "^3.4.0",
     "wolfy87-eventemitter": "^4.3.0",
     "xlsx": "^0.8.0",

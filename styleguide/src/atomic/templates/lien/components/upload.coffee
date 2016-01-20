@@ -47,7 +47,7 @@ Templates.lien_upload = React.createClass
     #skip the first 3 rows
     objects = []
     for row in [3...rs+1] by 1
-      object = {general:{}, subs:[], checks:[], season:[]}
+      object = {annotations:[], general:{}, subs:[], checks:[], season:[]}
       objects.push(object)
       for g in [0..groups.length-1]
         group = groups[g]
@@ -89,30 +89,36 @@ Templates.lien_upload = React.createClass
     check_interest = sheet[XLSX.utils.encode_cell(c:first.c+7, r: row)]
     if check_date
       check =
-        check_date: if check_date then check_date.v
-        deposit_date: if deposit_date then deposit_date.v
-        check_number: if check_number then check_number.v
-        check_amount: if check_amount then check_amount.v
-        type: if type then type.v
-        dif: if dif then dif.v
-        check_principal: if check_principal then check_principal.v
-        check_interest: if check_interest then check_interest.v
+        check_date: if check_date then check_date.w
+        deposit_date: if deposit_date then deposit_date.w
+        check_number: if check_number then check_number.w
+        check_amount: if check_amount then check_amount.w
+        type: if type then type.w
+        dif: if dif then dif.w
+        check_principal: if check_principal then check_principal.w
+        check_interest: if check_interest then check_interest.w
       object.checks.push(check)
 
 
   parseSeason: ->
     #TODO: I'm not sure what to do with these last fields
+    #TODO: Theyre deprecated. Nothing to do
 
   parseGeneral: (object, sheet, group, row)->
     first = XLSX.utils.decode_cell group.first
     last = XLSX.utils.decode_cell group.last
+
     for i in [first.c..last.c]
       head_cell = XLSX.utils.encode_cell(c:i, r:first.r)
       data_cell = XLSX.utils.encode_cell(c:i, r:row)
-      val = if sheet[data_cell]
-        sheet[data_cell].v
-      else
-        ""
+      notes = []
+      val = ""
+      if sheet[data_cell]
+        if sheet[data_cell].w
+          val = sheet[data_cell].w.trim()
+        if sheet[data_cell].c
+          notes = sheet[data_cell].c
+
       tag_text = sheet[head_cell].v
       tag = switch tag_text
         when "Unique ID" then "unique_id"
@@ -158,6 +164,12 @@ Templates.lien_upload = React.createClass
 
       if tag
         object.general[tag] = val
+        object.annotations = object.annotations.concat notes.map (note) ->
+          author: note.a
+          comment: note.t.split('\n')[1]
+          tag: tag
+
+    #Parse annotations
 
 
   handleFile: (e) ->
@@ -180,6 +192,8 @@ Templates.lien_upload = React.createClass
         sheet = workbook.Sheets["Sheet1"]
         groups = @getHeaders(sheet)
         objects = @parseObjects(sheet, groups)
+        a=Test.init_from_json(objects[0])
+        debugger
 
         @setState(data:objects)
 

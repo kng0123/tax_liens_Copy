@@ -41,4 +41,6 @@ MUI.Libs.SvgIcons = require('material-ui/lib/svg-icons');
 global.ReactRouter = require("react-router");
 global.App = {}
 
+global.Test = require('./classes/lien.js')
+
 require('./app.coffee')
