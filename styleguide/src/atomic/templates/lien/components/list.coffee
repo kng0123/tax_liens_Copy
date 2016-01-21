@@ -5,20 +5,17 @@ Templates.lien_list = React.createClass
     liens: []
 
   componentWillMount: ->
-    Lien = Parse.Object.extend("Lien");
     query = new Parse.Query(Lien);
     query.find({
     	success : (results) =>
-        data = results.map (item) ->
-          item._toFullJSON()
-        @setState liens:data
+        @setState liens:results
     	,
     	error : (obj, error) ->
     })
 
   goToLien: (indices) ->
     lien = @state.liens[indices[0]]
-    @props.dispatch(ReduxRouter.pushState(null, '/lien/item/'+lien.objectId))
+    @props.dispatch(ReduxRouter.pushState(null, '/lien/item/'+lien.get('unique_id')))
 
   goToUpload: () ->
     @props.dispatch(ReduxRouter.pushState(null, '/lien/upload'))
@@ -63,8 +60,8 @@ Templates.lien_list = React.createClass
           TableHeaderColumn null, "Status"
       TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows,
         @state.liens.map (v, k) ->
-          TableRow key:v.objectId,
-            TableRowColumn null, v.unique_id
+          TableRow key:v.id,
+            TableRowColumn null, v.get('unique_id')
             TableRowColumn null, 'Data'
             TableRowColumn null, 'Data'
 

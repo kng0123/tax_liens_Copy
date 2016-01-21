@@ -25,6 +25,7 @@ global.Recompose = require('recompose')
 global.moment = require('moment')
 global.tv4 = require('tv4')
 global.Parse = require('./parse')
+global.moment = require('moment')
 global.XLSX = require('xlsx-browserify-shim');
 
 Parse.initialize("4jhLXmNyrqVvhHBfYpAR5wtNtqTLY6o0kt10dICm", "w0DVkEdklERduqzIVTWpUU3hIpn7uUpi58iXux9F");
@@ -41,6 +42,6 @@ MUI.Libs.SvgIcons = require('material-ui/lib/svg-icons');
 global.ReactRouter = require("react-router");
 global.App = {}
 
-global.Test = require('./classes/lien.js')
+global.Lien = require('./classes/lien.js')
 
 require('./app.coffee')

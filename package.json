@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "watchify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
+    "cloud": "watchify components/cloud.coffee -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js",
     "prod": "browserify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
   },
   "browserify": {

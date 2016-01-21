@@ -67,12 +67,21 @@ Templates.lien_upload = React.createClass
     util = sheet[XLSX.utils.encode_cell(c:first.c+7, r: row)]
     util_date = sheet[XLSX.utils.encode_cell(c:first.c+8, r: row)]
     total = sheet[XLSX.utils.encode_cell(c:first.c+14, r: row)]
-    if tax_date or util_date
+    if tax_date
       sub =
-        tax:  if tax then tax.v
-        tax_date: if tax_date then tax_date.v
-        util: if util then util.v
-        util_date: if util_date then util_date.v
+        type: 'tax'
+        sub_date: tax_date.w
+        amount: tax.v
+        interest: undefined
+        check: undefined
+      object.subs.push(sub)
+    if util_date
+      sub =
+        type: 'utility'
+        sub_date: util_date.w
+        amount: util.v
+        interest: undefined
+        check: undefined
       object.subs.push(sub)
 
 
@@ -192,12 +201,16 @@ Templates.lien_upload = React.createClass
         sheet = workbook.Sheets["Sheet1"]
         groups = @getHeaders(sheet)
         objects = @parseObjects(sheet, groups)
-        a=Test.init_from_json(objects[0])
-        debugger
 
-        @setState(data:objects)
-
-        return
+        promises = objects.map (lien) =>
+          Lien.init_from_json(lien)
+        @setState(data:[])
+        Parse.Promise.when(promises).then () =>
+          data = @state.data
+          @setState(data: data.concat(Array.prototype.slice.call(arguments)))
+        .fail (liens) =>
+          data = @state.data
+          @setState(data: data.concat(liens))
 
       reader.readAsBinaryString f
       ++i
@@ -212,7 +225,50 @@ Templates.lien_upload = React.createClass
     Factory = React.Factory
 
     RaisedButton = React.createFactory MUI.RaisedButton
-    data = @state.data
+    data = @state.data || []
+
+    Table = React.createFactory MUI.Table
+    TableHeader = React.createFactory MUI.TableHeader
+    TableRow = React.createFactory MUI.TableRow
+    TableHeaderColumn = React.createFactory MUI.TableHeaderColumn
+    TableBody = React.createFactory MUI.TableBody
+    TableRowColumn = React.createFactory MUI.TableRowColumn
+    RaisedButton = React.createFactory MUI.RaisedButton
+
+    table_state = {
+      fixedHeader: true,
+      fixedFooter: true,
+      stripedRows: false,
+      showRowHover: false,
+      selectable: true,
+      multiSelectable: false,
+      enableSelectAll: false,
+      deselectOnClickaway: true,
+      height: '300px',
+    };
+
+    table_props =
+      height: table_state.height
+      fixedHeader: table_state.fixedHeader
+      fixedFooter: table_state.fixedFooter
+      selectable: table_state.selectable
+      multiSelectable: table_state.multiSelectable
+      onRowSelection: (->)
+
+
+    table = Table table_props,
+      TableHeader enableSelectAll:table_state.enableSelectAll,
+        TableRow null,
+          TableHeaderColumn null, "ID"
+          TableHeaderColumn null, "Status"
+      TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows,
+        data.map (v, k) ->
+          status = "SUCCESS"
+          if v.error
+            status = "ERROR"
+          TableRow key:v.get('unique_id'),
+            TableRowColumn null, v.get('unique_id')
+            TableRowColumn null, status
 
     div className:'container',
       div className:'row',
@@ -226,4 +282,4 @@ Templates.lien_upload = React.createClass
       if data
         div className:'row',
           div className:'col-lg-12',
-            pre null, JSON.stringify(data, null, 2)
+            table
