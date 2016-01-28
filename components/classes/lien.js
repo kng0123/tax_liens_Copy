@@ -25,8 +25,16 @@ class Lien extends Parse.Object {
     return accounting.unformat(cert_fv * rate)
   }
 
+  search_fee() {
+    //If redeem within 10 days then 0
+    if (this.redeem_in_10()) {
+      return 0
+    }
+    return this.get('search_fee')
+  }
+
   redeem_in_10() {
-    return this.redeem_days() < 10 && this.get('redemption_date')
+    return !!this.get('redeem_in_10')
   }
 
   total_cash_out() {

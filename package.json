@@ -2,9 +2,9 @@
   "name": "client",
   "version": "0.0.1",
   "scripts": {
-    "start": "watchify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
+    "start": "BROWSER=true watchify components/index.js -v -t  browserify-css -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
     "cloud": "watchify components/cloud.coffee -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js",
-    "prod": "browserify components/index.js -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
+    "prod": "BROWSER=true browserify components/index.js -v -t browserify-css -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
   },
   "browserify": {
     "transform": [
@@ -36,7 +36,9 @@
     "morgan": "^1.0.0",
     "parse": "^1.6.13",
     "react": "^0.14.3",
+    "react-datepicker": "^0.18.0",
     "react-dom": "0.14.3",
+    "react-plain-editable": "^2.0.0",
     "react-redux": "4.0.0",
     "react-router": "1.0.0",
     "react-select": "1.0.0-beta6",
@@ -59,6 +61,7 @@
     "xlsx-browserify-shim": "0.0.5"
   },
   "devDependencies": {
+    "browserify-css": "^0.8.4",
     "grunt": "^0.4.4",
     "grunt-concurrent": "^0.5.0",
     "grunt-contrib-concat": "^0.4.0",
@@ -69,5 +72,10 @@
     "grunt-contrib-uglify": "^0.4.0",
     "grunt-contrib-watch": "^0.6.1",
     "matchdep": "^0.3.0"
+  },
+  "browserify-css": {
+    "autoInject": true,
+    "minify": true,
+    "rootDir": "."
   }
 }

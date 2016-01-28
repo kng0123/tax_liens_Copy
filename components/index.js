@@ -27,6 +27,12 @@ global.tv4 = require('tv4')
 global.Parse = require('./parse')
 global.moment = require('moment')
 global.XLSX = require('xlsx-browserify-shim');
+global.PlainEditable = require('react-plain-editable');
+global.DatePicker = require('react-datepicker');
+if (process.env.BROWSER) {
+  require('./app.css')
+}
+
 
 Parse.initialize("4jhLXmNyrqVvhHBfYpAR5wtNtqTLY6o0kt10dICm", "w0DVkEdklERduqzIVTWpUU3hIpn7uUpi58iXux9F");
 

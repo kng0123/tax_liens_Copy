@@ -14,8 +14,19 @@ Templates.lien = React.createClass
       @setState lien: results[0]
     )
 
+  onChange: (item) ->
+    (data) =>
+      val = switch item.type
+        when 'date' then data.toDate()
+        when 'bool' then $(data.target).is(':checked')
+        else  arguments[1]
+
+      lien = @state.lien
+      lien.set(item.key, val)
+      @setState(lien:lien)
+
   render: ->
-    {div, h3, h1, ul, li, span} = React.DOM
+    {div, h3, h1, ul, li, span, i} = React.DOM
     Factory = React.Factory
 
     Table = React.createFactory MUI.Table
@@ -39,34 +50,34 @@ Templates.lien = React.createClass
       #TODO LLCs HOW???
 
       #TODO there are 2 MUA ACCT's?
-      {label: "MUA ACCT 1", key:"mua_account_number"}
-      {label: "MUA ACCT 2", key:"mua_account_number"}
-      {label: "SALE DATE", key:"sale_date"}
-      {label: "CERT_FV", key:"cert_fv"}
-      {label: "PRINCIPAL_PREMIUM", key:"premium"}
-      {label: "TOTAL PAID", key:"total_paid"}
-      {label: "WINNING RATE", key:"winning_bid"}
-      {label: "COUNTY", key:"county"}
-      {label: "ADDRESS", key:"address"}
+      {label: "MUA ACCT 1", key:"mua_account_number", editable:true}
+      {label: "MUA ACCT 2", key:"mua_account_number", editable:true}
+      {label: "SALE DATE", key:"sale_date", editable:true, type:'date'}
+      {label: "CERT_FV", key:"cert_fv", editable:true}
+      {label: "PRINCIPAL_PREMIUM", key:"premium", editable:true}
+      {label: "TOTAL PAID", key:"total_paid", editable:true}
+      {label: "WINNING RATE", key:"winning_bid", editable:true}
+      {label: "COUNTY", key:"county", editable:true}
+      {label: "ADDRESS", key:"address", editable:true}
 
       #TODO These are in the excel
-      {label: "CITY", key:"county"}
-      {label: "STATE", key:"county"}
-      {label: "ZIP", key:"county"}
+      {label: "CITY", key:"city", editable:true}
+      {label: "STATE", key:"state", editable:true}
+      {label: "ZIP", key:"zip", editable:true}
     ]
 
     #Second column from excel GUI
     fee_fields = [
-      {label: "RECORDING DATE", key:"recording_date"}
-      {label: "RECORDING FEE", key:"recording_fee"}
-      {label: "SEARCH FEE", key:"search_fee"}
+      {label: "RECORDING DATE", key:"recording_date", editable:true, type:'date'}
+      {label: "RECORDING FEE", key:"recording_fee", editable:true}
+      {label: "SEARCH FEE", key:"search_fee", is_function:true, editable:true}
       {label: "FLAT RATE", key:"flat_rate", is_function:true}
       {label: "CERT INT", key:"cert_interest", is_function:true}
-      {label: "2013 YEP", key:"2013_yep"}
-      {label: "REDEMPTION DATE", key:"redemption_date"}
-      {label: "AMT", key:"redemption_amt"}
+      {label: "2013 YEP", key:"2013_yep", editable:true}
+      {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'}
+      {label: "AMT", key:"redemption_amt", editable:true}
       #TODO What is redeem within 10 days
-      {label: "REDEEM WITHIN 10 DAYS?", key:"redeem_in_10", is_function:true}
+      {label: "REDEEM WITHIN 10 DAYS?", key:"redeem_in_10", editable:true, type:'bool'}
       {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true}
       {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true}
       #TODO Calculate expected amt
@@ -191,6 +202,29 @@ Templates.lien = React.createClass
             TableRowColumn style:style, "note"
 
 
+    editable = React.createFactory PlainEditable
+    date_picker = React.createFactory DatePicker
+    checkbox = React.createFactory MUI.Checkbox
+    gen_editable = (key, item, val) =>
+      edit = switch(item.type)
+        when 'date' then date_picker selected:moment(val), onChange:@onChange(item)
+        when 'bool' then checkbox onCheck: @onChange(item), checked:!!val
+        else editable onBlur:@onChange(item), value:val
+      li key:key, className:'list-group-item',
+        div null,
+          span null, item.label
+
+        div null,
+          if ['date', 'bool'].indexOf(item.type) == -1
+            span style:{position:'absolute'},
+              if item.editable
+                i className:"fa fa-pencil"
+              else
+                i className:"fa fa-times-circle"
+          edit
+
+
+
     div className:'container-fluid',
       div className:'row',
         div className:'col-lg-12',
@@ -214,9 +248,8 @@ Templates.lien = React.createClass
                       val = val.toString()
                     if v.is_function
                       val = lien[v.key]().toString()
-                    li key:k, className:'list-group-item',
-                      span className:'badge', val
-                      span null, v.label
+                    gen_editable(k, v, val)
+
 
           div className:'col-md-3',
             div className:'panel panel-default',
@@ -235,9 +268,8 @@ Templates.lien = React.createClass
                       val = val.toString()
                     if v.is_function
                       val = lien[v.key]().toString()
-                    li key:k, className:'list-group-item',
-                      span className:'badge', val
-                      span null, v.label
+                    gen_editable(k, v, val)
+
 
           div className:'col-md-6',
             div className:'panel panel-default',

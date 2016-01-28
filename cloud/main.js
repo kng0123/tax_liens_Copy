@@ -1,9 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var accounting = require('accounting')
-var ____Class3W=Parse.Object;for(var ____Class3W____Key in ____Class3W){if(____Class3W.hasOwnProperty(____Class3W____Key)){Lien[____Class3W____Key]=____Class3W[____Class3W____Key];}}var ____SuperProtoOf____Class3W=____Class3W===null?null:____Class3W.prototype;Lien.prototype=Object.create(____SuperProtoOf____Class3W);Lien.prototype.constructor=Lien;Lien.__superConstructor__=____Class3W;
+var ____Class4=Parse.Object;for(var ____Class4____Key in ____Class4){if(____Class4.hasOwnProperty(____Class4____Key)){Lien[____Class4____Key]=____Class4[____Class4____Key];}}var ____SuperProtoOf____Class4=____Class4===null?null:____Class4.prototype;Lien.prototype=Object.create(____SuperProtoOf____Class4);Lien.prototype.constructor=Lien;Lien.__superConstructor__=____Class4;
   function Lien() {"use strict";
     // Pass the ClassName to the Parse.Object constructor
-    ____Class3W.call(this,'Lien');
+    ____Class4.call(this,'Lien');
     // All other initialization
   }
 
@@ -13,6 +13,7 @@ var ____Class3W=Parse.Object;for(var ____Class3W____Key in ____Class3W){if(____C
 
   Object.defineProperty(Lien.prototype,"flat_rate",{writable:true,configurable:true,value:function() {"use strict";
     //If redeem within 10 days then 0
+    debugger
     if (this.redeem_in_10()) {
       return 0
     }
@@ -146,9 +147,9 @@ var ____Class3W=Parse.Object;for(var ____Class3W____Key in ____Class3W){if(____C
   }});
 
 
-var ____Class3X=Parse.Object;for(var ____Class3X____Key in ____Class3X){if(____Class3X.hasOwnProperty(____Class3X____Key)){LienCheck[____Class3X____Key]=____Class3X[____Class3X____Key];}}var ____SuperProtoOf____Class3X=____Class3X===null?null:____Class3X.prototype;LienCheck.prototype=Object.create(____SuperProtoOf____Class3X);LienCheck.prototype.constructor=LienCheck;LienCheck.__superConstructor__=____Class3X;
+var ____Class5=Parse.Object;for(var ____Class5____Key in ____Class5){if(____Class5.hasOwnProperty(____Class5____Key)){LienCheck[____Class5____Key]=____Class5[____Class5____Key];}}var ____SuperProtoOf____Class5=____Class5===null?null:____Class5.prototype;LienCheck.prototype=Object.create(____SuperProtoOf____Class5);LienCheck.prototype.constructor=LienCheck;LienCheck.__superConstructor__=____Class5;
   function LienCheck() {"use strict";
-    ____Class3X.call(this,'LienCheck');
+    ____Class5.call(this,'LienCheck');
   }
   Object.defineProperty(LienCheck,"init_from_json",{writable:true,configurable:true,value:function(lien, data) {"use strict";
     var check = new LienCheck()
@@ -177,9 +178,9 @@ var ____Class3X=Parse.Object;for(var ____Class3X____Key in ____Class3X){if(____C
     return check
   }});
 
-var ____Class3Y=Parse.Object;for(var ____Class3Y____Key in ____Class3Y){if(____Class3Y.hasOwnProperty(____Class3Y____Key)){LienSub[____Class3Y____Key]=____Class3Y[____Class3Y____Key];}}var ____SuperProtoOf____Class3Y=____Class3Y===null?null:____Class3Y.prototype;LienSub.prototype=Object.create(____SuperProtoOf____Class3Y);LienSub.prototype.constructor=LienSub;LienSub.__superConstructor__=____Class3Y;
+var ____Class6=Parse.Object;for(var ____Class6____Key in ____Class6){if(____Class6.hasOwnProperty(____Class6____Key)){LienSub[____Class6____Key]=____Class6[____Class6____Key];}}var ____SuperProtoOf____Class6=____Class6===null?null:____Class6.prototype;LienSub.prototype=Object.create(____SuperProtoOf____Class6);LienSub.prototype.constructor=LienSub;LienSub.__superConstructor__=____Class6;
   function LienSub() {"use strict";
-    ____Class3Y.call(this,'LienSub');
+    ____Class6.call(this,'LienSub');
   }
 
   Object.defineProperty(LienSub.prototype,"interest",{writable:true,configurable:true,value:function() {"use strict";
@@ -234,9 +235,9 @@ var ____Class3Y=Parse.Object;for(var ____Class3Y____Key in ____Class3Y){if(____C
     return sub
   }});
 
-var ____Class3Z=Parse.Object;for(var ____Class3Z____Key in ____Class3Z){if(____Class3Z.hasOwnProperty(____Class3Z____Key)){LienNote[____Class3Z____Key]=____Class3Z[____Class3Z____Key];}}var ____SuperProtoOf____Class3Z=____Class3Z===null?null:____Class3Z.prototype;LienNote.prototype=Object.create(____SuperProtoOf____Class3Z);LienNote.prototype.constructor=LienNote;LienNote.__superConstructor__=____Class3Z;
+var ____Class7=Parse.Object;for(var ____Class7____Key in ____Class7){if(____Class7.hasOwnProperty(____Class7____Key)){LienNote[____Class7____Key]=____Class7[____Class7____Key];}}var ____SuperProtoOf____Class7=____Class7===null?null:____Class7.prototype;LienNote.prototype=Object.create(____SuperProtoOf____Class7);LienNote.prototype.constructor=LienNote;LienNote.__superConstructor__=____Class7;
   function LienNote() {"use strict";
-    ____Class3Z.call(this,'LienNote');
+    ____Class7.call(this,'LienNote');
   }
   Object.defineProperty(LienNote,"init_from_json",{writable:true,configurable:true,value:function(lien, data) {"use strict";
     var note = new LienNote()
