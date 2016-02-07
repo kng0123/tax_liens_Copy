@@ -22,20 +22,16 @@ Templates.lien = React.createClass
         else  arguments[1]
 
       lien = @state.lien
+      old = lien.get(item.key)
+      if typeof(old) == 'number'
+        val = parseFloat(val)
+
       lien.set(item.key, val)
       @setState(lien:lien)
 
   render: ->
-    {div, h3, h1, ul, li, span, i} = React.DOM
+    {div, h3, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
-
-    Table = React.createFactory MUI.Table
-    TableHeader = React.createFactory MUI.TableHeader
-    TableRow = React.createFactory MUI.TableRow
-    TableHeaderColumn = React.createFactory MUI.TableHeaderColumn
-    TableBody = React.createFactory MUI.TableBody
-    TableRowColumn = React.createFactory MUI.TableRowColumn
-    RaisedButton = React.createFactory MUI.RaisedButton
 
     lien = @state.lien
     if !lien
@@ -60,7 +56,7 @@ Templates.lien = React.createClass
       {label: "COUNTY", key:"county", editable:true}
       {label: "ADDRESS", key:"address", editable:true}
 
-      #TODO These are in the excel
+      #TODO These are not in the excel
       {label: "CITY", key:"city", editable:true}
       {label: "STATE", key:"state", editable:true}
       {label: "ZIP", key:"zip", editable:true}
@@ -98,109 +94,38 @@ Templates.lien = React.createClass
       {label: "DON'T PAY SUBS", key:"unique_id"}
     ]
 
-    sub_table_state = {
-      fixedHeader: false,
-      fixedFooter: false,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: false,
-      multiSelectable: false,
-      enableSelectAll: false,
-      adjustForCheckbox: false,
-      deselectOnClickaway: false,
-      displayRowCheckbox: false,
-      height: '600px',
-    };
 
-    sub_table_props =
-      height: sub_table_state.height
-      fixedHeader: sub_table_state.fixedHeader
-      fixedFooter: sub_table_state.fixedFooter
-      selectable: sub_table_state.selectable
-      multiSelectable: sub_table_state.multiSelectable
-      onRowSelection: ->
+    sub_headers = ["TYPE", "DATE", "AMT", "INT", "#", "VOID", "DATE", ""]
+    sub_rows = lien.get('subs').map (v, k) ->
+      [
+        v.get('type'),
+        moment(v.get('sub_date')).format('MM/DD/YYYY'),
+        v.get('amount'),
+        v.interest(),
+        "",
+        "",
+        "",
+        ""
+      ]
+    sub_table = Factory.table headers: sub_headers, rows: sub_rows
 
-    sub_table = Table sub_table_props,
-      TableHeader adjustForCheckbox:sub_table_state.adjustForCheckbox, enableSelectAll:sub_table_state.enableSelectAll, displayRowCheckbox:sub_table_state.displayRowCheckbox, displaySelectAll:false,
-        TableRow null,
-          TableHeaderColumn null, "TYPE"
-          TableHeaderColumn null, "DATE"
-          TableHeaderColumn null, "AMT"
-          TableHeaderColumn null, "INT"
-          TableHeaderColumn null, "#"
-          #TODO What does this toggle do?
-          TableHeaderColumn null, "VOID"
-          TableHeaderColumn null, "DATE"
-          #TODO WHAT DOES THE X Action do?
-          TableHeaderColumn null, ""
-      TableBody deselectOnClickaway:sub_table_state.deselectOnClickaway, showRowHover:sub_table_state.showRowHover, stripedRows:sub_table_state.stripedRows, displayRowCheckbox:sub_table_state.displayRowCheckbox,
-        lien.get('subs').map (v, k) ->
-          style = {padding:0, textAlign:'center'}
-          TableRow key:k,
-            TableRowColumn  style:style, v.get('type')
-            TableRowColumn  style:style, moment(v.get('sub_date')).format('MM/DD/YYYY')
-            TableRowColumn  style:style, v.get('amount')
-            TableRowColumn  style:style, v.interest()
-            TableRowColumn style:style, ""
-            TableRowColumn  style:style, ""
-            #TODO Why are there 2 dates
-            TableRowColumn  style:style, ""
-            TableRowColumn  style:style, ""
-
-    receipt_table_state = {
-      fixedHeader: false,
-      fixedFooter: false,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: false,
-      multiSelectable: false,
-      enableSelectAll: false,
-      adjustForCheckbox: false,
-      deselectOnClickaway: false,
-      displayRowCheckbox: false,
-      height: '600px',
-    };
-
-    receipt_table_props =
-      height: sub_table_state.height
-      fixedHeader: sub_table_state.fixedHeader
-      fixedFooter: sub_table_state.fixedFooter
-      selectable: sub_table_state.selectable
-      multiSelectable: sub_table_state.multiSelectable
-      onRowSelection: ->
-    receipt_table = Table sub_table_props,
-      TableHeader adjustForCheckbox:receipt_table_state.adjustForCheckbox, enableSelectAll:receipt_table_state.enableSelectAll, displayRowCheckbox:receipt_table_state.displayRowCheckbox, displaySelectAll:false,
-        TableRow null,
-          TableHeaderColumn null, "DEPOSIT DATE"
-          TableHeaderColumn null, "ACCOUNT"
-          TableHeaderColumn null, "CHECK DATE"
-          TableHeaderColumn null, "CHECK #"
-          TableHeaderColumn null, "REDEEM DATE"
-          TableHeaderColumn null, "CHECK AMOUNT"
-          TableHeaderColumn null, "PRINCIPAL"
-          TableHeaderColumn null, "SUBS PRINCIPAL"
-          TableHeaderColumn null, "CODE"
-          TableHeaderColumn null, "EXPECTED AMOUNT"
-          TableHeaderColumn null, "DIF"
-          TableHeaderColumn null, "NOTE"
-
-      TableBody deselectOnClickaway:receipt_table_state.deselectOnClickaway, showRowHover:receipt_table_state.showRowHover, stripedRows:receipt_table_state.stripedRows, displayRowCheckbox:receipt_table_state.displayRowCheckbox,
-        lien.get('checks').map (v, k) ->
-          style = {padding:0, textAlign:'center'}
-          TableRow key:k,
-            TableRowColumn style:style, moment(v.get('deposit_date')).format('MM/DD/YYYY')
-            TableRowColumn style:style, "NA"
-            TableRowColumn style:style, moment(v.get('check_date')).format('MM/DD/YYYY')
-            TableRowColumn style:style, v.get('check_number')
-            TableRowColumn style:style, v.get('')
-            TableRowColumn style:style, v.get('check_amount')
-            TableRowColumn style:style, v.get('check_principal')
-            TableRowColumn style:style, v.get('check_interest')
-            TableRowColumn style:style, "code"
-            TableRowColumn style:style, "expected"
-            TableRowColumn style:style, "dif"
-            TableRowColumn style:style, "note"
-
+    receipt_headers = ["DEPOSIT DATE", "ACCOUNT", "CHECK DATE", "CHECK #", "REDEEM DATE", "CHECK AMOUNT", "PRINCIPAL", "SUBS PRINCIPAL", "CODE", "EXPECTED AMOUNT", "DIF", "NOTE"]
+    receipt_rows = lien.get('checks').map (v, k) ->
+      [
+        moment(v.get('deposit_date')).format('MM/DD/YYYY')
+        "NA"
+        moment(v.get('check_date')).format('MM/DD/YYYY')
+        v.get('check_number')
+        v.get('')
+        v.get('check_amount')
+        v.get('check_principal')
+        v.get('check_interest')
+        "code"
+        "expected"
+        "dif"
+        "note"
+      ]
+    receipt_table = Factory.table headers: receipt_headers, rows: receipt_rows
 
     editable = React.createFactory PlainEditable
     date_picker = React.createFactory DatePicker
@@ -209,7 +134,11 @@ Templates.lien = React.createClass
       edit = switch(item.type)
         when 'date' then date_picker selected:moment(val), onChange:@onChange(item)
         when 'bool' then checkbox onCheck: @onChange(item), checked:!!val
-        else editable onBlur:@onChange(item), value:val
+        else
+          if item.editable
+            editable onBlur:@onChange(item), value:val
+          else
+            span style:{paddingLeft:'15px'}, val
       li key:key, className:'list-group-item',
         div null,
           span null, item.label
