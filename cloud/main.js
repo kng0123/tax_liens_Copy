@@ -1,9 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var accounting = require('accounting')
-var ____Class4=Parse.Object;for(var ____Class4____Key in ____Class4){if(____Class4.hasOwnProperty(____Class4____Key)){Lien[____Class4____Key]=____Class4[____Class4____Key];}}var ____SuperProtoOf____Class4=____Class4===null?null:____Class4.prototype;Lien.prototype=Object.create(____SuperProtoOf____Class4);Lien.prototype.constructor=Lien;Lien.__superConstructor__=____Class4;
+var ____Class0=Parse.Object;for(var ____Class0____Key in ____Class0){if(____Class0.hasOwnProperty(____Class0____Key)){Lien[____Class0____Key]=____Class0[____Class0____Key];}}var ____SuperProtoOf____Class0=____Class0===null?null:____Class0.prototype;Lien.prototype=Object.create(____SuperProtoOf____Class0);Lien.prototype.constructor=Lien;Lien.__superConstructor__=____Class0;
   function Lien() {"use strict";
     // Pass the ClassName to the Parse.Object constructor
-    ____Class4.call(this,'Lien');
+    ____Class0.call(this,'Lien');
     // All other initialization
   }
 
@@ -13,7 +13,6 @@ var ____Class4=Parse.Object;for(var ____Class4____Key in ____Class4){if(____Clas
 
   Object.defineProperty(Lien.prototype,"flat_rate",{writable:true,configurable:true,value:function() {"use strict";
     //If redeem within 10 days then 0
-    debugger
     if (this.redeem_in_10()) {
       return 0
     }
@@ -27,8 +26,16 @@ var ____Class4=Parse.Object;for(var ____Class4____Key in ____Class4){if(____Clas
     return accounting.unformat(cert_fv * rate)
   }});
 
+  Object.defineProperty(Lien.prototype,"search_fee",{writable:true,configurable:true,value:function() {"use strict";
+    //If redeem within 10 days then 0
+    if (this.redeem_in_10()) {
+      return 0
+    }
+    return this.get('search_fee')
+  }});
+
   Object.defineProperty(Lien.prototype,"redeem_in_10",{writable:true,configurable:true,value:function() {"use strict";
-    return this.redeem_days() < 10 && this.get('redemption_date')
+    return !!this.get('redeem_in_10')
   }});
 
   Object.defineProperty(Lien.prototype,"total_cash_out",{writable:true,configurable:true,value:function() {"use strict";
@@ -147,9 +154,9 @@ var ____Class4=Parse.Object;for(var ____Class4____Key in ____Class4){if(____Clas
   }});
 
 
-var ____Class5=Parse.Object;for(var ____Class5____Key in ____Class5){if(____Class5.hasOwnProperty(____Class5____Key)){LienCheck[____Class5____Key]=____Class5[____Class5____Key];}}var ____SuperProtoOf____Class5=____Class5===null?null:____Class5.prototype;LienCheck.prototype=Object.create(____SuperProtoOf____Class5);LienCheck.prototype.constructor=LienCheck;LienCheck.__superConstructor__=____Class5;
+var ____Class1=Parse.Object;for(var ____Class1____Key in ____Class1){if(____Class1.hasOwnProperty(____Class1____Key)){LienCheck[____Class1____Key]=____Class1[____Class1____Key];}}var ____SuperProtoOf____Class1=____Class1===null?null:____Class1.prototype;LienCheck.prototype=Object.create(____SuperProtoOf____Class1);LienCheck.prototype.constructor=LienCheck;LienCheck.__superConstructor__=____Class1;
   function LienCheck() {"use strict";
-    ____Class5.call(this,'LienCheck');
+    ____Class1.call(this,'LienCheck');
   }
   Object.defineProperty(LienCheck,"init_from_json",{writable:true,configurable:true,value:function(lien, data) {"use strict";
     var check = new LienCheck()
@@ -178,9 +185,9 @@ var ____Class5=Parse.Object;for(var ____Class5____Key in ____Class5){if(____Clas
     return check
   }});
 
-var ____Class6=Parse.Object;for(var ____Class6____Key in ____Class6){if(____Class6.hasOwnProperty(____Class6____Key)){LienSub[____Class6____Key]=____Class6[____Class6____Key];}}var ____SuperProtoOf____Class6=____Class6===null?null:____Class6.prototype;LienSub.prototype=Object.create(____SuperProtoOf____Class6);LienSub.prototype.constructor=LienSub;LienSub.__superConstructor__=____Class6;
+var ____Class2=Parse.Object;for(var ____Class2____Key in ____Class2){if(____Class2.hasOwnProperty(____Class2____Key)){LienSub[____Class2____Key]=____Class2[____Class2____Key];}}var ____SuperProtoOf____Class2=____Class2===null?null:____Class2.prototype;LienSub.prototype=Object.create(____SuperProtoOf____Class2);LienSub.prototype.constructor=LienSub;LienSub.__superConstructor__=____Class2;
   function LienSub() {"use strict";
-    ____Class6.call(this,'LienSub');
+    ____Class2.call(this,'LienSub');
   }
 
   Object.defineProperty(LienSub.prototype,"interest",{writable:true,configurable:true,value:function() {"use strict";
@@ -235,9 +242,9 @@ var ____Class6=Parse.Object;for(var ____Class6____Key in ____Class6){if(____Clas
     return sub
   }});
 
-var ____Class7=Parse.Object;for(var ____Class7____Key in ____Class7){if(____Class7.hasOwnProperty(____Class7____Key)){LienNote[____Class7____Key]=____Class7[____Class7____Key];}}var ____SuperProtoOf____Class7=____Class7===null?null:____Class7.prototype;LienNote.prototype=Object.create(____SuperProtoOf____Class7);LienNote.prototype.constructor=LienNote;LienNote.__superConstructor__=____Class7;
+var ____Class3=Parse.Object;for(var ____Class3____Key in ____Class3){if(____Class3.hasOwnProperty(____Class3____Key)){LienNote[____Class3____Key]=____Class3[____Class3____Key];}}var ____SuperProtoOf____Class3=____Class3===null?null:____Class3.prototype;LienNote.prototype=Object.create(____SuperProtoOf____Class3);LienNote.prototype.constructor=LienNote;LienNote.__superConstructor__=____Class3;
   function LienNote() {"use strict";
-    ____Class7.call(this,'LienNote');
+    ____Class3.call(this,'LienNote');
   }
   Object.defineProperty(LienNote,"init_from_json",{writable:true,configurable:true,value:function(lien, data) {"use strict";
     var note = new LienNote()

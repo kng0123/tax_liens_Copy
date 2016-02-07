@@ -14,7 +14,14 @@ html
     // Custom Fonts
     link(href='/font-awesome/css/font-awesome.min.css', rel='stylesheet', type='text/css')
     script(src='//www.parsecdn.com/js/parse-1.6.7.min.js')
+
   body
     #content
     // React latest
     script(src='/js/bundle.js')
+    script(type="text/javascript").
+      $(document).ready(function(){
+        injectTapEventPlugin()
+        element = React.createElement(App.Root)
+        ReactDOM.render(element, $("#content")[0]);
+      })

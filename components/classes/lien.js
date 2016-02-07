@@ -1,4 +1,8 @@
 var accounting = require('accounting')
+var LienCheck = require('./LienCheck')
+var LienSub = require('./LienSub')
+var LienNote = require('./LienNote')
+
 class Lien extends Parse.Object {
   constructor() {
     // Pass the ClassName to the Parse.Object constructor
@@ -136,10 +140,17 @@ class Lien extends Parse.Object {
         }
       })
     )
-    Object.keys(info).map ( (key)=>
+    Object.keys(info).map ( function(key) {
       lien.set(key,info[key])
-    )
-    return lien.save().then(function(lien) {
+    })
+    lien.subs = data.subs.map( (sub) => LienSub.init_from_json(lien, sub))
+    lien.checks = data.checks.map( (check) => LienCheck.init_from_json(lien, check))
+    lien.annotations = data.annotations.map( (note) => LienNote.init_from_json(lien, note))
+    return lien
+  }
+
+  save_json() {
+    return this.save().then(function(lien) {
       lien.set('subs', data.subs.map( (sub) => LienSub.init_from_json(lien, sub)) )
       lien.set('checks', data.checks.map( (check) => LienCheck.init_from_json(lien, check)) )
       lien.set('annotations', data.annotations.map( (note) => LienNote.init_from_json(lien, note)) )
@@ -149,113 +160,13 @@ class Lien extends Parse.Object {
       lien.error = error
       return lien
     })
-
   }
 }
 
-class LienCheck extends Parse.Object {
-  constructor() {
-    super('LienCheck');
-  }
-  static init_from_json(lien, data) {
-    var check = new LienCheck()
-    check.set("lien", lien);
-
-    data = JSON.parse(JSON.stringify(data), ( (k,v) => {
-        var number_types = ['check_amount']
-        var date_types = ['check_date', 'deposit_date']
-        var calc_types = ['check_interest', 'check_principal', 'dif']
-        if(number_types.includes(k)){
-          return accounting.unformat(data[k], ".")
-        }else if(date_types.includes(k)) {
-          return new Date(data[k])
-        }else if(calc_types.includes(k)) {
-          return ""
-        } else {
-           return v
-        }
-      })
-    )
-
-    Object.keys(data).map ( (key)=>
-      check.set(key,data[key])
-    )
-
-    return check
-  }
-}
-class LienSub extends Parse.Object {
-  constructor() {
-    super('LienSub');
-  }
-
-  interest() {
-    var lien = this.get('lien')
-    var sub_total_before = lien.total_subs_before_sub(this)
-    var cert_fv = lien.get('cert_fv')
-    var sub_amount = this.get('amount')
-
-    var interest = 0
-    var days = lien.redeem_days(this.get('sub_date'))
 
 
-    if (sub_total_before + cert_fv >= 1500) {
-      interest = this.get('amount') * (days/365) * 0.18
-    } else {
-      if (sub_total_before + cert_fv + sub_amount <= 1500) {
-        interest = this.get('amount') * (days/365) * 0.08
-      } else {
-        var low_interest = 1500 - (cert_fv + sub_amount)
-        var high_interst = sub_amount - low_interest
-
-        interest = low_interest * (days/365) * 0.08 + high_interst * (days/365) * 0.18
-      }
-    }
-
-    return interest
-  }
-  static init_from_json(lien, data) {
-    var sub = new LienSub()
-    sub.set("lien", lien);
-
-    data = JSON.parse(JSON.stringify(data), ( (k,v) => {
-        var number_types = ['check_amount']
-        var date_types = ['sub_date', 'check_date']
-        var calc_types = ['interest']
-        if(number_types.includes(k)){
-          return accounting.unformat(data[k], ".")
-        }else if(date_types.includes(k)) {
-          return new Date(data[k])
-        }else if(calc_types.includes(k)) {
-          return ""
-        } else {
-           return v
-        }
-      })
-    )
-
-    Object.keys(data).map ( (key)=>
-      sub.set(key,data[key])
-    )
-
-    return sub
-  }
-}
-class LienNote extends Parse.Object {
-  constructor() {
-    super('LienNote');
-  }
-  static init_from_json(lien, data) {
-    var note = new LienNote()
-    note.set("lien", lien);
-    return note
-  }
-}
 
 // After specifying the Lien subclass...
 Parse.Object.registerSubclass('Lien', Lien);
-Parse.Object.registerSubclass('LienCheck', LienCheck);
-Parse.Object.registerSubclass('LienSub', LienSub);
-Parse.Object.registerSubclass('LienNote', LienNote);
 
 module.exports = Lien

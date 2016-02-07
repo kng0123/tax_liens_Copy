@@ -26,5 +26,12 @@
 
 <!-- React latest-->
 <script src="/js/bundle.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  injectTapEventPlugin()
+  element = React.createElement(App.Root)
+  ReactDOM.render(element, $("#content")[0]);
+})
+</script>
 </body>
 </html>

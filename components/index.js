@@ -2,7 +2,8 @@
 global.$ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
-global._ = require('underscore')
+require('babel-polyfill')
+// global._ = require('underscore')
 global.React = React;
 global.ReactDOM = ReactDOM;
 
@@ -25,29 +26,33 @@ global.Recompose = require('recompose')
 global.moment = require('moment')
 global.tv4 = require('tv4')
 global.Parse = require('./parse')
+global.ParseReact = require('parse-react')
 global.moment = require('moment')
 global.XLSX = require('xlsx-browserify-shim');
 global.PlainEditable = require('react-plain-editable');
 global.DatePicker = require('react-datepicker');
-if (process.env.BROWSER) {
-  require('./app.css')
-}
+
+// if (process.env.BROWSER) {
+//TODO: HOw do we parse this only for the browser builds?
+require('./app.css')
+// }
 
 
 Parse.initialize("4jhLXmNyrqVvhHBfYpAR5wtNtqTLY6o0kt10dICm", "w0DVkEdklERduqzIVTWpUU3hIpn7uUpi58iXux9F");
 
 injectTapEventPlugin = require("react-tap-event-plugin");
 global.MUI = require('material-ui');
-MUI.Libs = {};
-MUI.Libs.Menu = require('material-ui/lib/menus/menu');
-MUI.Libs.MenuItem = require('material-ui/lib/menus/menu-item');
-MUI.Libs.MenuDivider = require('material-ui/lib/menus/menu-divider');
+MUI.Libs = {
+  Menu: require('material-ui/lib/menus/menu'),
+  MenuItem: require('material-ui/lib/menus/menu-item'),
+  MenuDivider: require('material-ui/lib/menus/menu-divider'),
+  SvgIcons: require('material-ui/lib/svg-icons')
 
-MUI.Libs.SvgIcons = require('material-ui/lib/svg-icons');
+};
 
 global.ReactRouter = require("react-router");
-global.App = {}
-
-global.Lien = require('./classes/lien.js')
-
-require('./app.coffee')
+global.App = {
+  Models: require('./classes'),
+  Utils: require('./utils'),
+}
+require('./app.coffee')(App)

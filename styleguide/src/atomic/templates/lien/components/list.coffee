@@ -5,7 +5,7 @@ Templates.lien_list = React.createClass
     liens: []
 
   componentWillMount: ->
-    query = new Parse.Query(Lien);
+    query = new Parse.Query(App.Models.Lien);
     query.find({
     	success : (results) =>
         @setState liens:results

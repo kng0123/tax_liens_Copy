@@ -5,7 +5,7 @@ Templates.lien = React.createClass
     lien: undefined
 
   componentWillMount: ->
-    query = new Parse.Query(Lien);
+    query = new Parse.Query(App.Models.Lien);
     query.equalTo("unique_id", this.props.routeParams.id)
     query.include("subs")
     query.include("checks")
