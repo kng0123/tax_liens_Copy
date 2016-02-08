@@ -29,9 +29,13 @@ Templates.lien = React.createClass
       lien.set(item.key, val)
       @setState(lien:lien)
 
+  save: ->
+    @state.lien.save()
+
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
+    RaisedButton = React.createFactory MUI.RaisedButton
 
     lien = @state.lien
     if !lien
@@ -43,7 +47,10 @@ Templates.lien = React.createClass
           Factory.lien_search @props
       div className:'row',
         div className:'col-lg-12',
-          h1 null, "LIEN #{@state.lien.get('unique_id')}"
+          div className:'container-fluid',
+            h1 null, "LIEN #{@state.lien.get('unique_id')}"
+            RaisedButton label:"Save", onClick:@save, type:'button', disabled:!lien.dirty(), primary:true
+
       if @state.lien
         div className:'row',
           div className:'col-md-6',
