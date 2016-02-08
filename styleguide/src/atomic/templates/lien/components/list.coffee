@@ -5,12 +5,36 @@ Templates.lien_list = React.createClass
     liens: []
 
   componentWillMount: ->
+    @queryLiens(@props)
+
+  componentWillReceiveProps: (props)->
+    @queryLiens(props)
+
+  queryLiens: (props)->
+    query_params = props.router.location.query
     query = new Parse.Query(App.Models.Lien);
+    if query_params.id
+      query.equalTo("unique_id", query_params.id)
+    else if query_params.block
+      query.equalTo("block", query_params.block)
+      query.equalTo("lot", query_params.lot) if query_params.lot
+      query.equalTo("qualifier", query_params.qualifier) if query_params.qualifier
+    else if query_params.cert
+      query.equalTo("cert_number", query_params.cert)
+    else if query_params.sale_year
+      year = parseInt(query_params.sale_year)
+      query.greaterThan("sale_date", moment([year, 0]).toDate());
+      query.lessThan("sale_date", moment([year+1, 0]).toDate());
+    else if query_params.township
+      query.contains("county", query_params.township)
+
+    #TODO What to do with case #?
     query.find({
     	success : (results) =>
         @setState liens:results
     	,
     	error : (obj, error) ->
+        
     })
 
   goToLien: (indices) ->
@@ -60,19 +84,24 @@ Templates.lien_list = React.createClass
           TableHeaderColumn null, "Status"
       TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows,
         @state.liens.map (v, k) ->
-          TableRow key:v.id,
+          TableRow key:k,
             TableRowColumn null, v.get('unique_id')
             TableRowColumn null, 'Data'
             TableRowColumn null, 'Data'
 
-    div className:'container',
-      div className:'row',
-        div className:'col-lg-12',
-          RaisedButton label:"Upload", onClick:@goToUpload, type:'button', primary:true
+    div null,
+      div className:'container-fluid',
+        div className:'row',
+          div className:'col-lg-12',
+            Factory.lien_search @props
+      div className:'container',
+        div className:'row',
+          div className:'col-lg-12',
+            RaisedButton label:"Upload", onClick:@goToUpload, type:'button', primary:true
 
-      div className:'row',
-        div className:'col-lg-12',
-          if @state.liens.length
-            table
-          else
-            p null, "No liens found. Try uploading some."
+        div className:'row',
+          div className:'col-lg-12',
+            if @state.liens.length
+              table
+            else
+              p null, "No liens found. Try uploading some."

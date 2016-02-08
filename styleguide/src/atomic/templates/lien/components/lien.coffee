@@ -37,6 +37,28 @@ Templates.lien = React.createClass
     if !lien
       return div null, ""
 
+    div className:'container-fluid',
+      div className:'row',
+        div className:'col-lg-12',
+          Factory.lien_search @props
+      div className:'row',
+        div className:'col-lg-12',
+          h1 null, "LIEN #{@state.lien.get('unique_id')}"
+      if @state.lien
+        div className:'row',
+          div className:'col-md-6',
+            Factory.lien_general lien:lien, onChange:@onChange
+          div className:'col-md-6',
+            Factory.lien_subs lien:lien
+          div className:'col-md-12',
+            Factory.lien_checks lien:lien
+      else
+        div null, ""
+
+Templates.lien_general = React.createClass
+  displayName: 'LienGeneral'
+
+  render: ->
     #First column from excel GUI
     general_fields = [
       {label: "Lien ID", key:"unique_id"}
@@ -84,15 +106,89 @@ Templates.lien = React.createClass
       #TODO where are notes?
       {label: "Notes", key:"notes"}
     ]
+    lien = @props.lien
 
+    editable = React.createFactory PlainEditable
+    date_picker = React.createFactory DatePicker
+    checkbox = React.createFactory MUI.Checkbox
+    gen_editable = (key, item, val) =>
+      edit = switch(item.type)
+        when 'date' then date_picker selected:moment(val), onChange:@props.onChange(item)
+        when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
+        else
+          if item.editable
+            editable onBlur:@props.onChange(item), value:val
+          else
+            span style:{paddingLeft:'15px'}, val
+      li key:key, className:'list-group-item',
+        div null,
+          span null, item.label
+
+        div null,
+          if ['date', 'bool'].indexOf(item.type) == -1
+            span style:{position:'absolute'},
+              if item.editable
+                i className:"fa fa-pencil"
+              else
+                i className:"fa fa-times-circle"
+          edit
+
+    {div, h3, h1, ul, li, span, i, p} = React.DOM
+    div className:'container-fluid',
+      div className:'row',
+        div className:'col-md-6',
+          div className:'panel panel-default',
+            div className:'panel-heading',
+              h3 className:'panel-title', "General"
+            div className:'panel-body',
+              ul className:'list-group',
+                general_fields.map (v, k) ->
+                  val = if lien.get(v.key) is undefined
+                    ""
+                  else
+                    lien.get(v.key)
+                  if val instanceof Date
+                    val = moment(val).format('MM/DD/YYYY');
+                  if typeof val is 'number'
+                    val = val.toString()
+                  if v.is_function
+                    val = lien[v.key]().toString()
+                  gen_editable(k, v, val)
+
+        div className:'col-md-6',
+          div className:'panel panel-default',
+            div className:'panel-heading',
+              h3 className:'panel-title', "Fees"
+            div className:'panel-body',
+              ul className:'list-group',
+                fee_fields.map (v, k) ->
+                  val = if lien.get(v.key) is undefined
+                    ""
+                  else
+                    lien.get(v.key)
+                  if val instanceof Date
+                    val = moment(val).format('MM/DD/YYYY');
+                  if typeof val is 'number'
+                    val = val.toString()
+                  if v.is_function
+                    val = lien[v.key]().toString()
+                  gen_editable(k, v, val)
+
+Templates.lien_subs = React.createClass
+  displayName: 'LienSubs'
+
+  render: ->
+    {div, h3, h1, ul, li, span, i, p} = React.DOM
+    Factory = React.Factory
     #Third column from excel gui
     #lien.subs = [{type:'check'}, {type:'check'}]
-    subs_fields = [
-      #TODO What does this select
-      {label: "LIEN STATUS", key:"status"}
-      #TODO What does this toggle
-      {label: "DON'T PAY SUBS", key:"unique_id"}
-    ]
+    lien = @props.lien
+    # subs_fields = [
+    #   #TODO What does this select
+    #   {label: "LIEN STATUS", key:"status"}
+    #   #TODO What does this toggle
+    #   {label: "DON'T PAY SUBS", key:"unique_id"}
+    # ]
 
 
     sub_headers = ["TYPE", "DATE", "AMT", "INT", "#", "VOID", "DATE", ""]
@@ -109,6 +205,26 @@ Templates.lien = React.createClass
       ]
     sub_table = Factory.table headers: sub_headers, rows: sub_rows
 
+    div className:'panel panel-default',
+      div className:'panel-heading',
+        h3 className:'panel-title', "Subsequents"
+      div className:'panel-body',
+        ul className:'list-group',
+          # subs_fields.map (v, k) ->
+          #   li key:k, className:'list-group-item',
+          #     span className:'badge', lien[v.key]
+          #     span null, v.label
+          sub_table
+
+Templates.lien_checks = React.createClass
+  displayName: 'LienChecks'
+
+  render: ->
+    {div, h3, h1, ul, li, span, i, p} = React.DOM
+    Factory = React.Factory
+    #Third column from excel gui
+    #lien.subs = [{type:'check'}, {type:'check'}]
+    lien = @props.lien
     receipt_headers = ["DEPOSIT DATE", "ACCOUNT", "CHECK DATE", "CHECK #", "REDEEM DATE", "CHECK AMOUNT", "PRINCIPAL", "SUBS PRINCIPAL", "CODE", "EXPECTED AMOUNT", "DIF", "NOTE"]
     receipt_rows = lien.get('checks').map (v, k) ->
       [
@@ -127,97 +243,9 @@ Templates.lien = React.createClass
       ]
     receipt_table = Factory.table headers: receipt_headers, rows: receipt_rows
 
-    editable = React.createFactory PlainEditable
-    date_picker = React.createFactory DatePicker
-    checkbox = React.createFactory MUI.Checkbox
-    gen_editable = (key, item, val) =>
-      edit = switch(item.type)
-        when 'date' then date_picker selected:moment(val), onChange:@onChange(item)
-        when 'bool' then checkbox onCheck: @onChange(item), checked:!!val
-        else
-          if item.editable
-            editable onBlur:@onChange(item), value:val
-          else
-            span style:{paddingLeft:'15px'}, val
-      li key:key, className:'list-group-item',
-        div null,
-          span null, item.label
-
-        div null,
-          if ['date', 'bool'].indexOf(item.type) == -1
-            span style:{position:'absolute'},
-              if item.editable
-                i className:"fa fa-pencil"
-              else
-                i className:"fa fa-times-circle"
-          edit
-
-
-
-    div className:'container-fluid',
-      div className:'row',
-        div className:'col-lg-12',
-          h1 null, "LIEN #{@state.lien.get('unique_id')}"
-      if @state.lien
-        div className:'row',
-          div className:'col-md-3',
-            div className:'panel panel-default',
-              div className:'panel-heading',
-                h3 className:'panel-title', "General"
-              div className:'panel-body',
-                ul className:'list-group',
-                  general_fields.map (v, k) ->
-                    val = if lien.get(v.key) is undefined
-                      ""
-                    else
-                      lien.get(v.key)
-                    if val instanceof Date
-                      val = moment(val).format('MM/DD/YYYY');
-                    if typeof val is 'number'
-                      val = val.toString()
-                    if v.is_function
-                      val = lien[v.key]().toString()
-                    gen_editable(k, v, val)
-
-
-          div className:'col-md-3',
-            div className:'panel panel-default',
-              div className:'panel-heading',
-                h3 className:'panel-title', "Fees"
-              div className:'panel-body',
-                ul className:'list-group',
-                  fee_fields.map (v, k) ->
-                    val = if lien.get(v.key) is undefined
-                      ""
-                    else
-                      lien.get(v.key)
-                    if val instanceof Date
-                      val = moment(val).format('MM/DD/YYYY');
-                    if typeof val is 'number'
-                      val = val.toString()
-                    if v.is_function
-                      val = lien[v.key]().toString()
-                    gen_editable(k, v, val)
-
-
-          div className:'col-md-6',
-            div className:'panel panel-default',
-              div className:'panel-heading',
-                h3 className:'panel-title', "Subsequents"
-              div className:'panel-body',
-                ul className:'list-group',
-                  subs_fields.map (v, k) ->
-                    li key:k, className:'list-group-item',
-                      span className:'badge', lien[v.key]
-                      span null, v.label
-                  sub_table
-
-          div className:'col-md-12',
-            div className:'panel panel-default',
-              div className:'panel-heading',
-                h3 className:'panel-title', "Receipts"
-              div className:'panel-body',
-                ul className:'list-group',
-                  receipt_table
-      else
-        div null, ""
+    div className:'panel panel-default',
+      div className:'panel-heading',
+        h3 className:'panel-title', "Receipts"
+      div className:'panel-body',
+        ul className:'list-group',
+          receipt_table

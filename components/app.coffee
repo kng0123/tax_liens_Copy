@@ -12,6 +12,23 @@ module.exports = (app) ->
         when 'USER_CHANGE' then Object.assign({}, user)
         when 'USER_UNSET' then {}
         else state
+
+    search: (state, action) ->
+      if !state
+        return {
+          block: '',
+          lot: '',
+          qualifier: '',
+          cert: '',
+          sale_year: '',
+          township: '',
+          case: '',
+          id: ''
+        }
+      
+      switch action.type
+        when 'INIT_SEARCH' then Object.assign({}, state, action.data)
+        else state
     auth_link: (state, action) ->
       if !state
         return {}

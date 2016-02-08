@@ -92,7 +92,7 @@ class Lien extends Parse.Object {
 
   cert_interest() {
     if (!this.get('redemption_date')) {
-      return
+      return 0
     }
     var days = this.redeem_days()
 
