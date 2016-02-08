@@ -143,6 +143,12 @@ class Lien extends Parse.Object {
     Object.keys(info).map ( function(key) {
       lien.set(key,info[key])
     })
+    //TODO: Lien defaults
+    if(!lien.get('search_fee')) {
+      lien.set('search_fee', 12)
+    }
+    lien.set('2013_yep', 0)
+    lien.set('yep_int', 0)
     lien.subs = data.subs.map( (sub) => LienSub.init_from_json(lien, sub))
     lien.checks = data.checks.map( (check) => LienCheck.init_from_json(lien, check))
     lien.annotations = data.annotations.map( (note) => LienNote.init_from_json(lien, note))
