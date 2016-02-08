@@ -4,6 +4,22 @@ class LienCheck extends Parse.Object {
   constructor() {
     super('LienCheck');
   }
+
+  expected_amount() {
+    var type = this.get('type')
+    //TODO Sub Payment Only
+    //TODO MISC
+    //TODO SOLD
+    if(type == 'Combined') {
+      return this.get('lien').expected_amount()
+    } else if (type == 'Cert Only') {
+      return this.get('lien').expected_amount() - this.get('lien').get('premium')
+    } else if (type == 'Premium Only') {
+      return this.get('lien').get('premium')
+    }
+    return 0
+  }
+
   static init_from_json(lien, data) {
     var check = new LienCheck()
     check.set("lien", lien);

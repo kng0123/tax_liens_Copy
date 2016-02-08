@@ -245,9 +245,9 @@ Templates.lien_checks = React.createClass
         v.get('check_amount')
         v.get('check_principal')
         v.get('check_interest')
-        "code"
-        "expected"
-        "dif"
+        v.get('type')
+        v.expected_amount()
+        v.expected_amount() - v.get('check_amount')
         "note"
       ]
     receipt_table = Factory.table headers: receipt_headers, rows: receipt_rows
