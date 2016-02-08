@@ -30,7 +30,9 @@ Templates.lien = React.createClass
       @setState(lien:lien)
 
   save: ->
-    @state.lien.save()
+    @state.lien.save().then (data) =>
+      @setState(lien:data)
+    .fail () ->
 
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
