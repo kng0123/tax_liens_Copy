@@ -22,7 +22,7 @@ Templates.table = React.createClass
       adjustForCheckbox: false,
       deselectOnClickaway: false,
       displayRowCheckbox: false,
-      height: '600px',
+      height: @props.height || '600px',
     };
 
     table_props =

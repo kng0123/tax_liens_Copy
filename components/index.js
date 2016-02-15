@@ -17,6 +17,7 @@ global.ReduxRx = require('redux-rx')
 global.Select = require('react-select')
 global.classNames = require('classnames');
 global.Rx = require('rx')
+global.Select = require('react-select')
 global.RxReact = require('rx-react');
 global.RxRecompose = require('meteor-recompose');
 global.observeProps = RxRecompose.observeProps;

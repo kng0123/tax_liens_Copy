@@ -63,6 +63,9 @@ class Lien extends Parse.Object {
     }, 0)
   }
   diff() {
+    if (!this.get('redemption_date')) {
+      return 0
+    }
     return this.expected_amount() -this.total_check()
   }
 

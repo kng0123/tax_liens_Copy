@@ -25,7 +25,7 @@ module.exports = (app) ->
           case: '',
           id: ''
         }
-      
+
       switch action.type
         when 'INIT_SEARCH' then Object.assign({}, state, action.data)
         else state
@@ -92,6 +92,7 @@ module.exports = (app) ->
           Route path:'lien', component:conn(Templates.document),
             IndexRoute component:conn(Templates.lien_list)
             Route path:'upload', component:conn(Templates.lien_upload)
+            Route path:'subs', component:conn(Templates.lien_process_subs)
             Route path:'item/:id', component:conn(Templates.lien)
             # Route path:'forgot_password', component:conn(Templates.forgot_password)
 
