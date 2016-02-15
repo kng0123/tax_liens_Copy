@@ -23,8 +23,8 @@ Templates.lien_process_subs = React.createClass
     )
 
   render: ->
-    if true || @state.township and @state.date
-      React.Factory.lien_process_subs_list date:@state.date, township:'Atlantic City', goBack:@goBack
+    if @state.township and @state.date
+      React.Factory.lien_process_subs_list date:@state.date, township:@state.township, goBack:@goBack
     else
       React.Factory.lien_process_subs_form setSubs:@setSubs
 

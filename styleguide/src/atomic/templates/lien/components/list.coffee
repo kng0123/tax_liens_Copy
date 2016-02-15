@@ -34,7 +34,7 @@ Templates.lien_list = React.createClass
         @setState liens:results
     	,
     	error : (obj, error) ->
-        
+
     })
 
   goToLien: (indices) ->
@@ -43,6 +43,9 @@ Templates.lien_list = React.createClass
 
   goToUpload: () ->
     @props.dispatch(ReduxRouter.pushState(null, '/lien/upload'))
+
+  goToSubs: () ->
+    @props.dispatch(ReduxRouter.pushState(null, '/lien/subs'))
 
   render: ->
     {div, h3, h1, p} = React.DOM
@@ -98,6 +101,7 @@ Templates.lien_list = React.createClass
         div className:'row',
           div className:'col-lg-12',
             RaisedButton label:"Upload", onClick:@goToUpload, type:'button', primary:true
+            RaisedButton label:"Batch Subs", onClick:@goToSubs, type:'button', primary:false
 
         div className:'row',
           div className:'col-lg-12',
