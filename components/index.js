@@ -6,6 +6,9 @@ require('babel-polyfill')
 // global._ = require('underscore')
 global.React = React;
 global.ReactDOM = ReactDOM;
+let {FactoryPanda, FactoryDefinition} = require('factory-panda');
+global.FactoryPanda = FactoryPanda
+global.FactoryDefinition=FactoryDefinition
 
 global.Redux = require("redux")
 global.ReactRedux = require("react-redux")

@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'public/js/bundle.js',
-
+      'spec/factory/**/*.js',
       'spec/**/*Spec.js',
 
       { pattern: 'spec/support/files/*', watched: true, served: true, included: false },
@@ -31,8 +31,22 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'spec/factory/**/*.js': ['babel']
     },
 
+    babelPreprocessor: {
+      options: {
+        presets: ['es2015'],
+        sourceMap: 'inline'
+      },
+      filename: function (file) {
+        console.log(file);
+        return file.originalPath.replace(/\.js$/, '.es5.js');
+      },
+      sourceFileName: function (file) {
+        return file.originalPath;
+      }
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
