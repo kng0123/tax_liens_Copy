@@ -40,7 +40,6 @@ module.exports = function(config) {
         sourceMap: 'inline'
       },
       filename: function (file) {
-        console.log(file);
         return file.originalPath.replace(/\.js$/, '.es5.js');
       },
       sourceFileName: function (file) {
