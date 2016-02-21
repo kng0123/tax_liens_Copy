@@ -67,17 +67,17 @@ describe('Lien', function() {
 
     describe('Total interest due', function() {
       it('should be Flat Rate + Certificate Interest + Sub Interest + YEP Interest', function() {
-        expect(true).toBe(false)
+        expect(lien.total_interest_due()).toBe(524)
       })
     })
     describe('Expected Amount', function() {
       it('should be Total Cash Out + Total Interest Due + Search Fee', function() {
-        expect(true).toBe(false)
+        expect(lien.expected_amount()).toBe(5574)
       })
     })
     describe('Difference', function() {
       it('should be Expected Amount – Redemption Amount', function() {
-        expect(true).toBe(false)
+        expect(lien.diff()).toBe(5574)
       })
     })
   })

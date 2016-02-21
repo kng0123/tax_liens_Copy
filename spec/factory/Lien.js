@@ -35,6 +35,8 @@ FactoryPanda.define('lien', Lien, class LienFactory extends FactoryDefinition {
 
     instance.set("cert_int", options.cert_int || 0);
     instance.set("redeem_in_10", options.redeem_in_10 || false)
+    instance.set('subs', [])
+    instance.set('checks', [])
     super.build(instance, traits, options);
     return instance
   }
