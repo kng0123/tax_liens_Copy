@@ -31,6 +31,23 @@ describe('LienSub', function() {
         expect(lien.get('subs')[2].interest()).toBe(180)
       })
     })
+  })
 
+  describe('Batch operations', function() {
+    describe('Generate report to send to townships', function() {
+      it('should be written', function() {
+        expect(false).toBeTruthy()
+      })
+    })
+    describe('Export to Excel of subs', function() {
+      it('should be written', function() {
+        expect(false).toBeTruthy()
+      })
+    })
+    describe('Remove subs by batch', function() {
+      it('should be written', function() {
+        expect(false).toBeTruthy()
+      })
+    })
   })
 })

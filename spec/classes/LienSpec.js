@@ -81,4 +81,12 @@ describe('Lien', function() {
       })
     })
   })
+
+  describe('total outstanding balance per lien as of a certain date', function() {
+    it('should be written', function() {
+      expect(false).toBeTruthy()
+    })
+  })
+
+
 })

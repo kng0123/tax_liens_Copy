@@ -14,4 +14,15 @@ describe('LienCheck', function() {
     expect(check.get('lien')).toBeTruthy()
   })
 
+  describe('dif by receipt code', function() {
+    it('should be written', function() {
+      expect(false).toBeTruthy()
+    })
+  })
+
+  describe('Ability to export all receipts by date ranges', function() {
+    it('should be written', function() {
+      expect(false).toBeTruthy()
+    })
+  })
 })
