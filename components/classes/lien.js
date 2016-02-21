@@ -168,6 +168,12 @@ class Lien extends Parse.Object {
       return lien
     })
   }
+
+  add_check(check) {
+    var checks = this.get('checks')
+    checks.push(check)
+    this.set('checks', checks)
+  }
 }
 
 
