@@ -56,6 +56,8 @@ MUI.Libs = {
 };
 
 global.ReactRouter = require("react-router");
+//TODO: If we require inside an object we're not picking up changes
+require('./classes');
 global.App = {
   Models: require('./classes'),
   Utils: require('./utils'),
