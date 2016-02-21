@@ -48,7 +48,7 @@ class Lien extends Parse.Object {
     var subs_paid = this.get('subs').reduce((total, sub)=>{
       return total+sub.get('amount')
     }, 0)
-    return cert_fv+premium+recording_fee+subs_paid
+    return cert_fv+premium+recording_fee+subs_paid+this.get('search_fee')
   }
   //TODO: What is YEP
   total_interest_due() {

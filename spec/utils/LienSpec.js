@@ -42,4 +42,43 @@ describe('Lien', function() {
       expect(lien.cert_interest()).toBe(interest);
     })
   })
+
+  describe('Totals', function() {
+    let lien = undefined;
+    beforeEach(function() {
+      var options = {
+        winning_bid: 10,
+        cert_fv: 200,
+        premium: 1000,
+        recording_fee: 300,
+        search_fee: 50,
+        redemption_date: moment().add(365, 'days').toDate(),
+        sale_date: moment().toDate(),
+        sub_amounts: [500, 2000, 1000]
+      };
+      lien = FactoryPanda.build('lien', ['with_subs'], options);
+    })
+    describe('Total cash out', function() {
+      //TODO: Where are legal fees?
+      it('should be FV + Premium + Recording Fee + ALL Subs Paid + Legal Fees', function() {
+        expect(lien.total_cash_out()).toBe(5000);
+      })
+    })
+
+    describe('Total interest due', function() {
+      it('should be Flat Rate + Certificate Interest + Sub Interest + YEP Interest', function() {
+        expect(true).toBe(false)
+      })
+    })
+    describe('Expected Amount', function() {
+      it('should be Total Cash Out + Total Interest Due + Search Fee', function() {
+        expect(true).toBe(false)
+      })
+    })
+    describe('Difference', function() {
+      it('should be Expected Amount – Redemption Amount', function() {
+        expect(true).toBe(false)
+      })
+    })
+  })
 })
