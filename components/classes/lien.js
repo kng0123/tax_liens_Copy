@@ -74,8 +74,6 @@ class Lien extends Parse.Object {
       return total + sub.interest()
     }, 0)
   }
-  // Flat Rate + Certificate Interest + Sub Interest + YEP Interest
-
 
   redeem_days(date) {
     if(!date) {
@@ -111,7 +109,7 @@ class Lien extends Parse.Object {
     var subs = this.get('subs')
     var total = subs.reduce((prev, curr)=>{
       var sub_date = moment(curr.get('date'))
-      if(base_date < sub_date) {
+      if(sub_date < base_date) {
         prev = prev + curr.get('amount')
       }
       return prev

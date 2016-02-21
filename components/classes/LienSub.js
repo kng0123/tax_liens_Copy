@@ -14,17 +14,15 @@ class LienSub extends Parse.Object {
     var interest = 0
     var days = lien.redeem_days(this.get('sub_date'))
 
-
     if (sub_total_before + cert_fv >= 1500) {
       interest = this.get('amount') * (days/365) * 0.18
     } else {
       if (sub_total_before + cert_fv + sub_amount <= 1500) {
         interest = this.get('amount') * (days/365) * 0.08
       } else {
-        var low_interest = 1500 - (cert_fv + sub_amount)
-        var high_interst = sub_amount - low_interest
-
-        interest = low_interest * (days/365) * 0.08 + high_interst * (days/365) * 0.18
+        var low_interest = 1500 - (cert_fv + sub_total_before)
+        var high_interest = sub_amount - low_interest
+        interest = low_interest * (days/365) * 0.08 + high_interest * (days/365) * 0.18
       }
     }
 

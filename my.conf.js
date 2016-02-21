@@ -16,8 +16,9 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'public/js/bundle.js',
-      'spec/factory/**/*.js',
       'spec/**/*Spec.js',
+      'spec/factory/**/*.js',
+
 
       { pattern: 'spec/support/files/*', watched: true, served: true, included: false },
     ],
@@ -31,7 +32,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'spec/factory/**/*.js': ['babel']
+      'spec/factory/**/*.js': ['babel'],
+      'spec/**/*Spec.js':['babel']
     },
 
     babelPreprocessor: {
