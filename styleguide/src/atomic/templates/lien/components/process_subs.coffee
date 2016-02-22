@@ -72,7 +72,7 @@ Templates.lien_process_subs_list = React.createClass
     })
 
   onChange: (lien, type, sub) ->
-    return (event) ->
+    return (event) =>
       val = $(event.target).text()
       if sub
         sub.set('amount', parseFloat(val))
