@@ -21,7 +21,10 @@ DumbTemplates.header = React.createClass
     ToolbarTitle = React.createFactory MUI.ToolbarTitle
 
     Toolbar style:{marginBottom:'10px'},
-      ToolbarTitle text:'TTG Lien'
+      ToolbarGroup null,
+        ToolbarTitle text:'TTG Lien'
+      ToolbarGroup null,
+        link style:{lineHeight:'56px'}, to:'/', 'Home'
       ToolbarGroup float:'right',
         ToolbarSeparator null
         if logged_in
