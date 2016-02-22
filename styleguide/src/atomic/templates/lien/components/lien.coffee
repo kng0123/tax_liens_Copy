@@ -51,10 +51,10 @@ Templates.lien = React.createClass
       div className:'row',
         div className:'col-lg-12',
           Factory.lien_search @props
-      div className:'row',
-        div className:'col-lg-12',
-          div className:'container-fluid',
-            h1 null, "LIEN #{@state.lien.get('unique_id')}"
+      # div className:'row',
+      #   div className:'col-lg-12',
+      #     div className:'container-fluid',
+      #       h1 null, "LIEN #{@state.lien.get('unique_id')}"
 
       if @state.lien
         div className:'row',
@@ -128,80 +128,76 @@ Templates.lien_general = React.createClass
     gen_editable = (key, item, val) =>
       edit = switch(item.type)
         when 'date'
-          div style:{display: 'block', position: 'relative', width: '150px'},
+          div style:{display: 'block', position: 'relative', width: '100px'},
             date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
         when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
         when 'number'
           val = accounting.toFixed(val, 2)
           if item.editable
-            span style:{display:'inline-block', minWidth:'40px', paddingLeft:'15px'},
+            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
                 editable onBlur:@props.onChange(item), value:val
           else
-            span style:{paddingLeft:'15px'}, val
+            span style:{paddingRight:'15px'}, val
         else
           if item.editable
-            span style:{display:'inline-block', minWidth:'40px', paddingLeft:'15px'},
+            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
               editable onBlur:@props.onChange(item), value:val
           else
-            span style:{paddingLeft:'15px'}, val
-      li key:key, className:'list-group-item',
+            span style:{paddingRight:'10px'}, val
+      li key:key, className:'list-group-item compact',
 
         div style:{float:'left'},
           span null, item.label
 
         div style:{float:'right'},
+          edit
           if ['date', 'bool'].indexOf(item.type) == -1
             span style:{position:'absolute'},
               if item.editable
                 i className:"fa fa-pencil"
               else
                 i className:"fa fa-times-circle"
-          edit
         div style:{clear:'both'}, ""
 
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     div className:'container-fluid',
       div className:'row',
-        div className:'col-md-6',
+        div className:'col-md-12',
           div className:'panel panel-default',
             div className:'panel-heading',
               h3 className:'panel-title', "General"
             div className:'panel-body',
-              ul className:'list-group',
-                general_fields.map (v, k) ->
-                  val = if lien.get(v.key) is undefined
-                    ""
-                  else
-                    lien.get(v.key)
-                  if val instanceof Date
-                    val = moment(val).format('MM/DD/YYYY');
-                  if typeof val is 'number'
-                    val = val.toString()
-                  if v.is_function
-                    val = lien[v.key]().toString()
-                  gen_editable(k, v, val)
-                li className:'list-group-item',
-                  React.Factory.lien_llcs lien:lien
+              div style:{width:'50%', float:'left'},
+                ul className:'list-group',
+                  general_fields.map (v, k) ->
+                    val = if lien.get(v.key) is undefined
+                      ""
+                    else
+                      lien.get(v.key)
+                    if val instanceof Date
+                      val = moment(val).format('MM/DD/YYYY');
+                    if typeof val is 'number'
+                      val = val.toString()
+                    if v.is_function
+                      val = lien[v.key]().toString()
+                    gen_editable(k, v, val)
+                  li className:'list-group-item',
+                    React.Factory.lien_llcs lien:lien
 
-
-        div className:'col-md-6',
-          div className:'panel panel-default',
-            div className:'panel-heading',
-              h3 className:'panel-title', "Fees"
-            div className:'panel-body',
-              ul className:'list-group',
-                fee_fields.map (v, k) ->
-                  val = if lien.get(v.key) is undefined
-                    ""
-                  else
-                    lien.get(v.key)
-                  if val instanceof Date
-                    val = moment(val).format('MM/DD/YYYY');
-                  if typeof val is 'number'
-                    val = val.toString()
-                  if v.is_function
-                    val = lien[v.key]().toString()
-                  gen_editable(k, v, val)
+              div style:{width:'50%', float:'right' },
+                ul className:'list-group',
+                  fee_fields.map (v, k) ->
+                    val = if lien.get(v.key) is undefined
+                      ""
+                    else
+                      lien.get(v.key)
+                    if val instanceof Date
+                      val = moment(val).format('MM/DD/YYYY');
+                    if typeof val is 'number'
+                      val = val.toString()
+                    if v.is_function
+                      val = lien[v.key]().toString()
+                    gen_editable(k, v, val)
 
 Templates.lien_subs = React.createClass
   displayName: 'LienSubs'
@@ -241,7 +237,7 @@ Templates.lien_subs = React.createClass
         "",
         ""
       ]
-    sub_table = Factory.table headers: sub_headers, rows: sub_rows
+    sub_table = Factory.table headers: sub_headers, rows: sub_rows, height:'250px'
     select = React.createFactory Select
 
     div className:'panel panel-default',
@@ -275,7 +271,7 @@ Templates.lien_llcs = React.createClass
         moment(v.get('start')).format('MM/DD/YYYY'),
         moment(v.get('stop')).format('MM/DD/YYYY')
       ]
-    llc_table = Factory.table headers: llc_headers, rows: llc_rows, height:'200px'
+    llc_table = Factory.table headers: llc_headers, rows: llc_rows, height:'50px'
 
     llc_table
 
