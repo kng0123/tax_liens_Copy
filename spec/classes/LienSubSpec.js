@@ -33,8 +33,11 @@ describe('LienSub', function() {
     })
   })
 
+  //Subs are batched and sent to townships
+  //Townships write in the amounts and send it back to be copied
   describe('Batch operations', function() {
     describe('Generate report to send to townships', function() {
+      //Remove where sub status is redeemed or status is none
       it('should be written', function() {
         expect(false).toBeTruthy()
       })
@@ -44,6 +47,7 @@ describe('LienSub', function() {
         expect(false).toBeTruthy()
       })
     })
+    //This is to void checks that we recieve
     describe('Remove subs by batch', function() {
       it('should be written', function() {
         expect(false).toBeTruthy()

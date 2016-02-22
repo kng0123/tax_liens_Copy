@@ -127,24 +127,29 @@ Templates.lien_general = React.createClass
     checkbox = React.createFactory MUI.Checkbox
     gen_editable = (key, item, val) =>
       edit = switch(item.type)
-        when 'date' then date_picker selected:moment(val), onChange:@props.onChange(item)
+        when 'date'
+          div style:{display: 'block', position: 'relative', width: '150px'},
+            date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
         when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
         when 'number'
           val = accounting.toFixed(val, 2)
           if item.editable
-            editable onBlur:@props.onChange(item), value:val
+            span style:{display:'inline-block', minWidth:'40px', paddingLeft:'15px'},
+                editable onBlur:@props.onChange(item), value:val
           else
             span style:{paddingLeft:'15px'}, val
         else
           if item.editable
-            editable onBlur:@props.onChange(item), value:val
+            span style:{display:'inline-block', minWidth:'40px', paddingLeft:'15px'},
+              editable onBlur:@props.onChange(item), value:val
           else
             span style:{paddingLeft:'15px'}, val
       li key:key, className:'list-group-item',
-        div null,
+
+        div style:{float:'left'},
           span null, item.label
 
-        div null,
+        div style:{float:'right'},
           if ['date', 'bool'].indexOf(item.type) == -1
             span style:{position:'absolute'},
               if item.editable
@@ -152,6 +157,7 @@ Templates.lien_general = React.createClass
               else
                 i className:"fa fa-times-circle"
           edit
+        div style:{clear:'both'}, ""
 
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     div className:'container-fluid',
