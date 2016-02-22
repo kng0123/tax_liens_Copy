@@ -39,12 +39,18 @@ Templates.table = React.createClass
     table = Table table_props,
       TableHeader adjustForCheckbox:table_state.adjustForCheckbox, enableSelectAll:table_state.enableSelectAll, displayRowCheckbox:table_state.displayRowCheckbox, displaySelectAll:false,
         TableRow null,
-          headers.map (header, index) ->
-            TableHeaderColumn key:index, header
+          headers.map (header, index) =>
+            props = key:index
+            if @props.widths
+              props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
+            TableHeaderColumn props, header
 
       TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows, displayRowCheckbox:table_state.displayRowCheckbox,
-        rows.map (row, k) ->
+        rows.map (row, k) =>
           style = {padding:0, textAlign:'center'}
           TableRow key:k,
-            row.map (item, index) ->
-              TableRowColumn  key:index, style:style, item
+            row.map (item, index) =>
+              props = key:index
+              if @props.widths
+                props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
+              TableRowColumn  props, item
