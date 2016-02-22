@@ -209,7 +209,7 @@ Templates.lien_process_subs_list = React.createClass
       buf
     saveAs new Blob([ s2ab(wbout) ], type: 'application/octet-stream'), 'test.xlsx'
   render: ->
-    {div, h3, h1, input, pre} = React.DOM
+    {div, h3, h1, input, pre,p} = React.DOM
     Factory = React.Factory
 
     RaisedButton = React.createFactory MUI.RaisedButton
@@ -244,6 +244,8 @@ Templates.lien_process_subs_list = React.createClass
 
     div className:'container-fluid',
       div className:'row',
+        div className:'col-lg-12',
+          p null, "Interest for #{moment(@props.date).format('MM/DD/YYYY')}"
         div className:'col-lg-12',
           RaisedButton label:"Go back", onClick:@props.goBack, type:'button', primary:true
           RaisedButton label:"Export Excel", onClick:@exportXLSX, type:'button', primary:true
