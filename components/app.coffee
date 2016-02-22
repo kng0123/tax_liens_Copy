@@ -43,10 +43,10 @@ module.exports = (app) ->
       action(store.dispatch, store.getState)
     else
       next(action)
-
+  
   app.store = store = Redux.compose(
     Redux.applyMiddleware(thunk),
-    ReduxRouter.reduxReactRouter(ReactHistory),
+      ReduxRouter.reduxReactRouter({createHistory: ReactHistory.createHashHistory}),
     ReduxDevtools.devTools()
   )(Redux.createStore)(reducer)
 
