@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'public/js/bundle.js',
+      { pattern: 'public/js/bundle.js', watched: true},
       'spec/**/*Spec.js',
       'spec/factory/**/*.js',
 

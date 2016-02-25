@@ -1,5 +1,6 @@
 {Action, Templates, SmartTemplates} = require('./script.coffee')
 
+
 module.exports = (app) ->
   global.SmartTemplates = SmartTemplates
   reducer = Redux.combineReducers(
@@ -43,7 +44,7 @@ module.exports = (app) ->
       action(store.dispatch, store.getState)
     else
       next(action)
-  
+
   app.store = store = Redux.compose(
     Redux.applyMiddleware(thunk),
       ReduxRouter.reduxReactRouter({createHistory: ReactHistory.createHashHistory}),
