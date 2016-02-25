@@ -67,15 +67,7 @@ const Form = React.createClass({
            value="Bob"
            floatingLabelText="Name"
           />
-          <FormsyText
-           name='namesd'
-           validations='isWords'
-           validationError={wordsError}
-           required
-           hintText="What is your name?"
-           value="Dole"
-           floatingLabelText="Name"
-          />
+
           <FormsySelect
             name='frequency'
             required
@@ -135,4 +127,4 @@ const Form = React.createClass({
   }
 });
 
-module.exports = Form
+export default Form;
