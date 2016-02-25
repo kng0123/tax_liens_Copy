@@ -1,5 +1,6 @@
 {Action, Templates, SmartTemplates} = require('./script.coffee')
 
+Form = require('./form.jsx')
 
 module.exports = (app) ->
   global.SmartTemplates = SmartTemplates
@@ -84,6 +85,7 @@ module.exports = (app) ->
 
       provider store:store,
         Router null,
+          Route path:'/test', component:conn(Form)
           Route path:'/', component:conn(Templates.document),
             IndexRoute component:conn(Templates.lien_list)
           Route path:'auth', component:conn(Templates.document_box),
