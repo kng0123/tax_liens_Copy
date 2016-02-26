@@ -63,4 +63,4 @@ global.App = {
   Models: require('./classes'),
   Utils: require('./utils'),
 }
-require('./app.coffee')(App)
+require('./root')(App)
