@@ -35,7 +35,7 @@ Root = React.createClass
           Route path:'sign_up', component:conn(Templates.sign_up)
         Route path:'lien', component:conn(Templates.document_box), onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
           IndexRoute component:conn(Templates.lien_list)
-          Route path:'upload', component:conn(Styleguide.Organisms.Auth.SignIn)
+          Route path:'upload', component:conn(Templates.lien_upload)
           Route path:'subs', component:conn(Templates.lien_process_subs)
           Route path:'item/:id', component:conn(Templates.lien)
 
