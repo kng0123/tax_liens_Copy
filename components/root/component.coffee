@@ -26,8 +26,8 @@ Root = React.createClass
         Route path:'/', onEnter:redirect('/lien'), component:conn(Templates.document),
           IndexRoute component:conn(Templates.lien_list)
         Route path:'auth', component:conn(Templates.document_box),    onLeave:onLeave, onEnter:onEnter(conditions:['logged_out'], errorRoute:'/lien'),
-          IndexRoute component:conn(Templates.sign_in)
-          Route path:'sign_in', component:conn(Templates.sign_in)
+          IndexRoute component:conn(Styleguide.Organisms.Auth.SignIn)
+          Route path:'sign_in', component:conn(Styleguide.Organisms.Auth.SignIn)
           Route path:'sign_up', component:conn(Templates.sign_up)
         Route path:'lien', component:conn(Templates.document),        onLeave:onLeave, onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
           IndexRoute component:conn(Templates.lien_list)

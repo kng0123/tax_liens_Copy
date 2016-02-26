@@ -49,6 +49,23 @@ reducer = Redux.combineReducers({
       default:
         return state;
     }
+  },
+  form: function(state, action) {
+    console.log(action);
+    if (!state || action.type == "@@reduxReactRouter/routerDidChange") {
+      return {};
+    }
+    switch (action.type) {
+      case 'FORM_SUBMIT':
+        var new_state = Object.assign({}, state)
+        new_state[action.name] = {}
+        return new_state
+      case 'FORM_RESPONSE':
+        var new_state = Object.assign({}, state)
+        new_state[action.name] = action
+        return new_state
+    }
+    return state
   }
 });
 

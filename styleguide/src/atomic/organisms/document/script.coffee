@@ -93,7 +93,7 @@ Templates.document_box = React.createClass
     div className:'document', id:'wrapper',
       Factory.header Object.assign({}, @props, {windowWidth:@state.windowWidth}), ""
       div className: 'document-body-container', id:'page-wrapper',
-        div className:'document-body-content', style:{margin:'0 auto', width:'400px', border:'1px solid black', padding:'10px'},
+        div className:'document-body-content', style:{margin:'0 auto'},
           this.props.children || Factory.page
 
 Templates.loading_document = React.createClass
