@@ -26,7 +26,7 @@ Root = React.createClass
     # Only the top level route is allowed to define requirements
     provider store:store,
       Router history:RouteContext,
-        Route path:'/test', component:conn(Styleguide.Molecules.Forms.Example)
+        Route path:'/test', component:conn(Styleguide.Molecules.Grids.Example)
         Route path:'/', onEnter:redirect('/lien'), component:conn(Templates.document),
           IndexRoute component:conn(Styleguide.Organisms.Auth.SignIn)
         Route path:'auth', component:conn(Templates.document_box), onEnter:onEnter(conditions:['logged_out'], errorRoute:'/lien'),

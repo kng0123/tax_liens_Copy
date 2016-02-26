@@ -51,7 +51,8 @@ MUI.Libs = {
   Menu: require('material-ui/lib/menus/menu'),
   MenuItem: require('material-ui/lib/menus/menu-item'),
   MenuDivider: require('material-ui/lib/menus/menu-divider'),
-  SvgIcons: require('material-ui/lib/svg-icons')
+  SvgIcons: require('material-ui/lib/svg-icons'),
+  FontIcons: require('material-ui/lib/font-icon')
 
 };
 
@@ -63,4 +64,6 @@ global.App = {
   Models: require('./classes'),
   Utils: require('./utils'),
 }
+import ReactDataGrid from 'react-data-grid'
+global.ReactDataGrid = ReactDataGrid
 require('./root')(App)

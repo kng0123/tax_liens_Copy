@@ -49,8 +49,8 @@ Templates.lien = React.createClass
 
     div className:'container-fluid',
       div className:'row',
-        div className:'col-lg-12',
-          Factory.lien_search @props
+        div className:'col-lg-12', ""
+          # Factory.lien_search @props
       # div className:'row',
       #   div className:'col-lg-12',
       #     div className:'container-fluid',
@@ -199,23 +199,41 @@ Templates.lien_general = React.createClass
                       val = lien[v.key]().toString()
                     gen_editable(k, v, val)
 
+Templates.formatter = React.createClass
+  displayName: 'formatter'
+
+  render: ->
+    {div} = React.DOM
+    fi = React.createFactory MUI.Libs.FontIcons
+    iconStyles = {
+      color: '#FB8C00'
+      marginRight: 10,
+    };
+    div null,
+      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+
 Templates.lien_subs = React.createClass
   displayName: 'LienSubs'
 
   onSubState: ->
 
+  rowGetter: (i) ->
+    sub = @props.lien.get('subs')[i]
+    row = {
+      type: sub.get('type'),
+      date: moment(sub.get('sub_date')).format('MM/DD/YY'),
+      amt: sub.get('amount'),
+      int: sub.interest(),
+      number: "",
+      actions: {g:2}
+    }
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
-    #Third column from excel gui
-    #lien.subs = [{type:'check'}, {type:'check'}]
     lien = @props.lien
-    # subs_fields = [
-    #   #TODO What does this select
-    #   {label: "LIEN STATUS", key:"status"}
-    #   #TODO What does this toggle
-    #   {label: "DON'T PAY SUBS", key:"unique_id"}
-    # ]
 
     state_options = [
         { value: 'redeemed', label: 'Redeemed' },
@@ -225,19 +243,23 @@ Templates.lien_subs = React.createClass
         { value: 'none', label: 'No Subs' },
     ];
 
-    sub_headers = ["TYPE", "DATE", "AMT", "INT", "#", "VOID", "DATE", ""]
-    sub_rows = lien.get('subs').map (v, k) ->
-      [
-        v.get('type'),
-        moment(v.get('sub_date')).format('MM/DD/YYYY'),
-        v.get('amount'),
-        v.interest(),
-        "",
-        "",
-        "",
-        ""
-      ]
-    sub_table = Factory.table headers: sub_headers, rows: sub_rows, height:'250px'
+    columns = [
+      {name:"TYPE", key:'type'}
+      {name:"Sub date", key:'date'}
+      {name:"Check #", key:'number'}
+      {name:"Date paid", key:'date'}
+      {name:"Amount", key:'amt'}
+      {name:"Interest", key:'int'}
+      {name:"Actions", key:'actions', formatter : Factory.formatter}
+    ]
+
+    sub_table = React.createFactory(ReactDataGrid) {
+      columns:columns
+      enableCellSelect: true
+      rowGetter:@rowGetter
+      rowsCount:lien.get('subs').length
+      minHeight:500
+    }
     select = React.createFactory Select
 
     div className:'panel panel-default',
@@ -279,29 +301,51 @@ Templates.lien_llcs = React.createClass
 Templates.lien_checks = React.createClass
   displayName: 'LienChecks'
 
+  rowGetter: (i) ->
+    receipt = @props.lien.get('checks')[i]
+    {
+      deposit_date: moment(receipt.get('deposit_date')).format('MM/DD/YYYY')
+      account: "NA"
+      check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
+      check_number: receipt.get('check_number')
+      redeem_date: receipt.get('')
+      check_amount: receipt.get('check_amount')
+      principal: receipt.get('check_principal')
+      subs: receipt.get('check_interest')
+      code: receipt.get('type')
+      expected_amt: receipt.expected_amount()
+      dif: receipt.expected_amount() - receipt.get('check_amount')
+      note: "note"
+    }
+
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
     #Third column from excel gui
     #lien.subs = [{type:'check'}, {type:'check'}]
     lien = @props.lien
-    receipt_headers = ["DEPOSIT DATE", "ACCOUNT", "CHECK DATE", "CHECK #", "REDEEM DATE", "CHECK AMOUNT", "PRINCIPAL", "SUBS PRINCIPAL", "CODE", "EXPECTED AMOUNT", "DIF", "NOTE"]
-    receipt_rows = lien.get('checks').map (v, k) ->
-      [
-        moment(v.get('deposit_date')).format('MM/DD/YYYY')
-        "NA"
-        moment(v.get('check_date')).format('MM/DD/YYYY')
-        v.get('check_number')
-        v.get('')
-        v.get('check_amount')
-        v.get('check_principal')
-        v.get('check_interest')
-        v.get('type')
-        v.expected_amount()
-        v.expected_amount() - v.get('check_amount')
-        "note"
-      ]
-    receipt_table = Factory.table headers: receipt_headers, rows: receipt_rows
+    columns = [
+      {name:"Deposit date", key:'deposit_date'}
+      {name:"Account", key:'account'}
+      {name:"Check date", key:'check_date'}
+      {name:"Check #", key:'check_number'}
+      {name:"Redeem date", key:'redeem_date'}
+      {name:"Check amount", key:'check_amount'}
+      {name:"Principal", key:'principal'}
+      {name:"Subs Principal", key:'subs'}
+      {name:"Code", key:'code'}
+      {name:"Expected Amt", key:'expected_amt'}
+      {name:"Dif", key:'dif'}
+      {name:"Note", key:'note'}
+    ]
+
+    receipt_table = React.createFactory(ReactDataGrid) {
+      columns:columns
+      enableCellSelect: true
+      rowGetter:@rowGetter
+      rowsCount:lien.get('checks').length
+      minHeight:500
+    }
 
     div className:'panel panel-default',
       div className:'panel-heading',
