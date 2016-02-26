@@ -73,6 +73,10 @@ Templates.document = React.createClass
 Templates.document_box = React.createClass
   displayName: 'DocumnetBox'
 
+  contextTypes: {
+    router: React.PropTypes.object
+  },
+
   getInitialState: ->
     windowWidth: window.innerWidth
 

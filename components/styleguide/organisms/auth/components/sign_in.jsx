@@ -42,8 +42,7 @@ const SignIn = React.createClass({
         <span className="sr-only">{"Error:"}</span>
         {"Invalid username/password"}
       </div>
-    }
-
+      }
 
     return (
       <Paper style={paperStyle}>

@@ -9,14 +9,14 @@ Templates.lien_process_subs = React.createClass
     data =
       township: township
       date: date
-    @props.dispatch(ReduxRouter.pushState(null, @props.router.location.pathname, data))
+    @props.dispatch(ReduxRouter.pushState(null, @props.location.pathname, data))
     return false
 
   goBack: ->
-    @props.dispatch(ReduxRouter.pushState(null, @props.router.location.pathname, {}))
+    @props.dispatch(ReduxRouter.pushState(null, @props.location.pathname, {}))
 
   render: ->
-    state = @props.router.location.query
+    state = @props.location.query
     if state.township and state.date
       React.Factory.lien_process_subs_list date:state.date, township:state.township, goBack:@goBack
     else

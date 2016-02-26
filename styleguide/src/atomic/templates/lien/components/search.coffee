@@ -5,7 +5,7 @@ Templates.lien_search = React.createClass
     data: Object.assign {}, @props.search
 
   componentWillMount: ->
-    @props.dispatch({type:'INIT_SEARCH', data:@props.router.location.query})
+    @props.dispatch({type:'INIT_SEARCH', data:@props.location.query})
 
   componentWillReceiveProps: (props)->
     @setState(data: props.search)

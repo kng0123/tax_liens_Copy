@@ -12,12 +12,14 @@ var thunk = function(store) {
   };
 };
 
+import { Router, Route, browserHistory } from 'react-router'
+import { syncHistory, routeReducer } from 'redux-simple-router'
+const reduxRouterMiddleware = syncHistory(browserHistory)
 
 var store = Redux.compose(
-  Redux.applyMiddleware(thunk),
-  ReduxRouter.reduxReactRouter({createHistory: ReactHistory.createHashHistory}),
+  Redux.applyMiddleware(thunk, reduxRouterMiddleware),
   ReduxDevtools.devTools()
 )(Redux.createStore)(reducer)
 
-
+reduxRouterMiddleware.listenForReplays(store)
 export default store

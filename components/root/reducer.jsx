@@ -1,7 +1,8 @@
 var reducer;
+import { syncHistory, routeReducer } from 'redux-simple-router'
 
 reducer = Redux.combineReducers({
-  router: ReduxRouter.routerStateReducer,
+  routing: routeReducer,
   user: function(state, action) {
     var user;
     user = Parse.User.current() || {};

@@ -1,6 +1,8 @@
 Templates.lien_list = React.createClass
   displayName: 'LienList'
-
+  contextTypes: {
+    router: React.PropTypes.object
+  },
   getInitialState: ->
     liens: []
 
@@ -11,7 +13,7 @@ Templates.lien_list = React.createClass
     @queryLiens(props)
 
   queryLiens: (props)->
-    query_params = props.router.location.query
+    query_params = @props.location.query
     query = new Parse.Query(App.Models.Lien);
     if query_params.id
       query.equalTo("unique_id", query_params.id)
@@ -39,13 +41,13 @@ Templates.lien_list = React.createClass
 
   goToLien: (indices) ->
     lien = @state.liens[indices[0]]
-    @props.dispatch(ReduxRouter.pushState(null, '/lien/item/'+lien.get('unique_id')))
+    @context.router.push('/lien/item/'+lien.get('unique_id'))
 
   goToUpload: () ->
-    @props.dispatch(ReduxRouter.pushState(null, '/lien/upload'))
+    @context.router.push('/lien/upload')
 
   goToSubs: () ->
-    @props.dispatch(ReduxRouter.pushState(null, '/lien/subs'))
+    @context.router.push('/lien/subs')
 
   render: ->
     {div, h3, h1, p} = React.DOM
