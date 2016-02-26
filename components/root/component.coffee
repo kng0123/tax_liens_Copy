@@ -3,13 +3,10 @@ global.SmartTemplates = SmartTemplates
 Styleguide = require('../styleguide')
 
 store = require('./store.jsx')
-{onEnter, conn} = require('./route_manager.coffee')
+{onEnter, conn, redirect, onLeave} = require('./route_manager.coffee')
 
 Root = React.createClass
   displayName:'Root'
-
-  onLeave: ()->
-    router_requirements.pop()
 
   render: ->
     Router = React.createFactory ReduxRouter.ReduxRouter
@@ -25,18 +22,18 @@ Root = React.createClass
 
     provider store:store,
       Router null,
-        Route onLeave:@onLeave, path:'/test', component:conn(Styleguide.Molecules.Forms.Example)
-        Route onLeave:@onLeave, path:'/', component:conn(Templates.document),
+        Route path:'/test', component:conn(Styleguide.Molecules.Forms.Example)
+        Route path:'/', onEnter:redirect('/lien'), component:conn(Templates.document),
           IndexRoute component:conn(Templates.lien_list)
-        Route onLeave:@onLeave, onEnter:onEnter(conditions:['logged_out'], errorRoute:'/lien'), path:'auth', component:conn(Templates.document_box),
+        Route path:'auth', component:conn(Templates.document_box),    onLeave:onLeave, onEnter:onEnter(conditions:['logged_out'], errorRoute:'/lien'),
           IndexRoute component:conn(Templates.sign_in)
-          Route onLeave:@onLeave, path:'sign_in', component:conn(Templates.sign_in)
-          Route onLeave:@onLeave, path:'sign_up', component:conn(Templates.sign_up)
-        Route onLeave:@onLeave, onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'), path:'lien', component:conn(Templates.document),
+          Route path:'sign_in', component:conn(Templates.sign_in)
+          Route path:'sign_up', component:conn(Templates.sign_up)
+        Route path:'lien', component:conn(Templates.document),        onLeave:onLeave, onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
           IndexRoute component:conn(Templates.lien_list)
-          Route onLeave:@onLeave, path:'upload', component:conn(Templates.lien_upload)
-          Route onLeave:@onLeave, path:'subs', component:conn(Templates.lien_process_subs)
-          Route onLeave:@onLeave, path:'item/:id', component:conn(Templates.lien)
+          Route path:'upload', component:conn(Templates.lien_upload)
+          Route path:'subs', component:conn(Templates.lien_process_subs)
+          Route path:'item/:id', component:conn(Templates.lien)
 
           # Route path:'forgot_password', component:conn(Templates.forgot_password)
 

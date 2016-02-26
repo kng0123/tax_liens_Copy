@@ -18,6 +18,13 @@ exports.onEnter = (route_props) ->
       router_requirements.pop()
       replaceState null, route_props.errorRoute
 
+exports.onLeave = ()->
+  router_requirements.pop()
+
+exports.redirect = (route) ->
+  (nextState, replaceState) =>
+    replaceState null, route
+
 exports.conn = conn = ReactRedux.connect((state) ->
   if checkRequirements()
     state
