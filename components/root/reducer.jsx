@@ -52,6 +52,7 @@ reducer = Redux.combineReducers({
     }
   },
   form: function(state, action) {
+    console.log(action);
     if (!state || action.type == "@@reduxReactRouter/routerDidChange") {
       return {};
     }

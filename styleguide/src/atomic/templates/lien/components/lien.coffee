@@ -39,7 +39,7 @@ Templates.lien = React.createClass
     .fail () ->
 
   render: ->
-    {div, h3, h1, ul, li, span, i, p} = React.DOM
+    {div, h3, h5, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
     RaisedButton = React.createFactory MUI.RaisedButton
 
@@ -47,26 +47,39 @@ Templates.lien = React.createClass
     if !lien
       return div null, ""
 
-    div className:'container-fluid',
-      div className:'row',
-        div className:'col-lg-12', ""
-          # Factory.lien_search @props
-      # div className:'row',
-      #   div className:'col-lg-12',
-      #     div className:'container-fluid',
-      #       h1 null, "LIEN #{@state.lien.get('unique_id')}"
-
-      if @state.lien
-        div className:'row',
-          div className:'col-md-6',
-            Factory.lien_general lien:lien, onChange:@onChange
-          div className:'col-md-6',
-            Factory.lien_notes lien:lien
-            Factory.lien_subs lien:lien, onChange:@onChange
-          div className:'col-md-12',
-            Factory.lien_checks Object.assign {}, @props, lien:lien
-      else
-        div null, ""
+    if !@state.lien
+      div null, ""
+    else
+      div null,
+        div className:'container',
+          div className:'row',
+            div style:{width:'1200px', margin:'0 auto'},
+              Factory.lien_search @props
+        div className:'container',
+          div className:'row',
+            div className:'col-lg-12',
+              div className:'container-fluid',
+                h5 null,
+                  span null, "LIEN #{@state.lien.get('unique_id')}"
+                  React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+                  React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
+                  React.createFactory(MUI.FlatButton) label:"Add account", secondary:true, onTouchTap:@openCreate
+          div className:'row',
+            div className:'col-md-6',
+              Factory.lien_notes lien:lien, onChange:@onChange
+            div className:'col-md-6',
+              Factory.lien_notes lien:lien, onChange:@onChange
+          div className:'row',
+            div className:'col-md-6',
+              Factory.lien_subs lien:lien, onChange:@onChange
+            div className:'col-md-6',
+              Factory.lien_notes lien:lien, onChange:@onChange
+          div className:'row',
+            div className:'col-md-12',
+              Factory.lien_checks Object.assign {}, @props, lien:lien
+          div className:'row',
+            div className:'col-md-12',
+              Factory.lien_general lien:lien, onChange:@onChange
 
 Templates.lien_general = React.createClass
   displayName: 'LienGeneral'
@@ -259,22 +272,17 @@ Templates.lien_subs = React.createClass
       enableCellSelect: true
       rowGetter:@rowGetter
       rowsCount:lien.get('subs').length
-      minHeight:500
+      minHeight:130
     }
     select = React.createFactory Select
 
     div className:'panel panel-default',
       div className:'panel-heading',
-        h3 className:'panel-title', "Subsequents"
-      div className:'panel-body',
-        ul className:'list-group',
-          li className:'list-group-item',
+        h3 className:'panel-title',
+          span null, "Subsequents"
+          span style:{width:'150px', display:'inline-block'},
             select name:'sub_status', value:lien.get('sub_status'), options: state_options, onChange:@props.onChange({type:'select', key:"sub_status"})
-          # subs_fields.map (v, k) ->
-          #   li key:k, className:'list-group-item',
-          #     span className:'badge', lien[v.key]
-          #     span null, v.label
-
+        div style:{width:'100%'},
           sub_table
 
 Templates.lien_llcs = React.createClass
@@ -391,16 +399,16 @@ Templates.lien_checks = React.createClass
       enableCellSelect: true
       rowGetter:@rowGetter
       rowsCount:lien.get('checks').length
-      minHeight:500
+      minHeight:130
     }
 
     div className:'panel panel-default',
       div className:'panel-heading',
-        h3 className:'panel-title', "Receipts"
-      div className:'panel-body',
-        React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+        h3 className:'panel-title',
+          span null, "Receipts"
+          React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
         @getDialog()
-        ul className:'list-group',
+        div style:{width:'100%'},
           receipt_table
 
 
@@ -418,7 +426,6 @@ Templates.lien_notes = React.createClass
     div className:'panel panel-default',
       div className:'panel-heading',
         h3 className:'panel-title', "Notes"
-      div className:'panel-body',
-        ul className:'list-group',
+        ul className:'list-group', style:{height:'130px'},
           notes.map (note, key) ->
             div key:key, "BLAH"
