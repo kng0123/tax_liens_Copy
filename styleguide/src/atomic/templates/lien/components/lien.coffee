@@ -64,7 +64,7 @@ Templates.lien = React.createClass
             Factory.lien_notes lien:lien
             Factory.lien_subs lien:lien, onChange:@onChange
           div className:'col-md-12',
-            Factory.lien_checks lien:lien
+            Factory.lien_checks Object.assign {}, @props, lien:lien
       else
         div null, ""
 
@@ -201,7 +201,8 @@ Templates.lien_general = React.createClass
 
 Templates.formatter = React.createClass
   displayName: 'formatter'
-
+  click: ->
+    alert(1)
   render: ->
     {div} = React.DOM
     fi = React.createFactory MUI.Libs.FontIcons
@@ -210,7 +211,7 @@ Templates.formatter = React.createClass
       marginRight: 10,
     };
     div null,
-      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+      fi onClick:@click, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
       fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
       fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
       fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
@@ -225,7 +226,7 @@ Templates.lien_subs = React.createClass
     row = {
       type: sub.get('type'),
       date: moment(sub.get('sub_date')).format('MM/DD/YY'),
-      amt: sub.get('amount'),
+      amt: sub.get('amount') || "",
       int: sub.interest(),
       number: "",
       actions: {g:2}
@@ -297,9 +298,52 @@ Templates.lien_llcs = React.createClass
 
     llc_table
 
+Templates.lien_check_actions = React.createClass
+  displayName: 'LienCheckActions'
+  click: ->
+    alert(1)
+  render: ->
+    {div} = React.DOM
+    fi = React.createFactory MUI.Libs.FontIcons
+    iconStyles = {
+      color: '#FB8C00'
+      marginRight: 10,
+    };
+
+    div null,
+      fi onClick:@props.value.onClick, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "edit"
 
 Templates.lien_checks = React.createClass
   displayName: 'LienChecks'
+
+  getInitialState: ->
+    {div} = React.DOM
+    open: false
+    modal: undefined
+    modal_actions: div null, ""
+
+  handleClose: ->
+    @setState open: false
+
+  openCreate: ->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.CreateReceipt) @props, ""
+      modal_actions: [React.createFactory(MUI.FlatButton) label:"Create", secondary:true, onTouchTap: @handleClose]
+
+  openEdit: (receipt)->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.EditReceipt) Object.assign {receipt: receipt}, @props, ""
+      modal_actions: [React.createFactory(MUI.FlatButton) label:"Edit", secondary:true, onTouchTap: @handleClose]
+
+  getDialog: ->
+    modal = @state.modal
+    dialog = React.createFactory MUI.Libs.Dialog
+
+    dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'400px'},
+      modal
+
 
   rowGetter: (i) ->
     receipt = @props.lien.get('checks')[i]
@@ -308,15 +352,32 @@ Templates.lien_checks = React.createClass
       account: "NA"
       check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       check_number: receipt.get('check_number')
-      redeem_date: receipt.get('')
+      redeem_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       check_amount: receipt.get('check_amount')
       principal: receipt.get('check_principal')
       subs: receipt.get('check_interest')
       code: receipt.get('type')
       expected_amt: receipt.expected_amount()
       dif: receipt.expected_amount() - receipt.get('check_amount')
-      note: "note"
+      actions: {onClick:@openEdit.bind(@, receipt), receipt:receipt}
     }
+
+  getColumns: () ->
+    {div} = React.DOM
+    fi = React.createFactory MUI.Libs.FontIcons
+
+    columns = [
+      {name:"Deposit date", key:'deposit_date'}
+      {name:"Redeem date", key:'redeem_date'}
+      {name:"Account", key:'account'}
+      {name:"Check date", key:'check_date'}
+      {name:"Check #", key:'check_number'}
+      {name:"Code", key:'code'}
+      {name:"Check amount", key:'check_amount'}
+      {name:"Expected Amt", key:'expected_amt'}
+      {name:"Dif", key:'dif'}
+      {name:"Actions", key:'actions', formatter: React.Factory.lien_check_actions}
+    ]
 
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
@@ -324,23 +385,9 @@ Templates.lien_checks = React.createClass
     #Third column from excel gui
     #lien.subs = [{type:'check'}, {type:'check'}]
     lien = @props.lien
-    columns = [
-      {name:"Deposit date", key:'deposit_date'}
-      {name:"Account", key:'account'}
-      {name:"Check date", key:'check_date'}
-      {name:"Check #", key:'check_number'}
-      {name:"Redeem date", key:'redeem_date'}
-      {name:"Check amount", key:'check_amount'}
-      {name:"Principal", key:'principal'}
-      {name:"Subs Principal", key:'subs'}
-      {name:"Code", key:'code'}
-      {name:"Expected Amt", key:'expected_amt'}
-      {name:"Dif", key:'dif'}
-      {name:"Note", key:'note'}
-    ]
 
     receipt_table = React.createFactory(ReactDataGrid) {
-      columns:columns
+      columns:@getColumns()
       enableCellSelect: true
       rowGetter:@rowGetter
       rowsCount:lien.get('checks').length
@@ -351,6 +398,8 @@ Templates.lien_checks = React.createClass
       div className:'panel-heading',
         h3 className:'panel-title', "Receipts"
       div className:'panel-body',
+        React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+        @getDialog()
         ul className:'list-group',
           receipt_table
 

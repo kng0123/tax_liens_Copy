@@ -52,8 +52,8 @@ MUI.Libs = {
   MenuItem: require('material-ui/lib/menus/menu-item'),
   MenuDivider: require('material-ui/lib/menus/menu-divider'),
   SvgIcons: require('material-ui/lib/svg-icons'),
-  FontIcons: require('material-ui/lib/font-icon')
-
+  FontIcons: require('material-ui/lib/font-icon'),
+  Dialog: require('material-ui/lib/dialog')
 };
 
 global.ReactRouter = require("react-router");
@@ -66,4 +66,5 @@ global.App = {
 }
 import ReactDataGrid from 'react-data-grid'
 global.ReactDataGrid = ReactDataGrid
+global.Styleguide = require('./styleguide')
 require('./root')(App)

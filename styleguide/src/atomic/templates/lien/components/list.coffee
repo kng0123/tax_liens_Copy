@@ -13,7 +13,7 @@ Templates.lien_list = React.createClass
     @queryLiens(props)
 
   queryLiens: (props)->
-    query_params = @props.location.query
+    query_params = @props.search
     query = new Parse.Query(App.Models.Lien);
     if query_params.id
       query.equalTo("unique_id", query_params.id)
@@ -43,11 +43,6 @@ Templates.lien_list = React.createClass
     lien = @state.liens[indices[0]]
     @context.router.push('/lien/item/'+lien.get('unique_id'))
 
-  goToUpload: () ->
-    @context.router.push('/lien/upload')
-
-  goToSubs: () ->
-    @context.router.push('/lien/subs')
 
   render: ->
     {div, h3, h1, p} = React.DOM
@@ -100,11 +95,6 @@ Templates.lien_list = React.createClass
           div className:'col-lg-12',
             Factory.lien_search @props
       div className:'container',
-        div className:'row',
-          div className:'col-lg-12',
-            RaisedButton label:"Upload", onClick:@goToUpload, type:'button', primary:true
-            RaisedButton label:"Batch Subs", onClick:@goToSubs, type:'button', primary:false
-
         div className:'row',
           div className:'col-lg-12',
             if @state.liens.length

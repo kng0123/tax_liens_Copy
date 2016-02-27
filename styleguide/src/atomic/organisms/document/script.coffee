@@ -1,11 +1,15 @@
 DumbTemplates.header = React.createClass
   displayName: 'Header'
 
+  contextTypes: {
+    router: React.PropTypes.object
+  },
+
   logout: ->
     @props.dispatch(Action.logout())
 
   login: ->
-    @props.dispatch(ReduxRouter.pushState(null, '/auth/sign_in'))
+    @context.router.push('/auth/sign_in')
 
   render: ->
     {div, button, p, span, a, ul, li, nav} = React.DOM
@@ -20,11 +24,21 @@ DumbTemplates.header = React.createClass
     ToolbarSeparator = React.createFactory MUI.ToolbarSeparator
     ToolbarTitle = React.createFactory MUI.ToolbarTitle
 
+    linkStyles = {lineHeight:'56px', marginRight:'10px'}
+
     Toolbar style:{marginBottom:'10px'},
       ToolbarGroup null,
         ToolbarTitle text:'TTG Lien'
       ToolbarGroup null,
-        link style:{lineHeight:'56px'}, to:'/', 'Home'
+        if @props.user.id
+          div null,
+            link style:linkStyles, to:'/', 'Home'
+            link style:linkStyles, to:'/lien/upload', 'Upload'
+            link style:linkStyles, to:'/lien/subs', 'Batch subs'
+        else
+          div null,
+            link style:linkStyles, to:'/', 'Home'
+
       ToolbarGroup float:'right',
         ToolbarSeparator null
         if logged_in

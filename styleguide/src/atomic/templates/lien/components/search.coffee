@@ -1,6 +1,10 @@
 Templates.lien_search = React.createClass
   displayName: 'LienSearch'
 
+  contextTypes: {
+    router: React.PropTypes.object
+  },
+
   getInitialState: ->
     data: Object.assign {}, @props.search
 
@@ -21,7 +25,10 @@ Templates.lien_search = React.createClass
   onSubmit: (e) ->
     e.stopPropagation()
     e.preventDefault()
-    @props.dispatch(ReduxRouter.pushState(null, '/', @state.data))
+    @context.router.push(
+      pathname: '/lien',
+      query: @state.data
+    )
     return false
 
   render: ->
