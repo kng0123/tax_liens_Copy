@@ -13,8 +13,10 @@ Templates.lien_list = React.createClass
     @queryLiens(props)
 
   queryLiens: (props)->
-    query_params = @props.search
+    query_params = props.search
     query = new Parse.Query(App.Models.Lien);
+    if !query_params
+      return
     if query_params.id
       query.equalTo("unique_id", query_params.id)
     else if query_params.block
@@ -29,6 +31,8 @@ Templates.lien_list = React.createClass
       query.lessThan("sale_date", moment([year+1, 0]).toDate());
     else if query_params.township
       query.contains("county", query_params.township)
+    else
+      return
 
     #TODO What to do with case #?
     query.find({
@@ -92,7 +96,7 @@ Templates.lien_list = React.createClass
     div null,
       div className:'container-fluid',
         div className:'row',
-          div className:'col-lg-12',
+          div style:{width:'1200px', margin:'0 auto'},
             Factory.lien_search @props
       div className:'container',
         div className:'row',

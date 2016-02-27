@@ -32,7 +32,7 @@ reducer = Redux.combineReducers({
       };
     }
     switch (action.type) {
-      case 'INIT_SEARCH':
+      case 'SEARCH':
         return Object.assign({}, state, action.data);
       default:
         return state;
@@ -52,7 +52,6 @@ reducer = Redux.combineReducers({
     }
   },
   form: function(state, action) {
-    console.log(action);
     if (!state || action.type == "@@reduxReactRouter/routerDidChange") {
       return {};
     }

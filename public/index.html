@@ -31,8 +31,10 @@
 <script type="text/javascript">
 $(document).ready(function(){
   injectTapEventPlugin()
-  element = React.createElement(App.Root)
+  var element = React.createElement(App.Root)
   ReactDOM.render(element, $("#content")[0]);
+  var query = App.store.getState().routing.location.query
+  App.store.dispatch({type:'SEARCH', data:query})
 })
 </script>
 </body>

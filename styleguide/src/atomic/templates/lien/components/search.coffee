@@ -8,11 +8,8 @@ Templates.lien_search = React.createClass
   getInitialState: ->
     data: Object.assign {}, @props.search
 
-  componentWillMount: ->
-    @props.dispatch({type:'INIT_SEARCH', data:@props.location.query})
-
   componentWillReceiveProps: (props)->
-    @setState(data: props.search)
+    @setState data: props.search
 
   onChange: (event) ->
     name = event.target.name
@@ -29,6 +26,7 @@ Templates.lien_search = React.createClass
       pathname: '/lien',
       query: @state.data
     )
+    this.props.dispatch({type:'SEARCH', data:@state.data})
     return false
 
   render: ->
@@ -58,4 +56,4 @@ Templates.lien_search = React.createClass
             div null,
               span null, item.label
             input onChange:@onChange, style:{width:'150px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
-      button type:'submit', className:'btn btn-primary', "Go"
+      button type:'submit', className:'btn btn-primary hidden', "Go"
