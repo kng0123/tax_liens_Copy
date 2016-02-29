@@ -23,10 +23,18 @@ var MyOwnInput = React.createClass({
     // An error message is returned ONLY if the component is invalid
     // or the server has returned an error message
     var errorMessage = this.getErrorMessage();
+    var style = {
+      width: this.props.width || '100px',
+      marginTop:"10px"
+    }
+    var val = moment(this.getValue())
+    if(!this.getValue()) {
+      val = ""
+    }
 
     return (
-      <div className={className} style={{marginTop:"10px"}}>
-        <DatePicker className='form-control datepicker' selected={moment(this.getValue())} onChange={this.changeValue}/>
+      <div className={className} style={style}>
+        <DatePicker className='form-control datepicker' selected={val} onChange={this.changeValue}/>
         <span>{errorMessage}</span>
       </div>
     );

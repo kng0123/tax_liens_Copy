@@ -3,7 +3,27 @@ Templates.lien = React.createClass
   displayName: 'Lien'
 
   getInitialState: ->
+    {div} = React.DOM
     lien: undefined
+    open: false
+    modal: undefined
+    modal_actions: div null, ""
+
+  handleClose: ->
+    @setState open: false
+
+  openCreate: ->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.CreateReceipt) Object.assign {lien:@state.lien, callback:=>@setState open:false}, @props, ""
+      # modal_actions: [React.createFactory(MUI.FlatButton) label:"Create", secondary:true, onTouchTap: @handleClose]
+
+  getDialog: ->
+    modal = @state.modal
+    dialog = React.createFactory MUI.Libs.Dialog
+
+    dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'400px'},
+      modal
 
   componentWillMount: ->
     query = new Parse.Query(App.Models.Lien);
@@ -52,6 +72,7 @@ Templates.lien = React.createClass
       div null, ""
     else
       div null,
+        @getDialog()
         div className:'container',
           div className:'row',
             div style:{width:'1200px', margin:'0 auto'},
@@ -318,7 +339,7 @@ Templates.lien_checks = React.createClass
   openEdit: (receipt)->
     @setState
       open: true
-      modal: React.createFactory(Styleguide.Organisms.Lien.EditReceipt) Object.assign {receipt: receipt}, @props, ""
+      modal: React.createFactory(Styleguide.Organisms.Lien.EditReceipt) Object.assign {receipt: receipt, callback:=>@setState open:false}, @props, ""
       modal_actions: [React.createFactory(MUI.FlatButton) label:"Edit", secondary:true, onTouchTap: @handleClose]
 
   getDialog: ->
