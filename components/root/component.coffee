@@ -37,6 +37,7 @@ Root = React.createClass
           IndexRoute component:conn(Templates.lien_list)
           Route path:'upload', component:conn(Templates.lien_upload)
           Route path:'subs', component:conn(Templates.lien_process_subs)
+          Route path:'batch/:id', component:conn(Templates.lien_process_subs_list)
           Route path:'item/:id', component:conn(Templates.lien)
 
           # Route path:'forgot_password', component:conn(Templates.forgot_password)

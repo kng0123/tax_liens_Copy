@@ -13,9 +13,6 @@ Templates.lien_process_subs = React.createClass
     @props.dispatch(ReduxRouter.pushState(null, @props.location.pathname, data))
     return false
 
-  goBack: ->
-    @props.dispatch(ReduxRouter.pushState(null, @props.location.pathname, {}))
-
   render: ->
     state = @props.location.query
     if state.township and state.date
@@ -63,6 +60,33 @@ Templates.lien_process_subs_form = React.createClass
     batch = @state.batches[indices[0]]
     @context.router.push('/lien/batch/'+batch.id)
 
+  createBatch: (event) ->
+    event.stopPropagation()
+    event.preventDefault()
+    query = new Parse.Query(App.Models.Lien);
+    query.include("subs")
+    query.equalTo("township", @state.data.township)
+    #TODO WHAT DOES THIS MEAN???
+    #Principal Balance > $0
+    query.notEqualTo('sub_status', 'redeemed')
+    query.notEqualTo('sub_status', 'none')
+    query.find({
+    	success : (liens) =>
+        batch = {
+          sub_date: @state.batch_date,
+          township: @state.data.township,
+          subs: [],
+          liens: liens
+        }
+        App.Models.SubBatch.init_from_json(batch).save()
+        .then( (batch) =>
+          @context.router.push('/lien/batch/'+batch.id)
+        )
+    	,
+    	error : (obj, error) ->
+    })
+
+
   valueRenderer: (val) ->
     {div, h3, p, form, input, span, ul, li, button} = React.DOM
     if val
@@ -91,7 +115,7 @@ Templates.lien_process_subs_form = React.createClass
     batch_rows = @state.batches.map (batch, k) =>
       [
         batch.get('township').get('township')
-        moment(batch.get('createdAt')).format('MM/DD/YYYY')
+        moment(batch.get('sub_date')).format('MM/DD/YYYY')
       ]
     # widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px','50px','50px','50px']
 
@@ -124,30 +148,27 @@ Templates.lien_process_subs_form = React.createClass
 
 Templates.lien_process_subs_list = React.createClass
   displayName: 'LienProcessSubsList'
-
+  contextTypes: {
+    router: React.PropTypes.object
+  },
   getInitialState: ->
-    liens: []
+    batch: undefined
 
   componentWillMount: ->
-    @queryLiens(@props)
-
-  componentWillReceiveProps: (props)->
-    @queryLiens(props)
-
-  queryLiens: (props)->
-    query = new Parse.Query(App.Models.Lien);
+    query = new Parse.Query(App.Models.SubBatch);
+    query.equalTo("objectId", this.props.routeParams.id)
     query.include("subs")
-    query.equalTo("county", @props.township)
-    #TODO WHAT DOES THIS MEAN???
-    #Principal Balance > $0
-    query.notEqualTo('sub_status', 'redeemed')
-    query.notEqualTo('sub_status', 'none')
-    query.find({
-    	success : (results) =>
-        @setState liens:results
-    	,
-    	error : (obj, error) ->
-    })
+    query.include("liens")
+    query.find({}).then( (results) =>
+      batch = results[0]
+      @setState(
+        batch: batch
+        subs: batch.get('subs').reduce( (m, sub) ->
+          m[sub.id] = sub
+          return m
+        , {})
+      )
+    )
 
   onChange: (lien, type, sub) ->
     return (event) =>
@@ -164,6 +185,21 @@ Templates.lien_process_subs_list = React.createClass
         lien.set('subs', lien.get('subs').concat(sub))
         lien.save()
 
+  goToLien: (event) ->
+    id = event.target.dataset.id
+    @context.router.push('/lien/item/'+id)
+
+  toggleVoid: ->
+    batch = @state.batch
+    
+    void_state = !!batch.get('void')
+    batch.set('void', !void_state)
+    batch.get('subs').map( (sub) ->
+      sub.set('void', !void_state)
+    )
+    batch.save().then (batch) =>
+      @setState batch:batch
+
   subDate: (lien, date, type) ->
     matches = lien.get('subs').map (sub) ->
       if sub.get('type') == type
@@ -175,21 +211,6 @@ Templates.lien_process_subs_list = React.createClass
       matches[0]
 
   exportXLSX: ->
-    # Extract data from workbook
-    # var workbook = XLSX.read(data, {
-    #     type: 'binary',
-    #     cellStyles: true //To get groups
-    #   });
-    # b=workbook.Sheets.Sheet1
-    # data = b['!cols'].map(function(col) {
-    #   var o = {};
-    #   var keys = Object.keys(col)
-    #   keys.map(function(k) {
-    #     o[k] = col[k];
-    #     return o;
-    #   })
-    #   return o;
-    # })
     Workbook = ->
       if !(this instanceof Workbook)
         return new Workbook
@@ -206,11 +227,19 @@ Templates.lien_process_subs_list = React.createClass
       ["Interest Date: #{moment(@props.date).format('MM/DD/YYYY')}"]
       ["Township", "Block", "Lot", "Qualifier", "MUA Acct 1", "Certificate #", "Address", "Sale Date", "Tax Amount", "Utility Amount", "Other Amount"]
     ]
-    rows = @state.liens.map (lien, k) =>
+    rows = @state.batch.get('liens').map (lien, k) =>
       date = moment(@props.date)
-      tax_sub = @subDate(lien, date, 'tax')
-      utility_sub = @subDate(lien, date, 'utility')
-      other_sub = @subDate(lien, date, 'other')
+      subs = lien.get('subs').map( (sub) =>
+        @state.subs[sub.id]
+      )
+      subs = subs.reduce( (m, sub) =>
+        if sub
+          m[sub.get('type')] = sub
+        return m
+      , {})
+      tax_sub = subs['tax']
+      utility_sub = subs['utility']
+      other_sub = subs['other']
       [
         lien.get('county'),
         lien.get('block'),
@@ -220,9 +249,9 @@ Templates.lien_process_subs_list = React.createClass
         lien.get('cert_number'),
         lien.get('address'),
         moment(lien.get('sale_date')).toDate()
-        ""
-        ""
-        ""
+        (if tax_sub then tax_sub.get('amount') || "" else "")
+        (if utility_sub then utility_sub.get('amount') || "" else "")
+        (if other_sub then other_sub.get('amount') || "" else "")
       ]
     data= data.concat rows
     ws = convert_to_xlsx_json(data)
@@ -289,19 +318,31 @@ Templates.lien_process_subs_list = React.createClass
   render: ->
     {div, h3, h1, input, pre,p} = React.DOM
     Factory = React.Factory
+    if !@state.batch
+      return div null, "Loading..."
 
     RaisedButton = React.createFactory MUI.RaisedButton
 
     sub_headers = ["TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE", "TAX", "UTILITY", "OTHER"]
     editable = React.createFactory PlainEditable
-    sub_rows = @state.liens.map (lien, k) =>
+    sub_rows = @state.batch.get('liens').map (lien, k) =>
       date = moment(@props.date)
-      tax_sub = @subDate(lien, date, 'tax')
-      utility_sub = @subDate(lien, date, 'utility')
-      other_sub = @subDate(lien, date, 'other')
+      sub_date = ""
+      subs = lien.get('subs').map( (sub) =>
+        @state.subs[sub.id]
+      )
+      subs = subs.reduce( (m, sub) =>
+        if sub
+          sub_date = sub.get('sub_date')
+          m[sub.get('type')] = sub
+        return m
+      , {})
+      tax_sub = subs['tax'] || new App.Models.LienSub({type:'tax', sub_date:sub_date})
+      utility_sub = subs['utility'] || new App.Models.LienSub({type:'utility', sub_date:sub_date})
+      other_sub = subs['other'] || new App.Models.LienSub({type:'other', sub_date:sub_date})
 
       [
-        lien.get('county'),
+        div onClick:@goToLien, 'data-id':lien.get('unique_id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
@@ -310,23 +351,27 @@ Templates.lien_process_subs_list = React.createClass
         lien.get('address'),
         moment(lien.get('sale_date')).format('MM/DD/YYYY')
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'tax', tax_sub), value: if tax_sub then tax_sub.get('amount').toString()
+          editable onBlur:@onChange(lien, 'tax', tax_sub), value: if tax_sub then (tax_sub.get('amount') || "").toString()
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'utility', utility_sub), value: if utility_sub then utility_sub.get('amount').toString()
+          editable onBlur:@onChange(lien, 'utility', utility_sub), value: if utility_sub then (utility_sub.get('amount') || "").toString()
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'other', other_sub), value: if other_sub then other_sub.get('amount').toString()
+          editable onBlur:@onChange(lien, 'other', other_sub), value: if other_sub then (other_sub.get('amount') || "").toString()
       ]
     widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px','50px','50px','50px']
 
-    sub_table = Factory.table widths:widths, headers: sub_headers, rows: sub_rows
+    sub_table = Factory.table widths:widths, selectable:false, headers: sub_headers, rows: sub_rows
 
+    void_label = "Void"
+
+    if @state.batch.get('void')
+      void_label = "Un-Void"
     div className:'container-fluid',
       div className:'row',
         div className:'col-lg-12',
           p null, "Interest for #{moment(@props.date).format('MM/DD/YYYY')}"
         div className:'col-lg-12',
-          RaisedButton label:"Go back", onClick:@props.goBack, type:'button', primary:true
           RaisedButton label:"Export Excel", onClick:@exportXLSX, type:'button', primary:true
+          RaisedButton label:void_label, onClick:@toggleVoid, type:'button', primary:false
           sub_table
 
 

@@ -48,7 +48,7 @@ class Lien extends Parse.Object {
     var premium = this.get('premium') || 0
     var recording_fee = this.get('recording_fee') || 0
     var subs_paid = this.get('subs').reduce((total, sub)=>{
-      return total+sub.get('amount')
+      return total+sub.amount()
     }, 0)
     return cert_fv+premium+recording_fee+subs_paid
   }
@@ -110,6 +110,9 @@ class Lien extends Parse.Object {
 
     var subs = this.get('subs')
     var total = subs.reduce((prev, curr)=>{
+      if(curr.get('void')) {
+        return 0
+      }
       var sub_date = moment(curr.get('date'))
       if(sub_date < base_date) {
         prev = prev + curr.get('amount')
@@ -160,19 +163,12 @@ class Lien extends Parse.Object {
     return lien
   }
 
-  static save_json(object) {
-    var lien = Lien.init_from_json(object)
-    return lien.save().then(function(lien) {
-      lien.set('subs', object.subs.map( (sub) => LienSub.init_from_json(lien, sub)) )
-      lien.set('owners', object.owners.map( (owner) => LienOwner.init_from_json(lien, owner)) )
-      lien.set('checks', object.checks.map( (check) => LienCheck.init_from_json(lien, check)) )
-      lien.set('annotations', object.annotations.map( (note) => LienNote.init_from_json(lien, note)) )
-      return lien.save()
-    }).fail(function(error) {
-      lien.error = error
-      debugger
-      return lien
-    })
+  static save_json(lien, object) {
+    lien.set('subs', object.subs.map( (sub) => LienSub.init_from_json(lien, sub)) )
+    lien.set('owners', object.owners.map( (owner) => LienOwner.init_from_json(lien, owner)) )
+    lien.set('checks', object.checks.map( (check) => LienCheck.init_from_json(lien, check)) )
+    lien.set('annotations', object.annotations.map( (note) => LienNote.init_from_json(lien, note)) )
+    return lien
   }
 
   add_check(check) {

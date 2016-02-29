@@ -287,11 +287,15 @@ class LienXLSX {
 
     Parse.Promise.when(promises).then( (townships) =>{
       var towns = townships.reduce( (m, ts) => { m[ts.get('township')] = ts; return m;}, {})
-      return Parse.Promise.when(this.objects.map( (lien, k) =>{
+      return Parse.Object.saveAll(this.objects.map( (lien, k) =>{
       //TODO: UPgrade request limit
       // return Parse.Promise.when(this.objects.slice(0,100).map( (lien, k) =>{
         lien.general['township'] = towns[lien.general['county']]
-        return Models.Lien.save_json(lien)
+        return Models.Lien.init_from_json(lien)
+      }))
+    }).then( (liens) => {
+      return Parse.Object.saveAll(this.objects.map( (lien_object, k) =>{
+        return Models.Lien.save_json(liens[k], lien_object)
       }))
     }).then( (liens) => {
       //Parse out SubBatches
@@ -310,7 +314,9 @@ class LienXLSX {
               liens: []
             }
           }
-          sub_dates.push(sub_date)
+          if( sub_dates.indexOf(sub_date) == -1 ) {
+            sub_dates.push(sub_date)
+          }
           sub_batches[township+sub_date].subs.push(sub)
         })
         //Add the Lein to each batch

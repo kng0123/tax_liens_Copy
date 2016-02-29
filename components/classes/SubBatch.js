@@ -10,6 +10,7 @@ class SubBatch extends Parse.Object {
     batch.set("subs", json.subs);
     batch.set("township", json.township);
     batch.set("sub_date", json.sub_date);
+    batch.set('liens', json.liens)
 
     return batch
   }

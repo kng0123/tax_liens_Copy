@@ -63,7 +63,7 @@ Templates.lien = React.createClass
                 h5 null,
                   span null, "LIEN #{@state.lien.get('unique_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
-                  React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
+                  # React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
           div className:'row',
             div className:'col-md-6',
               Factory.lien_info lien:lien, onChange:@onChange
@@ -196,7 +196,7 @@ Templates.lien_subs = React.createClass
     row = {
       type: sub.get('type'),
       date: moment(sub.get('sub_date')).format('MM/DD/YY'),
-      amt: sub.get('amount') || "",
+      amt: sub.amount() || "",
       int: sub.interest(),
       number: "",
       actions: {g:2}
@@ -446,7 +446,8 @@ Templates.lien_info = React.createClass
         when 'date'
           div style:{display: 'block', position: 'relative', width: '100px'},
             date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
-        when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
+        when 'bool'
+          checkbox onCheck: @props.onChange(item), checked:!!val
         when 'number'
           val = accounting.toFixed(val, 2)
           if item.editable
@@ -474,7 +475,7 @@ Templates.lien_info = React.createClass
               div className:'col-lg-4', key:k,
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
-                  val = "Empty" if val is undefined
+                  val = "Empty" if val is undefined and field.type != 'bool'
                   gen_editable(field_key, field, val)
                 )
             )
