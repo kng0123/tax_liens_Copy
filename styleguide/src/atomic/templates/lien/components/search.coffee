@@ -72,7 +72,7 @@ Templates.lien_search = React.createClass
             div null,
               span null, item.label
             if item.key != 'township'
-              input onChange:@onChange, style:{width:'150px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
+              input onChange:@onChange, style:{width:'130px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
             else
-              select name:'sub_status', style:{width:'150px'},value:@state.data[item.key], name:item.key, options:@state.townships, onChange:@onChange
-      button type:'submit', className:'btn btn-primary hidden', "Go"
+              select name:'sub_status', style:{width:'130px'},value:@state.data[item.key], name:item.key, options:@state.townships, onChange:@onChange
+      button type:'submit', style:{marginTop:'20px', marginLeft:'10px'}, className:'btn btn-primary', "Go"
