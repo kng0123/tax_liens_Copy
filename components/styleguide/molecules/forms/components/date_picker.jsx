@@ -7,7 +7,7 @@ var MyOwnInput = React.createClass({
   // setValue() will set the value of the component, which in
   // turn will validate it and the rest of the form
   changeValue: function (event) {
-    this.setValue(moment(event).format('YYYY-MM-DD'));
+    this.setValue(moment(event).toDate());
   },
 
   render: function () {
@@ -27,9 +27,11 @@ var MyOwnInput = React.createClass({
       width: this.props.width || '100px',
       marginTop:"10px"
     }
-    var val = moment(this.getValue())
+    var val = ""
     if(!this.getValue()) {
       val = ""
+    } else {
+      val = moment(this.getValue())
     }
 
     return (

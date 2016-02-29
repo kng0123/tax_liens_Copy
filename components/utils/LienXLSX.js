@@ -210,13 +210,26 @@ class LienXLSX {
     var check_principal = this.getCell(first+6, row) || {}
     var check_interest = this.getCell(first+7, row) || {}
 
+
+
     if( check_date && check_date.w ) {
+      type = type.w.toLowerCase()
+      if(type == 'combined') {
+        type = 'combined'
+      } else if (type == 'premium only') {
+        type = 'premium'
+      } else if (type == 'cert only') {
+        type = 'cert_w_interest'
+      } else {
+        debugger
+        throw new Error('Undefined check type')
+      }
       var check = {
         check_date: check_date.w,
         deposit_date: deposit_date.w,
         check_number: check_number.w,
         check_amount: check_amount.w,
-        type: type.w,
+        type: type,
         dif: dif.w,
         check_principal: check_principal.w,
         check_interest: check_interest.w

@@ -1,5 +1,6 @@
 accounting = require('accounting')
 Templates.lien = React.createClass
+
   displayName: 'Lien'
 
   getInitialState: ->
@@ -22,7 +23,7 @@ Templates.lien = React.createClass
     modal = @state.modal
     dialog = React.createFactory MUI.Libs.Dialog
 
-    dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'400px'},
+    dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'500px'},
       modal
 
   componentWillMount: ->
@@ -68,6 +69,15 @@ Templates.lien = React.createClass
     if !lien
       return div null, ""
 
+    state_options = [
+        { value: 'redeemed', label: 'Redeemed' },
+        { value: 'bankruptcy', label: 'Bankruptcy' },
+        { value: 'foreclosure', label: 'Foreclosure' },
+        { value: 'own', label: 'Own Home' },
+        { value: 'none', label: 'No Subs' },
+    ];
+    select = React.createFactory Select
+
     if !@state.lien
       div null, ""
     else
@@ -84,6 +94,8 @@ Templates.lien = React.createClass
                 h5 null,
                   span null, "LIEN #{@state.lien.get('unique_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+                  span style:{width:'150px', display:'inline-block'},
+                    select name:'sub_status', value:lien.get('sub_status'), options: state_options, onChange:@onChange({type:'select', key:"sub_status"})
                   # React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
           div className:'row',
             div className:'col-md-6',
@@ -227,14 +239,6 @@ Templates.lien_subs = React.createClass
     Factory = React.Factory
     lien = @props.lien
 
-    state_options = [
-        { value: 'redeemed', label: 'Redeemed' },
-        { value: 'bankruptcy', label: 'Bankruptcy' },
-        { value: 'foreclosure', label: 'Foreclosure' },
-        { value: 'own', label: 'Own Home' },
-        { value: 'none', label: 'No Subs' },
-    ];
-
     columns = [
       {name:"TYPE", key:'type'}
       {name:"Sub date", key:'date'}
@@ -252,14 +256,11 @@ Templates.lien_subs = React.createClass
       rowsCount:lien.get('subs').length
       minHeight:130
     }
-    select = React.createFactory Select
 
     div className:'panel panel-default',
       div className:'panel-heading',
         h3 className:'panel-title',
           span null, "Subsequents"
-          span style:{width:'150px', display:'inline-block'},
-            select name:'sub_status', value:lien.get('sub_status'), options: state_options, onChange:@props.onChange({type:'select', key:"sub_status"})
         div style:{width:'100%'},
           sub_table
 
@@ -340,7 +341,7 @@ Templates.lien_checks = React.createClass
     @setState
       open: true
       modal: React.createFactory(Styleguide.Organisms.Lien.EditReceipt) Object.assign {receipt: receipt, callback:=>@setState open:false}, @props, ""
-      modal_actions: [React.createFactory(MUI.FlatButton) label:"Edit", secondary:true, onTouchTap: @handleClose]
+      # modal_actions: [React.createFactory(MUI.FlatButton) label:"Edit", secondary:true, onTouchTap: @handleClose]
 
   getDialog: ->
     modal = @state.modal
@@ -357,7 +358,7 @@ Templates.lien_checks = React.createClass
       account: "NA"
       check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       check_number: receipt.get('check_number')
-      redeem_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
+      redeem_date: if receipt.get('redeem_date') then moment(receipt.get('redeem_date')).format('MM/DD/YYYY') else ""
       check_amount: receipt.get('check_amount')
       principal: receipt.get('check_principal')
       subs: receipt.get('check_interest')

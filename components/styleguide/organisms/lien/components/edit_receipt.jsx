@@ -5,18 +5,36 @@ const { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup, FormsySelect,
 const RaisedButton = require('material-ui/lib/raised-button');
 const Paper = require('material-ui/lib/paper');
 
-console.log(Molecules);
-
-const SignIn = React.createClass({
+const EditReceipt = React.createClass({
+  getInitialState: function() {
+    return {
+      receipt: new App.Models.LienCheck(),
+      model: {}
+    }
+  },
   submitForm: function(model) {
-    let action = Actions.attempt_sign_in(model)
-    this.props.dispatch(action)
+    // let action = Actions.attempt_sign_in(model)
+    // this.props.dispatch(action)
+    var receipt = this.props.receipt
+    var callback = this.props.callback
+    Object.keys(model).map(function(key) {
+      if(key == 'check_amount') {
+         return receipt.set(key,Number.parseFloat(model[key]))
+      } else {
+        return receipt.set(key, model[key])
+      }
+    })
+    return receipt.save().then(function(){
+      callback()
+    }).fail(function() {
+      debugger
+    })
+
   },
 
   styles: {
     paperStyle: {
-      width: 300,
-      margin: '20px auto',
+      width: '100%',
       padding: 20
     },
     switchStyle: {
@@ -30,9 +48,13 @@ const SignIn = React.createClass({
     }
   },
 
+  updateFormState: function(model) {
+    this.setState({model: model})
+  },
+
   render: function () {
     let {paperStyle, switchStyle, submitStyle, linksStyle } = this.styles;
-    let {div, span, h3, ul, li} = React.DOM
+    let {div, span, h3, ul, li, fieldset, label} = React.DOM
     let link = React.createFactory( ReactRouter.Link )
 
     let error = <div></div>
@@ -44,25 +66,78 @@ const SignIn = React.createClass({
       </div>
       }
 
+    var check = this.props.receipt
+    var deposit_date = undefined
+    if(check.get('deposit_date')) {
+      deposit_date = (check.get('deposit_date'))
+    }
+    var check_date = undefined
+    if(check.get('check_date')) {
+      check_date = (check.get('check_date'))
+    }
+    var redeem_date = undefined
+    if(check.get('redeem_date')) {
+      redeem_date = (check.get('redeem_date'))
+    }
+
+    var code_options = App.Models.LienCheck.code_options()
+    var sub_options = this.props.lien.get('subs').map( (sub) => {
+      return {label: sub.name(), value:sub}
+    })
+
+    var form_rows = [
+      {
+        label: 'Code',
+        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('type')} options={code_options} required name={"type"}/>
+      },
+        {
+          label: 'Sub',
+          filter: (function(){ return this.state.model.type != 'sub_only'}).bind(this),
+          element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('sub')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} return name={"sub"}/>
+        },
+      {
+        label: 'Deposit Date',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='deposit_date' value={deposit_date} required/>
+      },
+      {
+        label: 'Check Date',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='check_date' value={check_date} required/>
+      },
+      {
+        label: 'Redeem Date',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='redeem_date' value={redeem_date}/>
+      },
+      {
+        label: 'Check number',
+        element: <FormsyText name='check_number' required hintText="Check number" value={check.get('check_number')}/>
+      },
+      {
+        label: 'Check amount',
+        element: <FormsyText name='check_amount' type="number" value={check.get('check_amount').toString()} required hintText="Check amount"/>
+      }
+    ]
+    var form_body = form_rows.map( (row, key) => {
+        var className="form-group row"
+        if(row.filter && row.filter()) {
+          return
+        }
+        return (<div className={className} key={key}>
+          <label htmlFor="type" className="col-sm-3 form-control-label">{row.label}</label>
+          <div className="col-sm-9">
+            {row.element}
+          </div>
+        </div>)
+    }).filter(function(item){return item})
+
     return (
       <div style={paperStyle}>
-        <Formsy.Form onValidSubmit={this.submitForm}>
-          <FormsySelect name='receipt_code' required floatingLabelText="Receipt code">
-            <MUI.Libs.MenuItem value={'never'} primaryText="Never" />
-            <MUI.Libs.MenuItem value={'nightly'} primaryText="Every Night" />
-            <MUI.Libs.MenuItem value={'weeknights'} primaryText="Weeknights" />
-          </FormsySelect>
-          <Styleguide.Molecules.Forms.DatePicker name='deposit_date' value={moment(this.props.receipt.get('deposit_date')).format('YYYY-MM-DD')} required floatingLabelText="Deposit Date"/>
-          <Styleguide.Molecules.Forms.DatePicker name='check_date'   value={moment(this.props.receipt.get('check_date')).format('YYYY-MM-DD')} required floatingLabelText="Check Date"/>
-          <Styleguide.Molecules.Forms.DatePicker name='redeem_date'  value={moment(this.props.receipt.get('redeem_date')).format('YYYY-MM-DD')} required floatingLabelText="Redeem Date"/>
-
-          <FormsyText name='check_number' required hintText="Check number" value="" floatingLabelText="Check number"/>
-          <FormsyText name='check_amount' required hintText="Check amount" value="" floatingLabelText="Check amount"/>
-
+        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+          {form_body}
+          <MUI.RaisedButton key={"end"} label={"Save receipt"} type={"submit"} primary={true} />
         </Formsy.Form>
       </div>
     )
   }
 })
 
-export default SignIn
+export default EditReceipt

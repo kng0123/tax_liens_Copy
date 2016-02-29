@@ -10,6 +10,10 @@ class LienSub extends Parse.Object {
     }
   }
 
+  name() {
+    return this.get('type')+" "+this.get('amount')+" "+moment(this.get('sub_date')).format('MM/DD/YYYY')
+  }
+
   amount() {
     if( this.get('void')) {
       return 0

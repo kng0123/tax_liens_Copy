@@ -62,7 +62,7 @@ Parse.Cloud.beforeSave 'Lien', (request, response) ->
   if request.object.isNew()
     query = new (Parse.Query)('Lien')
     query.equalTo 'unique_id', request.object.get('unique_id')
-    query.find().then( (liens) ->
+    return query.find().then( (liens) ->
       if liens.length == 0
         response.success()
       else
@@ -77,7 +77,7 @@ Parse.Cloud.beforeSave 'LienSub', (request, response) ->
     query = new (Parse.Query)('Lien')
     query.equalTo 'type', request.object.get('type')
     query.equalTo 'sub_date', request.object.get('sub_date')
-    query.find().then( (liens) ->
+    return query.find().then( (liens) ->
       if liens.length == 0
         response.success()
       else
@@ -91,7 +91,7 @@ Parse.Cloud.beforeSave 'Township', (request, response) ->
   if request.object.isNew()
     query = new (Parse.Query)('Township')
     query.equalTo 'township', request.object.get('township')
-    query.find().then( (townships) ->
+    return query.find().then( (townships) ->
       if townships.length == 0
         response.success()
       else
