@@ -6,18 +6,32 @@ Templates.lien_search = React.createClass
   },
 
   getInitialState: ->
+    townships: []
     data: Object.assign {}, @props.search
+
+  componentWillMount: () ->
+    query = new Parse.Query('Township');
+    return query.find().then( (townships) =>
+      @setState townships:townships.map( (township) ->
+        label: township.get('township'), value:township.get('township')
+      )
+    )
 
   componentWillReceiveProps: (props)->
     @setState data: props.search
 
   onChange: (event) ->
-    name = event.target.name
-    val = event.target.value
+    if event.label
+      data = @state.data
+      data['township'] = event.value
+      @setState data: data
+    else
+      name = event.target.name
+      val = event.target.value
 
-    data = @state.data
-    data[name] = val
-    @setState data: data
+      data = @state.data
+      data[name] = val
+      @setState data: data
 
   onSubmit: (e) ->
     e.stopPropagation()
@@ -49,11 +63,16 @@ Templates.lien_search = React.createClass
         label: "Lien ID", type:'text', key:'id'
     ]
 
+    select = React.createFactory Select
+
     form className:'form-inline', onSubmit:@onSubmit,
       inputs.map (item, index) =>
         div key:index, className:'form-group',
           div style:{display:'block'},
             div null,
               span null, item.label
-            input onChange:@onChange, style:{width:'150px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
+            if item.key != 'township'
+              input onChange:@onChange, style:{width:'150px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
+            else
+              select name:'sub_status', style:{width:'150px'},value:@state.data[item.key], name:item.key, options:@state.townships, onChange:@onChange
       button type:'submit', className:'btn btn-primary hidden', "Go"

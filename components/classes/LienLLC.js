@@ -1,4 +1,5 @@
 var accounting = require('accounting')
+var Parse = require('parse')
 
 class LienLLC extends Parse.Object {
   constructor() {

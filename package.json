@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "BROWSER=true watchify components/index.js -v -t  browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
-    "cloud": "watchify components/cloud.coffee -v -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js",
+    "cloud": "watchify components/cloud.coffee -v -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js",
     "prod": "BROWSER=true browserify components/index.js -v -t browserify-css -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
   },
   "browserify": {
@@ -39,7 +39,7 @@
     "moment": "^2.10.6",
     "mongoose": "^4.2.8",
     "morgan": "^1.0.0",
-    "parse": "^1.6.13",
+    "parse": "^1.7.1",
     "parse-react": "^0.5.0",
     "react": "^0.14.3",
     "react-data-grid": "^0.14.13",

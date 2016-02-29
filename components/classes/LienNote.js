@@ -1,3 +1,5 @@
+var Parse = require('parse')
+
 class LienNote extends Parse.Object {
   constructor() {
     super('LienNote');

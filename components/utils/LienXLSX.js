@@ -1,5 +1,7 @@
 var accounting = require('accounting')
 var XLSX = require('xlsx-browserify-shim');
+var Parse = require('parse')
+var Models = require('../classes')
 
 import {LienSub, Lien, LienCheck, LienNote} from '../classes'
 
@@ -50,11 +52,11 @@ var tags = {
   "MZ Check": "mz_check"
 }
 
-class LienXLSX extends Parse.Object {
+class LienXLSX {
   constructor(data) {
-    // Pass the ClassName to the Parse.Object constructor
-    super('LienXLSX');
+    this.townships = []
     this.processData(data)
+
     // All other initialization
   }
 
@@ -67,10 +69,6 @@ class LienXLSX extends Parse.Object {
     this.sheet = workbook.Sheets["Sheet1"]
     var groups = this.getHeaders()
     this.objects = this.parseObjects(groups)
-    this.liens = this.objects.map(function(lien) {
-      return Lien.init_from_json(lien);
-    })
-    this.liens[0].save()
 
   }
 
@@ -146,6 +144,7 @@ class LienXLSX extends Parse.Object {
     for( var row of range(3, rows) ) {
       var object = {annotations:[], general:{}, subs:[], checks:[], season:[]}
       objects.push(object)
+
       for(var g of range(0, groups.length) ) {
         var group = groups[g]
         if(group.length == 15) {
@@ -155,10 +154,15 @@ class LienXLSX extends Parse.Object {
         } else if (group.length == 4){
           //DO NOTHING
         } else {
-          // this.parseGeneral(object, group, row)
+          this.parseGeneral(object, group, row)
         }
       }
+      //Add Owners
+      object.owners = [
+        {llc: object.general.llc, start_date: new Date()}
+      ]
     }
+
     return objects
   }
 
@@ -171,7 +175,7 @@ class LienXLSX extends Parse.Object {
     var util = this.getCell(first+7, row)
     var util_date = this.getCell(first+8, row)
     var total = this.getCell(first+14, row)
-    if( tax_date ){
+    if( tax_date && tax_date.w){
       var sub = {
         type: 'tax',
         sub_date: tax_date.w,
@@ -206,7 +210,7 @@ class LienXLSX extends Parse.Object {
     var check_principal = this.getCell(first+6, row) || {}
     var check_interest = this.getCell(first+7, row) || {}
 
-    if( check_date ) {
+    if( check_date && check_date.w ) {
       var check = {
         check_date: check_date.w,
         deposit_date: deposit_date.w,
@@ -230,7 +234,7 @@ class LienXLSX extends Parse.Object {
     var first = group.first
     var last = group.last
 
-    for( var col of range(first, last) ) {
+    for( var col of range(first, last+1) ) {
       var head = this.getCell(col, 2) || {}
       var data = this.getCell(col, row)
 
@@ -245,9 +249,16 @@ class LienXLSX extends Parse.Object {
         }
       }
 
-      var tag_text = head.v
+      var tag_text = head.v.trim()
       var tag = tags[tag_text]
+      if(val == "") {
+        val  = undefined
+      }
+
       if(tag) {
+        if(tag == 'county') {
+          this.addTownship(val)
+        }
         object.general[tag] = val
         object.annotations = object.annotations.concat(notes.map(function(note) {
           return {
@@ -258,6 +269,55 @@ class LienXLSX extends Parse.Object {
         }))
       }
     }
+  }
+
+  addTownship(val) {
+    if(this.townships.indexOf(val) == -1 ){
+      this.townships.push(val)
+    }
+  }
+
+  create() {
+    //Create townships
+    var promises = this.townships.map( (ts) => {
+      return Models.Township.findOrCreate(ts)
+    })
+    //Create MUA accounts
+    //Create LLCs
+
+    Parse.Promise.when(promises).then( (townships) =>{
+      var towns = townships.reduce( (m, ts) => { m[ts.get('township')] = ts; return m;}, {})
+      return Parse.Promise.when(this.objects.map( (lien, k) =>{
+      //TODO: UPgrade request limit
+      // return Parse.Promise.when(this.objects.slice(0,100).map( (lien, k) =>{
+        lien.general['township'] = towns[lien.general['county']]
+        return Models.Lien.save_json(lien)
+      }))
+    }).then( (liens) => {
+      //Parse out SubBatches
+      var sub_batches = {}
+      liens.map( (lien) => {
+        var township = lien.get('township').get('township')
+        var subs = lien.get('subs')
+        subs.map( (sub) => {
+          var sub_date = moment(sub.get('sub_date')).format('MM/DD/YYYY')
+          if( !sub_batches[township+sub_date]) {
+            sub_batches[township+sub_date] = {
+              sub_date: sub.get('sub_date'),
+              township:lien.get('township'),
+              subs: []
+            }
+          }
+          sub_batches[township+sub_date].subs.push(sub)
+        })
+      })
+      return Parse.Promise.when(Object.keys(sub_batches).map( (key) =>{
+        var batch = sub_batches[key]
+        return Models.SubBatch.init_from_json(batch).save()
+      }))
+    }).fail( (error) =>{
+      debugger
+    })
   }
 }
 

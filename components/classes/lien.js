@@ -2,6 +2,8 @@ var accounting = require('accounting')
 var LienCheck = require('./LienCheck')
 var LienSub = require('./LienSub')
 var LienNote = require('./LienNote')
+var LienOwner = require('./LienOwner')
+var Parse = require('parse')
 
 class Lien extends Parse.Object {
   constructor() {
@@ -42,9 +44,9 @@ class Lien extends Parse.Object {
   }
 
   total_cash_out() {
-    var cert_fv = this.get('cert_fv')
-    var premium = this.get('premium')
-    var recording_fee = this.get('recording_fee')
+    var cert_fv = this.get('cert_fv') || 0
+    var premium = this.get('premium') || 0
+    var recording_fee = this.get('recording_fee') || 0
     var subs_paid = this.get('subs').reduce((total, sub)=>{
       return total+sub.get('amount')
     }, 0)
@@ -126,6 +128,7 @@ class Lien extends Parse.Object {
         var number_types = ['assessed_value', 'tax_amount', 'cert_fv', 'winning_bid', 'premium', 'total_paid', 'recording_fee', 'search_fee', 'flat_rate', 'cert_int']
         var date_types = ['sale_date', 'recording_date', 'redemption_date', ]
         var calc_types = ['redemption_amt', 'total_cash_out', 'total_int_due', 'mz_check']
+
         if(number_types.includes(k)){
           return accounting.unformat(info[k], ".")
         }else if(date_types.includes(k)) {
@@ -148,23 +151,26 @@ class Lien extends Parse.Object {
     if(!lien.get('search_fee')) {
       lien.set('search_fee', 12)
     }
+    lien.set('township', data.general.township)
     lien.set('2013_yep', 0)
     lien.set('yep_int', 0)
-    lien.subs = data.subs.map( (sub) => LienSub.init_from_json(lien, sub))
-    lien.checks = data.checks.map( (check) => LienCheck.init_from_json(lien, check))
-    lien.annotations = data.annotations.map( (note) => LienNote.init_from_json(lien, note))
+    // lien.subs = data.subs.map( (sub) => LienSub.init_from_json(lien, sub))
+    // lien.checks = data.checks.map( (check) => LienCheck.init_from_json(lien, check))
+    // lien.annotations = data.annotations.map( (note) => LienNote.init_from_json(lien, note))
     return lien
   }
 
-  save_json() {
-    return this.save().then(function(lien) {
-      lien.set('subs', data.subs.map( (sub) => LienSub.init_from_json(lien, sub)) )
-      lien.set('checks', data.checks.map( (check) => LienCheck.init_from_json(lien, check)) )
-      lien.set('annotations', data.annotations.map( (note) => LienNote.init_from_json(lien, note)) )
-
-      return lien.save();
+  static save_json(object) {
+    var lien = Lien.init_from_json(object)
+    return lien.save().then(function(lien) {
+      lien.set('subs', object.subs.map( (sub) => LienSub.init_from_json(lien, sub)) )
+      lien.set('owners', object.owners.map( (owner) => LienOwner.init_from_json(lien, owner)) )
+      lien.set('checks', object.checks.map( (check) => LienCheck.init_from_json(lien, check)) )
+      lien.set('annotations', object.annotations.map( (note) => LienNote.init_from_json(lien, note)) )
+      return lien.save()
     }).fail(function(error) {
       lien.error = error
+      debugger
       return lien
     })
   }

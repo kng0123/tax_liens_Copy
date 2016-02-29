@@ -1,7 +1,61 @@
 Lien = require('./classes/lien.js')
+LienLoad = require('./utils/LienLoad.js')
+# Utils = require('./utils')
+# require('./index')
+Models = require('./classes')
+
+require("babel-core/register")
 
 Parse.Cloud.define 'hello', (request, response) ->
   response.success 'Hello world!'
+  return
+
+Parse.Cloud.define 'create', (request, response) ->
+  body = JSON.parse request.body
+  townships = body.townships
+  data = body.data
+  console.log townships
+  LienLoad.create(townships, data)
+
+Parse.Cloud.define 'delete', (request, response) ->
+  query = new (Parse.Query)('Lien')
+  query.find().then( (liens) ->
+    Parse.Object.destroyAll(liens)
+  ).then( ->
+    query = new (Parse.Query)('LienSub')
+    query.find()
+  ).then( (subs) ->
+    Parse.Object.destroyAll(subs)
+  ).then( ->
+    query = new (Parse.Query)('LienCheck')
+    query.find()
+  ).then( (checks) ->
+    Parse.Object.destroyAll(checks)
+  ).then( ->
+    query = new (Parse.Query)('LienNote')
+    query.find()
+  ).then( (notes) ->
+    Parse.Object.destroyAll(notes)
+  ).then( ->
+    query = new (Parse.Query)('Township')
+    query.find()
+  ).then( (townships) ->
+    Parse.Object.destroyAll(townships)
+  ).then( ->
+    query = new (Parse.Query)('SubBatch')
+    query.find()
+  ).then( (batches) ->
+    Parse.Object.destroyAll(batches)
+  ).then( ->
+    query = new (Parse.Query)('LienOwner')
+    query.find()
+  ).then( (owners) ->
+    Parse.Object.destroyAll(owners)
+  ).then( ->
+      response.success("success");
+  ).fail( ->
+    response.error("error")
+  )
   return
 
 Parse.Cloud.beforeSave 'Lien', (request, response) ->
@@ -28,6 +82,20 @@ Parse.Cloud.beforeSave 'LienSub', (request, response) ->
         response.success()
       else
         response.error("LienSub already created with this unique_id")
+    )
+  else
+    response.success()
+  return
+
+Parse.Cloud.beforeSave 'Township', (request, response) ->
+  if request.object.isNew()
+    query = new (Parse.Query)('Township')
+    query.equalTo 'township', request.object.get('township')
+    query.find().then( (townships) ->
+      if townships.length == 0
+        response.success()
+      else
+        response.error("township already created with this unique_id")
     )
   else
     response.success()

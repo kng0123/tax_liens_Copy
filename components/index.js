@@ -30,7 +30,7 @@ global.injectTapEventPlugin = require("react-tap-event-plugin")
 global.Recompose = require('recompose')
 global.moment = require('moment')
 global.tv4 = require('tv4')
-global.Parse = require('./parse')
+global.Parse = require('parse')
 global.ParseReact = require('parse-react')
 global.moment = require('moment')
 global.XLSX = require('xlsx-browserify-shim');
@@ -58,7 +58,6 @@ MUI.Libs = {
 
 global.ReactRouter = require("react-router");
 //TODO: If we require inside an object we're not picking up changes
-require('./classes');
 
 global.App = {
   Models: require('./classes'),

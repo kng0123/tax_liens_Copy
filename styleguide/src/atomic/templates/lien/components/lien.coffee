@@ -10,6 +10,7 @@ Templates.lien = React.createClass
     query.equalTo("unique_id", this.props.routeParams.id)
     query.include("subs")
     query.include("checks")
+    query.include("owners")
     query.include("llcs")
     query.include("annotations")
     query.find({}).then( (results) =>
@@ -63,7 +64,6 @@ Templates.lien = React.createClass
                   span null, "LIEN #{@state.lien.get('unique_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
-                  React.createFactory(MUI.FlatButton) label:"Add account", secondary:true, onTouchTap:@openCreate
           div className:'row',
             div className:'col-md-6',
               Factory.lien_info lien:lien, onChange:@onChange
@@ -78,8 +78,11 @@ Templates.lien = React.createClass
             div className:'col-md-12',
               Factory.lien_checks Object.assign {}, @props, lien:lien
           div className:'row',
-            div className:'col-md-12',
-              Factory.lien_general lien:lien, onChange:@onChange
+            div className:'col-md-6',
+              Factory.lien_llcs lien:lien, onChange:@onChange
+          # div className:'row',
+          #   div className:'col-md-12',
+          #     Factory.lien_general lien:lien, onChange:@onChange
 
 Templates.lien_general = React.createClass
   displayName: 'LienGeneral'
@@ -148,18 +151,6 @@ Templates.lien_general = React.createClass
             div className:'panel-body',
               div style:{width:'50%', float:'left'},
                 ul className:'list-group',
-                  general_fields.map (v, k) ->
-                    val = if lien.get(v.key) is undefined
-                      ""
-                    else
-                      lien.get(v.key)
-                    if val instanceof Date
-                      val = moment(val).format('MM/DD/YYYY');
-                    if typeof val is 'number'
-                      val = val.toString()
-                    if v.is_function
-                      val = lien[v.key]().toString()
-                    gen_editable(k, v, val)
                   li className:'list-group-item',
                     React.Factory.lien_llcs lien:lien
 
@@ -253,24 +244,43 @@ Templates.lien_subs = React.createClass
 
 Templates.lien_llcs = React.createClass
   displayName: 'LienLLCs'
-
+  rowGetter: (i) ->
+    owner = @props.lien.get('owners')[i]
+    row = {
+      llc: owner.get('llc'),
+      start: moment(owner.get('start_date')).format('MM/DD/YYYY'),
+      end: undefined
+    }
+    if owner.get('end_date')
+      row.end = moment(owner.get('end_date')).format('MM/DD/YYYY')
+    row
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
     Factory = React.Factory
     lien = @props.lien
 
 
-    llc_headers = ["LLC", "START", "STOP"]
-    llcs = lien.get('llcs') || []
-    llc_rows = llcs.map (v, k) ->
-      [
-        v.get('llc'),
-        moment(v.get('start')).format('MM/DD/YYYY'),
-        moment(v.get('stop')).format('MM/DD/YYYY')
-      ]
-    llc_table = Factory.table headers: llc_headers, rows: llc_rows, height:'50px'
+    columns = [
+      {name:"LLC", key:'llc'}
+      {name:"Start date", key:'start'}
+      {name:"End date", key:'end'}
+    ]
 
-    llc_table
+    llc_table = React.createFactory(ReactDataGrid) {
+      columns:columns
+      enableCellSelect: true
+      rowGetter:@rowGetter
+      rowsCount:lien.get('owners').length
+      minHeight:130
+    }
+
+
+    div className:'panel panel-default',
+      div className:'panel-heading',
+        h3 className:'panel-title',
+          span null, "Owners"
+        div style:{width:'100%'},
+          llc_table
 
 Templates.lien_check_actions = React.createClass
   displayName: 'LienCheckActions'
@@ -370,9 +380,9 @@ Templates.lien_checks = React.createClass
 
     div className:'panel panel-default',
       div className:'panel-heading',
-        h3 className:'panel-title',
-          span null, "Receipts"
-          React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+        # h3 className:'panel-title',
+        #   span null, "Receipts"
+        #   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
         @getDialog()
         div style:{width:'100%'},
           receipt_table
@@ -411,23 +421,46 @@ Templates.lien_info = React.createClass
       [{label: "Lien ID", key:"unique_id"}
       {label: "BLOCK/LOT/QUAL", key:"block_lot"}
       {label: "TOWNSHIP", key:"county", editable:false}
-      {label: "CERTIFICATE #", key:"cert_number", editable:true}]
+      {label: "CERTIFICATE #", key:"cert_number", editable:true}
+      {label: "MUA ACCOUNT #s", key:"mua_account_number", editable:true}
+      ]
 
       [{label: "ADDRESS", key:"address", editable:true}
       {label: "CITY", key:"city", editable:true}
       {label: "STATE", key:"state", editable:true}
       {label: "ZIP", key:"zip", editable:true}]
+
+      [
+        {label: "SALE DATE", key:"sale_date", editable:true, type:'date'}
+        {label: "RECORDING DATE", key:"recording_date", editable:true, type:'date'}
+        {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'}
+        {label: "REDEEM IN 10?", key:"redeem_in_10", editable:true, type:'bool'}
+      ]
     ]
 
     editable = React.createFactory PlainEditable
     date_picker = React.createFactory DatePicker
     checkbox = React.createFactory MUI.Checkbox
     gen_editable = (key, item, val) =>
-      edit = if item.editable
-          span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
-            editable onBlur:@props.onChange(item), value:val
+      edit = switch(item.type)
+        when 'date'
+          div style:{display: 'block', position: 'relative', width: '100px'},
+            date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
+        when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
+        when 'number'
+          val = accounting.toFixed(val, 2)
+          if item.editable
+            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
+                editable onBlur:@props.onChange(item), value:val
+          else
+            span style:{paddingRight:'15px'}, val
         else
-          small className:'text-muted', val || "Empty"
+          if item.editable
+            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
+              editable onBlur:@props.onChange(item), value:val
+          else
+            small className:'text-muted', val || "Empty"
+
       fieldset style:{marginBottom:'0px'}, className:'form-group', key:key,
         div null,
           label style:{marginBottom:'0px'}, item.label
@@ -438,7 +471,7 @@ Templates.lien_info = React.createClass
         form className:'container-fluid',
           div className:'row',
             general_fields.map( (fields,k) =>
-              div className:'col-lg-6', key:k,
+              div className:'col-lg-4', key:k,
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
                   val = "Empty" if val is undefined
@@ -455,16 +488,12 @@ Templates.lien_cash = React.createClass
     #Third column from excel gui
     #lien.subs = [{type:'check'}, {type:'check'}]
     lien = @props.lien
+
     notes = lien.get('annotations')
 
     #Second column from excel GUI
     fields = [
-      [
-        {label: "SALE DATE", key:"sale_date", editable:true, type:'date'}
-        {label: "RECORDING DATE", key:"recording_date", editable:true, type:'date'}
-        {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'}
-        {label: "REDEEM IN 10?", key:"redeem_in_10", editable:true, type:'bool'}
-      ]
+
       [
         {label: "WINNING RATE", key:"winning_bid", editable:true}
         {label: "RECORDING FEE", key:"recording_fee", editable:true, type:'number'}
@@ -472,11 +501,14 @@ Templates.lien_cash = React.createClass
         {label: "YEAR END PENALTY", key:"2013_yep", editable:true, type:'number'}
       ]
       [
-        # {label: "FACE VALUE", key:"cert_fv", editable:false, type:'number'}
-        # {label: "PREMIUM", key:"premium", editable:false, type:'number'}
-        # {label: "TOTAL PAID", key:"total_paid", editable:false, type:'number'}
-        # {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'number'}
-        # {label: "CERT INT", key:"cert_interest", is_function:true, type:'number'}
+        {label: "FACE VALUE", key:"cert_fv", editable:false, type:'number'}
+        {label: "PREMIUM", key:"premium", editable:false, type:'number'}
+        {label: "TOTAL PAID", key:"total_paid", editable:false, type:'number'}
+        {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'number'}
+        {label: "CERT INT", key:"cert_interest", is_function:true, type:'number'}
+      ]
+      [
+
 
         # {label: "REDEMPTION AMOUNT", key:"redemption_amt", editable:true, type:'number'}
         {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true, type:'number'}
@@ -484,7 +516,7 @@ Templates.lien_cash = React.createClass
         #TODO Calculate expected amt
         {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'number'}
         #TODO: No longer required
-        # {label: "MZ CHECK", key:"total_check", is_function:true}
+        {label: "MZ CHECK", key:"total_check", is_function:true}
         {label: "DIFFERENCE", key:"diff", is_function:true, type:'number'}
       ]
     ]

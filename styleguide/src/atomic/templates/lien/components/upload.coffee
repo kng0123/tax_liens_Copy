@@ -18,10 +18,11 @@ Templates.lien_upload = React.createClass
         data = e.target.result
 
         lien_xlsx = new App.Utils.LienXLSX(data)
-        @setState(data: data.concat(lien_xlsx.liens))
 
-        # promises = objects.map (lien) =>
-        #   Lien.init_from_json(lien)
+        # Parse.Cloud.run('create', data:data)
+        lien_xlsx.create()
+        # promises = lien_xlsx.objects.map (lien) =>
+        #   App.Models.Lien.save_json(lien)
         # @setState(data:[])
         # Parse.Promise.when(promises).then () =>
         #   data = @state.data
