@@ -16,7 +16,7 @@ Templates.table = React.createClass
       fixedFooter: false,
       stripedRows: false,
       showRowHover: false,
-      selectable: false,
+      selectable: @props.selectable,
       multiSelectable: false,
       enableSelectAll: false,
       adjustForCheckbox: false,
@@ -31,7 +31,9 @@ Templates.table = React.createClass
       fixedFooter: table_state.fixedFooter
       selectable: table_state.selectable
       multiSelectable: table_state.multiSelectable
-      onRowSelection: ->
+      onRowSelection: @props.onRowSelection
+
+    # debugger
 
     headers = @props.headers
     rows = @props.rows

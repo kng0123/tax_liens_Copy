@@ -1,3 +1,4 @@
+Paper = require('material-ui/lib/paper');
 Templates.lien_process_subs = React.createClass
   displayName: 'LienProcessSubs'
 
@@ -25,24 +26,101 @@ Templates.lien_process_subs = React.createClass
 Templates.lien_process_subs_form = React.createClass
   displayName: 'LienProcessSubsForm'
 
+  contextTypes: {
+    router: React.PropTypes.object
+  },
+
+  getInitialState: () ->
+    data: {
+      township: undefined
+    }
+    townships: []
+    batches: []
+    batch_date: new Date()
+
+  componentDidMount: () ->
+    township_query = new Parse.Query('Township');
+    township_query.find().then( (townships) =>
+      @setState townships:townships.map( (township) ->
+        label: township.get('township'), value:township
+      )
+    )
+    @fetchBatches()
+
+  fetchBatches: (township) ->
+    batch_query = new Parse.Query('SubBatch');
+    if township
+      batch_query.equalTo('township', township)
+    return batch_query.find().then( (batches) =>
+      @setState batches:batches
+    )
+
+  onChange: (event) ->
+    @setState data:{township:event.value}
+    @fetchBatches(event.value)
+
+  goToBatch: (indices) ->
+    batch = @state.batches[indices[0]]
+    @context.router.push('/lien/batch/'+batch.id)
+
+  valueRenderer: (val) ->
+    {div, h3, p, form, input, span, ul, li, button} = React.DOM
+    if val
+      val.get('township')
+
   render: ->
-    {div, h3, p, form, input, span, ul, li} = React.DOM
+    {div, h3, p, form, input, span, ul, li, button} = React.DOM
     date_picker = React.createFactory DatePicker
     TextField = React.createFactory MUI.TextField
     RaisedButton = React.createFactory MUI.RaisedButton
+    Paper = React.createFactory Paper
+    paperStyle=  {
+      width: 450,
+      margin: '20px auto',
+      padding: 20
+    }
 
+    select = React.createFactory Select
+
+    Factory = React.Factory
+
+    RaisedButton = React.createFactory MUI.RaisedButton
+
+    batch_headers = ["TOWNSHIP", "DATE"]
+    editable = React.createFactory PlainEditable
+    batch_rows = @state.batches.map (batch, k) =>
+      [
+        batch.get('township').get('township')
+        moment(batch.get('createdAt')).format('MM/DD/YYYY')
+      ]
+    # widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px','50px','50px','50px']
+
+    batch_table = Factory.table selectable: true, onRowSelection:@goToBatch, headers: batch_headers, rows: batch_rows
+    val = ""
+    if @state.data.township
+      val = @state.data.township
+    date_picker = React.createFactory DatePicker
+    RaisedButton = React.createFactory MUI.RaisedButton
     div className:'container',
       div className:'row',
         div className:'col-md-offset-4 col-md-4',
           h3 className:'strong text-center text-grey', "Specify sub list"
-          div null,
-            form onSubmit:@props.setSubs,
-              TextField fullWidth: true, name:'township', type:'text', hintText:"Township", floatingLabelText:"Township"
-              div null,
-                span style:float:'left', "Sub date: "
-                date_picker style:{width:'100%'}, name:'date'
-              div style:{textAlign:'right', marginTop:'10px'},
-                RaisedButton label:"Fetch subs list", type:'submit', primary:true
+          div style:paperStyle,
+            form
+              select name:'township', style:{width:'360px'}, value:val, options:@state.townships, onChange:@onChange, valueRenderer:@valueRenderer
+      div className:'row',
+        div className:'col-sm-12',
+          p null, "Recent Subsequents"
+          form className:'form-inline', onSubmit:@createBatch,
+            div className:'form-group',
+              div style:{float:'left', width:'160px'},
+                div style:{display: 'block', position: 'relative', width: '100px'},
+                  date_picker className:'form-control datepicker', selected:moment(@state.batch_date), onChange:@updateBatchDate
+              div style:{float:'left'},
+                select name:'township', style:{width:'200px'}, value:val, options:@state.townships, onChange:@onChange, valueRenderer:@valueRenderer
+              RaisedButton label:"Create new batch", onClick:@logout, type:'submit', disabled:!(val.id && @state.batch_date), primary:true
+        div className:'col-sm-12',
+          batch_table
 
 Templates.lien_process_subs_list = React.createClass
   displayName: 'LienProcessSubsList'
