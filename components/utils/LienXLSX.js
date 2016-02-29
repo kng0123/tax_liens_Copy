@@ -299,16 +299,23 @@ class LienXLSX {
       liens.map( (lien) => {
         var township = lien.get('township').get('township')
         var subs = lien.get('subs')
+        var sub_dates = []
         subs.map( (sub) => {
           var sub_date = moment(sub.get('sub_date')).format('MM/DD/YYYY')
           if( !sub_batches[township+sub_date]) {
             sub_batches[township+sub_date] = {
               sub_date: sub.get('sub_date'),
               township:lien.get('township'),
-              subs: []
+              subs: [],
+              liens: []
             }
           }
+          sub_dates.push(sub_date)
           sub_batches[township+sub_date].subs.push(sub)
+        })
+        //Add the Lein to each batch
+        sub_dates.map((date) => {
+          sub_batches[township+date].liens.push(lien)
         })
       })
       return Parse.Promise.when(Object.keys(sub_batches).map( (key) =>{
