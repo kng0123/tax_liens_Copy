@@ -93,20 +93,22 @@ class LienXLSX {
   //Strategy:
   //   Select the row the headers are on
   //   Split the headers into groups based on the color of the cell
-  getHeaders() {
+  getHeaders(row=0) {
     var {rows, cols} = this.getRange()
     //Group cells by background color into arrays
     var group_color_break = null
     var groups = []
     var group = null
 
-    var row = 2 //This is the row the headers are on
     var last = undefined;
     for( var col of range(0, cols) ) {
       var cell = this.getCell(col, row)
 
       //If this cell is empty add it to the group and move to the next one
       if (cell == undefined) {
+        if(group == null) {
+          break;
+        }
         group.push(undefined)
         continue
       }
@@ -134,8 +136,11 @@ class LienXLSX {
       last = col
       group.push(cell.w)
     }
-
-    return groups
+    if( groups.length < 2) {
+      return this.getHeaders.call(this,++row)
+    } else {
+      return groups
+    }
   }
 
   parseObjects (groups){
