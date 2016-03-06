@@ -2,7 +2,7 @@ Templates.lien_upload = React.createClass
   displayName: 'LienUpload'
 
   getInitialState: ->
-    lien_xlsx: []
+    lien_xlsx: undefined
 
   handleFile: (e) ->
     files = e.target.files
@@ -15,16 +15,19 @@ Templates.lien_upload = React.createClass
         data = e.target.result
         lien_xlsx = new App.Utils.LienXLSX(data)
         @setState lien_xlsx: lien_xlsx
-        lien_xlsx.create()
+        # lien_xlsx.create()
       reader.readAsBinaryString f
       ++i
+
+  handleCreate: ->
+    @state.lien_xlsx.create()
 
   handleClick: ->
      fileUploadDom = React.findDOMNode(@refs.fileUpload);
      fileUploadDom.click();
 
   render: ->
-    {div, h3, h1, input, pre} = React.DOM
+    {div, h3, h1, input, pre, span} = React.DOM
     Factory = React.Factory
     RaisedButton = React.createFactory MUI.RaisedButton
 
@@ -36,3 +39,21 @@ Templates.lien_upload = React.createClass
         div className:'col-lg-12',
           RaisedButton label:"Upload", type:'button', primary:true, onClick:@handleClick
           input ref:"fileUpload", style:{display:'none'}, type:'file', onChange:@handleFile
+      if @state.lien_xlsx
+        data= @state.lien_xlsx
+        div className:'row',
+          div className:'col-lg-12',
+            div className:'panel panel-default',
+              div className:'panel-heading',
+                h3 className:'panel-title',
+                  span null, "Data that will be uploaded"
+              div className:'panel-body',
+                div style:{width:'100%'},
+                  div null,
+                   span null, "Townships: "
+                   span null, data.townships.length
+                  div null,
+                   span null, "Liens: "
+                   span null, data.objects.length
+                  div null,
+                    RaisedButton label:"Create liens", type:'button', primary:false, onClick:@handleCreate

@@ -43,7 +43,8 @@ require('./app.css')
 // }
 
 
-Parse.initialize("4jhLXmNyrqVvhHBfYpAR5wtNtqTLY6o0kt10dICm", "w0DVkEdklERduqzIVTWpUU3hIpn7uUpi58iXux9F");
+Parse.initialize("fake_app", "javascriptKey");
+Parse.serverURL = ('http://localhost:1337/parse');
 
 injectTapEventPlugin = require("react-tap-event-plugin");
 global.MUI = require('material-ui');
