@@ -95,7 +95,7 @@ Templates.lien = React.createClass
                   span null, "LIEN #{@state.lien.get('unique_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   span style:{width:'150px', display:'inline-block'},
-                    select name:'sub_status', value:lien.get('sub_status'), options: state_options, onChange:@onChange({type:'select', key:"sub_status"})
+                    select name:'status', value:lien.get('status'), options: state_options, onChange:@onChange({type:'select', key:"status"})
                   # React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate
           div className:'row',
             div className:'col-md-6',

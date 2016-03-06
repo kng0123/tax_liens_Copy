@@ -26,7 +26,7 @@ var tags = {
   "Lien Type": "lien_type",
   "List Item": "list_item",
   "Current Owner": "current_owner",
-  "Longitude ": "longitude",
+  "Longitude": "longitude",
   "Latitude": "latitude",
   "Assessed Value": "assessed_value",
   "Tax Amount": "tax_amount",
@@ -68,6 +68,7 @@ class LienXLSX {
 
     this.sheet = workbook.Sheets["Sheet1"]
     var groups = this.getHeaders()
+    this.groups = groups
     this.objects = this.parseObjects(groups)
 
   }
@@ -271,6 +272,8 @@ class LienXLSX {
       if(tag) {
         if(tag == 'county') {
           this.addTownship(val)
+        } else if (tag == 'status' && val) {
+          val = val.toLowerCase()
         }
         object.general[tag] = val
         object.annotations = object.annotations.concat(notes.map(function(note) {

@@ -68,8 +68,8 @@ Templates.lien_process_subs_form = React.createClass
     query.equalTo("township", @state.data.township)
     #TODO WHAT DOES THIS MEAN???
     #Principal Balance > $0
-    query.notEqualTo('sub_status', 'redeemed')
-    query.notEqualTo('sub_status', 'none')
+    query.notEqualTo('status', 'redeemed')
+    query.notEqualTo('status', 'none')
     query.find({
     	success : (liens) =>
         batch = {
