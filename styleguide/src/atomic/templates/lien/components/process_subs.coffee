@@ -233,7 +233,7 @@ Templates.lien_process_subs_list = React.createClass
 
     data = [
       ["SUB REQUEST"]
-      ["Interest Date: #{moment(@props.date).format('MM/DD/YYYY')}"]
+      ["Interest Date: #{moment(@state.batch.get('sub_date')).format('MM/DD/YYYY')}"]
       ["Township", "Block", "Lot", "Qualifier", "MUA Acct 1", "Certificate #", "Address", "Sale Date", "Tax Amount", "Utility Amount", "Other Amount"]
     ]
     rows = @state.batch.get('liens').map (lien, k) =>
@@ -250,9 +250,9 @@ Templates.lien_process_subs_list = React.createClass
       utility_sub = subs['utility']
       other_sub = subs['other']
       acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
-      tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format)
-      util_amount = accounting.formatMoney(util_sub.get('amount')/100, acc_format)
-      other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
+      tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format) if tax_sub
+      util_amount = accounting.formatMoney(utility_sub.get('amount')/100, acc_format) if utility_sub
+      other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format) if other_sub
       [
         lien.get('county'),
         lien.get('block'),
@@ -386,7 +386,7 @@ Templates.lien_process_subs_list = React.createClass
     div className:'container-fluid',
       div className:'row',
         div className:'col-lg-12',
-          p null, "Interest for #{moment(@props.date).format('MM/DD/YYYY')}"
+          p null, "Interest for #{moment(@state.batch.get('sub_date')).format('MM/DD/YYYY')}"
         div className:'col-lg-12',
           RaisedButton label:"Export Excel", onClick:@exportXLSX, type:'button', primary:true
           RaisedButton label:void_label, onClick:@toggleVoid, type:'button', primary:false
