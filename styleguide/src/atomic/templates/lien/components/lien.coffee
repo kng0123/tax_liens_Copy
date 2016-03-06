@@ -44,6 +44,7 @@ Templates.lien = React.createClass
         when 'date' then data.toDate()
         when 'bool' then $(data.target).is(':checked')
         when 'select' then data.value
+        when 'money' then Math.round(accounting.unformat($(data.target).html()) * 100)
         else  arguments[1]
 
       lien = @state.lien
@@ -113,94 +114,6 @@ Templates.lien = React.createClass
           div className:'row',
             div className:'col-md-6',
               Factory.lien_llcs lien:lien, onChange:@onChange
-          # div className:'row',
-          #   div className:'col-md-12',
-          #     Factory.lien_general lien:lien, onChange:@onChange
-
-Templates.lien_general = React.createClass
-  displayName: 'LienGeneral'
-
-  render: ->
-    #First column from excel GUI
-    cash_fields = [
-
-    ]
-
-    general_fields = [
-      #TODO there are 2 MUA ACCT's?
-      {label: "MUA ACCT 1", key:"mua_account_number", editable:true}
-      {label: "MUA ACCT 2", key:"mua_account_number", editable:true}
-    ]
-
-    #Second column from excel GUI
-    fee_fields = [
-    ]
-    lien = @props.lien
-
-    editable = React.createFactory PlainEditable
-    date_picker = React.createFactory DatePicker
-    checkbox = React.createFactory MUI.Checkbox
-    gen_editable = (key, item, val) =>
-      edit = switch(item.type)
-        when 'date'
-          div style:{display: 'block', position: 'relative', width: '100px'},
-            date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
-        when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
-        when 'number'
-          val = accounting.toFixed(val, 2)
-          if item.editable
-            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
-                editable onBlur:@props.onChange(item), value:val
-          else
-            span style:{paddingRight:'15px'}, val
-        else
-          if item.editable
-            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
-              editable onBlur:@props.onChange(item), value:val
-          else
-            span style:{paddingRight:'10px'}, val
-      li key:key, className:'list-group-item compact',
-
-        div style:{float:'left'},
-          span null, item.label
-
-        div style:{float:'right'},
-          edit
-          if ['date', 'bool'].indexOf(item.type) == -1
-            span style:{position:'absolute'},
-              if item.editable
-                i className:"fa fa-pencil"
-              else
-                i className:"fa fa-times-circle"
-        div style:{clear:'both'}, ""
-
-    {div, h3, h1, ul, li, span, i, p} = React.DOM
-    div className:'container-fluid',
-      div className:'row',
-        div className:'col-md-12',
-          div className:'panel panel-default',
-            div className:'panel-heading',
-              h3 className:'panel-title', "General"
-            div className:'panel-body',
-              div style:{width:'50%', float:'left'},
-                ul className:'list-group',
-                  li className:'list-group-item',
-                    React.Factory.lien_llcs lien:lien
-
-              div style:{width:'50%', float:'right' },
-                ul className:'list-group',
-                  fee_fields.map (v, k) ->
-                    val = if lien.get(v.key) is undefined
-                      ""
-                    else
-                      lien.get(v.key)
-                    if val instanceof Date
-                      val = moment(val).format('MM/DD/YYYY');
-                    if typeof val is 'number'
-                      val = val.toString()
-                    if v.is_function
-                      val = lien[v.key]().toString()
-                    gen_editable(k, v, val)
 
 Templates.formatter = React.createClass
   displayName: 'formatter'
@@ -226,11 +139,13 @@ Templates.lien_subs = React.createClass
 
   rowGetter: (i) ->
     sub = @props.lien.get('subs')[i]
+    acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
+    amount = sub.amount() || 0
     row = {
       type: sub.get('type'),
       date: moment(sub.get('sub_date')).format('MM/DD/YY'),
-      amt: sub.amount() || "",
-      int: sub.interest(),
+      amt: accounting.formatMoney(amount/100, acc_format) ,
+      int: accounting.formatMoney(sub.interest()/100, acc_format) ,
       number: "",
       actions: {g:2}
     }
@@ -353,18 +268,19 @@ Templates.lien_checks = React.createClass
 
   rowGetter: (i) ->
     receipt = @props.lien.get('checks')[i]
+    acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
     {
       deposit_date: moment(receipt.get('deposit_date')).format('MM/DD/YYYY')
       account: "NA"
       check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       check_number: receipt.get('check_number')
       redeem_date: if receipt.get('redeem_date') then moment(receipt.get('redeem_date')).format('MM/DD/YYYY') else ""
-      check_amount: receipt.get('check_amount')
+      check_amount: accounting.formatMoney(receipt.get('check_amount')/100, acc_format)
       principal: receipt.get('check_principal')
       subs: receipt.get('check_interest')
       code: receipt.get('type')
-      expected_amt: receipt.expected_amount()
-      dif: receipt.expected_amount() - receipt.get('check_amount')
+      expected_amt: accounting.formatMoney(receipt.expected_amount()/100, acc_format)
+      dif: accounting.formatMoney((receipt.expected_amount() - receipt.get('check_amount'))/100, acc_format)
       actions: {onClick:@openEdit.bind(@, receipt), receipt:receipt}
     }
 
@@ -519,42 +435,49 @@ Templates.lien_cash = React.createClass
 
       [
         {label: "WINNING RATE", key:"winning_bid", editable:true}
-        {label: "RECORDING FEE", key:"recording_fee", editable:true, type:'number'}
-        {label: "SEARCH FEE", key:"search_fee", is_function:true, editable:true}
-        {label: "YEAR END PENALTY", key:"2013_yep", editable:true, type:'number'}
+        {label: "RECORDING FEE", key:"recording_fee", editable:true, type:'money'}
+        {label: "SEARCH FEE", type:'money', key:"search_fee", is_function:true, editable:true}
+        {label: "YEAR END PENALTY", key:"2013_yep", editable:true, type:'money'}
       ]
       [
-        {label: "FACE VALUE", key:"cert_fv", editable:false, type:'number'}
-        {label: "PREMIUM", key:"premium", editable:false, type:'number'}
-        {label: "TOTAL PAID", key:"total_paid", editable:false, type:'number'}
-        {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'number'}
-        {label: "CERT INT", key:"cert_interest", is_function:true, type:'number'}
+        {label: "FACE VALUE", key:"cert_fv", editable:false, type:'money'}
+        {label: "PREMIUM", key:"premium", editable:false, type:'money'}
+        {label: "TOTAL PAID", key:"total_paid", editable:false, type:'money'}
+        {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'money'}
+        {label: "CERT INT", key:"cert_interest", is_function:true, type:'money'}
       ]
       [
 
 
         # {label: "REDEMPTION AMOUNT", key:"redemption_amt", editable:true, type:'number'}
-        {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true, type:'number'}
-        {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true, type:'number'}
+        {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true, type:'money'}
+        {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true, type:'money'}
         #TODO Calculate expected amt
-        {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'number'}
+        {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'money'}
         #TODO: No longer required
-        {label: "MZ CHECK", key:"total_check", is_function:true}
-        {label: "DIFFERENCE", key:"diff", is_function:true, type:'number'}
+        {label: "MZ CHECK", type:'money', key:"total_check", is_function:true}
+        {label: "DIFFERENCE", key:"diff", is_function:true, type:'money'}
       ]
     ]
 
     editable = React.createFactory PlainEditable
     date_picker = React.createFactory DatePicker
     checkbox = React.createFactory MUI.Checkbox
+
     gen_editable = (key, item, val) =>
       edit = switch(item.type)
         when 'date'
           div style:{display: 'block', position: 'relative', width: '100px'},
             date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
         when 'bool' then checkbox onCheck: @props.onChange(item), checked:!!val
+        when 'money'
+          val = accounting.formatMoney(val/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+          if item.editable
+            span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
+                editable onBlur:@props.onChange(item), value:val
+          else
+            span style:{paddingRight:'15px'}, val
         when 'number'
-          val = accounting.toFixed(val, 2)
           if item.editable
             span style:{display:'inline-block', minWidth:'100px', paddingRight:'10px'},
                 editable onBlur:@props.onChange(item), value:val

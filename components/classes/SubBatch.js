@@ -14,6 +14,11 @@ class SubBatch extends Parse.Object {
 
     return batch
   }
+  addSub(sub) {
+    var subs = this.get('subs')
+    subs.push(sub)
+    this.set('subs', subs)
+  }
 }
 
 Parse.Object.registerSubclass('SubBatch', SubBatch);

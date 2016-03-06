@@ -12,10 +12,6 @@ class Lien extends Parse.Object {
     // All other initialization
   }
 
-  hasSuperHumanStrength() {
-    return this.get('strength') > 18;
-  }
-
   flat_rate() {
     //If redeem within 10 days then 0
     if (this.redeem_in_10()) {
@@ -23,9 +19,9 @@ class Lien extends Parse.Object {
     }
     var cert_fv = this.get('cert_fv')
     var rate = 0.06 //If fv >=1000
-    if ( cert_fv < 5000) {
+    if ( cert_fv < 500000) {
       rate = 0.02
-    } else if (cert_fv >= 5000 && cert_fv < 10000) {
+    } else if (cert_fv >= 500000 && cert_fv < 1000000) {
       rate = 0.04
     }
     return accounting.unformat(cert_fv * rate)
@@ -54,6 +50,9 @@ class Lien extends Parse.Object {
   }
   //TODO: What is YEP
   total_interest_due() {
+    if (!this.get('redemption_date')) {
+      return 0
+    }
     return this.flat_rate()  + this.cert_interest() + this.sub_interest()
   }
   expected_amount() {
@@ -133,7 +132,10 @@ class Lien extends Parse.Object {
         var calc_types = ['redemption_amt', 'total_cash_out', 'total_int_due', 'mz_check']
 
         if(number_types.includes(k)){
-          return accounting.unformat(info[k], ".")
+          //Record numbers in cents
+          if(k!='winning_bid') {
+            return accounting.unformat(info[k], ".")*100
+          }
         }else if(date_types.includes(k)) {
           if( !info[k]){
             return undefined
@@ -152,7 +154,7 @@ class Lien extends Parse.Object {
     })
     //TODO: Lien defaults
     if(!lien.get('search_fee')) {
-      lien.set('search_fee', 12)
+      lien.set('search_fee', 1200)
     }
     lien.set('township', data.general.township)
     lien.set('2013_yep', 0)

@@ -19,7 +19,7 @@ const EditReceipt = React.createClass({
     var callback = this.props.callback
     Object.keys(model).map(function(key) {
       if(key == 'check_amount') {
-         return receipt.set(key,Number.parseFloat(model[key]))
+         return receipt.set(key,Math.round(accounting.unformat($(data.target).html()) * 100))
       } else {
         return receipt.set(key, model[key])
       }

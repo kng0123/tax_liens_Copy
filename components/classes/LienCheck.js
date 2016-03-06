@@ -43,7 +43,7 @@ class LienCheck extends Parse.Object {
         var date_types = ['check_date', 'deposit_date']
         var calc_types = ['check_interest', 'check_principal', 'dif']
         if(number_types.includes(k)){
-          return accounting.unformat(data[k], ".")
+          return accounting.unformat(data[k], ".")*100
         }else if(date_types.includes(k)) {
           if(data[k].iso) {
             return new Date(date[k].iso)

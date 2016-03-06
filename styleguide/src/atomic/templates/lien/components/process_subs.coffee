@@ -172,18 +172,27 @@ Templates.lien_process_subs_list = React.createClass
 
   onChange: (lien, type, sub) ->
     return (event) =>
-      val = $(event.target).text()
-      if sub
+      val = $(event.target).text() || 0
+      val = Math.round(accounting.unformat(val) * 100)
+
+      if sub.get('lien')
         sub.set('amount', parseFloat(val))
         sub.save()
       else
         data =
           type: type
           sub_date: moment(@props.date).toDate().toString()
-          amount: parseFloat(val)
+          amount: $(event.target).text()
         sub = App.Models.LienSub.init_from_json(lien, data)
+
         lien.set('subs', lien.get('subs').concat(sub))
-        lien.save()
+        lien.save().then(() =>
+          @state.batch.addSub(sub)
+          @state.batch.save()
+        ).fail(()->
+          debugger
+        )
+
 
   goToLien: (event) ->
     id = event.target.dataset.id
@@ -191,7 +200,7 @@ Templates.lien_process_subs_list = React.createClass
 
   toggleVoid: ->
     batch = @state.batch
-    
+
     void_state = !!batch.get('void')
     batch.set('void', !void_state)
     batch.get('subs').map( (sub) ->
@@ -240,6 +249,10 @@ Templates.lien_process_subs_list = React.createClass
       tax_sub = subs['tax']
       utility_sub = subs['utility']
       other_sub = subs['other']
+      acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
+      tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format)
+      util_amount = accounting.formatMoney(util_sub.get('amount')/100, acc_format)
+      other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
       [
         lien.get('county'),
         lien.get('block'),
@@ -249,9 +262,9 @@ Templates.lien_process_subs_list = React.createClass
         lien.get('cert_number'),
         lien.get('address'),
         moment(lien.get('sale_date')).toDate()
-        (if tax_sub then tax_sub.get('amount') || "" else "")
-        (if utility_sub then utility_sub.get('amount') || "" else "")
-        (if other_sub then other_sub.get('amount') || "" else "")
+        (if tax_sub then tax_amount || "" else "")
+        (if utility_sub then util_amount || "" else "")
+        (if other_sub then other_amount || "" else "")
       ]
     data= data.concat rows
     ws = convert_to_xlsx_json(data)
@@ -340,6 +353,10 @@ Templates.lien_process_subs_list = React.createClass
       tax_sub = subs['tax'] || new App.Models.LienSub({type:'tax', sub_date:sub_date})
       utility_sub = subs['utility'] || new App.Models.LienSub({type:'utility', sub_date:sub_date})
       other_sub = subs['other'] || new App.Models.LienSub({type:'other', sub_date:sub_date})
+      acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
+      tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format)
+      util_amount = accounting.formatMoney(utility_sub.get('amount')/100, acc_format)
+      other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
 
       [
         div onClick:@goToLien, 'data-id':lien.get('unique_id'), lien.get('county')
@@ -351,12 +368,13 @@ Templates.lien_process_subs_list = React.createClass
         lien.get('address'),
         moment(lien.get('sale_date')).format('MM/DD/YYYY')
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'tax', tax_sub), value: if tax_sub then (tax_sub.get('amount') || "").toString()
+          editable onBlur:@onChange(lien, 'tax', tax_sub), value: if tax_sub.get('amount') then tax_amount
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'utility', utility_sub), value: if utility_sub then (utility_sub.get('amount') || "").toString()
+          editable onBlur:@onChange(lien, 'utility', utility_sub), value: if utility_sub.get('amount') then util_amount
         div style:{border:'1px solid black'},
-          editable onBlur:@onChange(lien, 'other', other_sub), value: if other_sub then (other_sub.get('amount') || "").toString()
+          editable onBlur:@onChange(lien, 'other', other_sub), value: if other_sub.get('amount') then other_amount
       ]
+
     widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px','50px','50px','50px']
 
     sub_table = Factory.table widths:widths, selectable:false, headers: sub_headers, rows: sub_rows
