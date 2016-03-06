@@ -181,7 +181,7 @@ Templates.lien_process_subs_list = React.createClass
       else
         data =
           type: type
-          sub_date: moment(@props.date).toDate().toString()
+          sub_date: @state.batch.get('sub_date').toString()
           amount: $(event.target).text()
         sub = App.Models.LienSub.init_from_json(lien, data)
 
