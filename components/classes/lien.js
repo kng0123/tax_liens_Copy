@@ -135,6 +135,8 @@ class Lien extends Parse.Object {
           //Record numbers in cents
           if(k!='winning_bid') {
             return accounting.unformat(info[k], ".")*100
+          } else {
+            return accounting.unformat(info[k])
           }
         }else if(date_types.includes(k)) {
           if( !info[k]){
