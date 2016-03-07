@@ -32,6 +32,10 @@ const ExportReceipts = React.createClass({
       var county = lien.get('township').get('township')
       var owner = lien.get('owners')[0].get('llc')
 
+      if(!lien.get('redemption_date')) {
+        lien.set('redemption_date', redemption_date)
+      }
+
       xlsx_export.addRow([
         lien.id, county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
         lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),

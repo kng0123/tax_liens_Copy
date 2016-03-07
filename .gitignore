@@ -26,10 +26,10 @@ build/Release
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules
 vendor
-public/js/bundle.js
-
+# public/js/bundle.js
+# public/css/all.css
 styleguide/bower_components
 styleguide/src_generated
 styleguide/build
-public/css/all.css
+
 components/script.coffee
