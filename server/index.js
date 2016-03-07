@@ -1,7 +1,17 @@
 
 // compatible API routes.
+var express        = require('express'),
+    path           = require('path'),
+    mongoose       = require('mongoose'),
+    logger         = require('morgan'),
+    bodyParser     = require('body-parser'),
+    compress       = require('compression'),
+    favicon        = require('static-favicon'),
+    methodOverride = require('method-override'),
+    errorHandler   = require('errorhandler'),
+    config         = require('../config'),
+    routes         = require('../routes');
 
-var express = require('express');
 var ParseServer = require('parse-server').ParseServer;
 
 var databaseUri = process.env.DATABASE_URI || process.env.MONGOLAB_URI;
@@ -23,6 +33,14 @@ var api = new ParseServer({
 // javascriptKey, restAPIKey, dotNetKey, clientKey
 
 var app = express();
+app
+  .use(compress())
+  .use(favicon())
+  .use(logger('dev'))
+  .use(bodyParser())
+  .use(methodOverride())
+  .use(express.static(path.join(__dirname, '../public')))
+  .use(routes.indexRouter);
 
 // Serve the Parse API on the /parse URL prefix
 var mountPath = process.env.PARSE_MOUNT || '/parse';
@@ -32,6 +50,16 @@ app.use(mountPath, api);
 app.get('/', function(req, res) {
   res.status(200).send('I dream of being a web site.');
 });
+
+app.set('port', config.server.port);
+app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
+
+
+
+if (app.get('env') === 'development') {
+  app.use(errorHandler());
+}
 
 var port = process.env.PORT || 1337;
 app.listen(port, function() {

@@ -16,7 +16,7 @@ var indexRouter = express.Router();
 indexRouter.route('/products')
 
 indexRouter.route('/*')
-  .all(function(req, res) {
-    res.render('grid');
-  })
+  // .all(function(req, res) {
+  //   res.render('index');
+  // })
 exports.indexRouter = indexRouter;
