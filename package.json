@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "BROWSER=true watchify components/index.js -v -t  browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
-    "cloud": "watchify components/cloud.coffee -v -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js",
-    "prod": "BROWSER=true browserify components/index.js -v -t browserify-css -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]  | uglifyjs -mc warnings=false > public/js/bundle.js"
+    "prod":  "BROWSER=true browserify components/index.js -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o public/js/bundle.js",
+    "cloud": "browserify components/cloud.coffee -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js"
   },
   "browserify": {
     "transform": [
