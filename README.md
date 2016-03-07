@@ -7,6 +7,7 @@
 3. Add the following collections
 ```
 db.createCollection('Lien')
+db.Lien.createIndex( { seq_id: 1 } )
 db.createCollection('LienSub')
 db.createCollection('LienCheck')
 db.createCollection('LienNote')

@@ -58,7 +58,7 @@ Counters.statics.findOneAndUpdate = function (query, doc, options, callback) {
 var Counter = mongoose.model('counters', Counters);
 app.post('/counter', function(req, res) {
   var count = req.body.count || 0
-  Counter.findOneAndUpdate({ _id: 'lien_id' }, { $inc: { seq: count } }, {}, function (err, counter) {
+  Counter.findOneAndUpdate({ _id: 'lien_id' }, { $inc: { seq: parseInt(count) } }, {}, function (err, counter) {
     if (err) throw err;
     console.log('updated, counter is ' + counter.value.seq);
     res.send(counter.value)

@@ -345,6 +345,15 @@ class LienXLSX {
           sub_batches[township+date].liens.push(lien)
         })
       })
+      $.post('/counter', {count: liens.length}, function(data) {
+        var start = data.seq - liens.length + 1
+        var end = data.seq
+        for(var i=start, j=0; i<=end; i++, j++) {
+          liens[j].set('seq_id', i)
+        }
+        Parse.Object.saveAll(liens)
+      })
+
       return Parse.Promise.when(Object.keys(sub_batches).map( (key) =>{
         var batch = sub_batches[key]
         return Models.SubBatch.init_from_json(batch).save()
