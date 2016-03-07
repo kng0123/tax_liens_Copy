@@ -347,7 +347,7 @@ class LienXLSX {
       })
       $.post('/counter', {count: liens.length}, function(data) {
         var start = data.seq + 1
-        var end = start+liens.length
+        var end = start+liens.length-1
         for(var i=start, j=0; i<=end; i++, j++) {
           liens[j].set('seq_id', i)
         }
