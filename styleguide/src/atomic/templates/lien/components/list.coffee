@@ -5,6 +5,26 @@ Templates.lien_list = React.createClass
   },
   getInitialState: ->
     liens: []
+    open: false
+    modal: undefined
+
+  handleClose: ->
+    @setState open: false
+
+  exportReceipts: ->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.ExportReceipts) Object.assign {liens:@state.liens, callback:=>@setState open:false}, @props, ""
+  exportLiens: ->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.ExportLiens) Object.assign {liens:@state.liens, callback:=>@setState open:false}, @props, ""
+
+  getDialog: ->
+    modal = @state.modal
+    dialog = React.createFactory MUI.Libs.Dialog
+    dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'500px'},
+      modal
 
   componentWillMount: ->
     @queryLiens(@props)
@@ -94,11 +114,17 @@ Templates.lien_list = React.createClass
             TableRowColumn null, 'Data'
 
     div null,
+      @getDialog()
       div className:'container-fluid',
         div className:'row',
           div style:{width:'1200px', margin:'0 auto'},
             Factory.lien_search @props
       div className:'container',
+        div className:'row',
+          if @state.liens.length
+            div className:'col-lg-12',
+              React.createFactory(MUI.FlatButton) label:"Export receipts", secondary:true, onTouchTap:@exportReceipts
+              React.createFactory(MUI.FlatButton) label:"Export liens", secondary:true, onTouchTap:@exportLiens
         div className:'row',
           div className:'col-lg-12',
             if @state.liens.length
