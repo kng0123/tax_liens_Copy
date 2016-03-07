@@ -2,7 +2,6 @@
 let LienSub = App.Models.LienSub
 FactoryPanda.define('lien_sub', LienSub, class LienSubFactory extends FactoryDefinition {
   static build(instance, traits=[], options={}) {
-    instance.set("unique_id", '14AtlanticCity1');
     instance.set("check_date", moment().subtract(options.past_days || 0, 'days').toDate());
     instance.set("date", moment().subtract(options.past_days || 0, 'days').toDate());
     instance.set("deposit_date", undefined);

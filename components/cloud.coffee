@@ -42,12 +42,12 @@ Parse.Cloud.define 'delete', (request, response) ->
 Parse.Cloud.beforeSave 'Lien', (request, response) ->
   if request.object.isNew()
     query = new (Parse.Query)('Lien')
-    query.equalTo 'unique_id', request.object.get('unique_id')
+    query.equalTo 'objectId', request.object.id
     return query.find().then( (liens) ->
       if liens.length == 0
         response.success()
       else
-        response.error("Lien already created with this unique_id")
+        response.error("Lien already created with this objectId")
     ).fail( (error) ->
       response.error(error)
     )
@@ -64,7 +64,7 @@ Parse.Cloud.beforeSave 'LienSub', (request, response) ->
       if liens.length == 0
         response.success()
       else
-        response.error("LienSub already created with this unique_id")
+        response.error("LienSub already created with this objectId")
     ).fail( (error) ->
       response.error(error)
     )
@@ -80,7 +80,7 @@ Parse.Cloud.beforeSave 'Township', (request, response) ->
       if townships.length == 0
         response.success()
       else
-        response.error("township already created with this unique_id")
+        response.error("township already created with this objectId")
     ).fail( (error) ->
       response.error(error)
     )

@@ -356,9 +356,9 @@ Templates.lien_process_subs_list = React.createClass
       tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format)
       util_amount = accounting.formatMoney(utility_sub.get('amount')/100, acc_format)
       other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
-
+      
       [
-        div onClick:@goToLien, 'data-id':lien.get('unique_id'), lien.get('county')
+        div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),

@@ -13,20 +13,38 @@ const ExportReceipts = React.createClass({
   submitForm: function(model) {
     // let action = Actions.attempt_sign_in(model)
     // this.props.dispatch(action)
-    var receipt = this.props.receipt
-    var callback = this.props.callback
-    Object.keys(model).map(function(key) {
-      if(key == 'check_amount') {
-         return receipt.set(key,Math.round(accounting.unformat($(data.target).html()) * 100))
-      } else {
-        return receipt.set(key, model[key])
-      }
+    var liens = this.props.liens
+    var redemption_date = model.redemption_date
+
+    var xlsx_export = new App.Utils.XLSXExport()
+    xlsx_export.addRow([
+      "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+      "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+      "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+      "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+      "Total Paid","Sale Date",
+
+      "Total Subs Paid", "Redemption Date", "Redemption", "Total Cash Out", "Total Int Due",
+      "MZ Check", "Dif"
+    ])
+
+    liens.map( (lien) => {
+      var county = lien.get('township').get('township')
+      var owner = lien.get('owners')[0].get('llc')
+
+      xlsx_export.addRow([
+        lien.id, county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
+        lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
+        lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
+        format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
+        format_money(lien.total_cash_out()), lien.get('sale_date'),
+
+        format_money(lien.subs_paid()), lien.get('redemption_date'), format_money(lien.expected_amount()), format_money(lien.total_cash_out()), format_money(lien.total_interest_due()),
+        format_money(lien.total_check()), format_money(lien.diff())
+      ])
     })
-    return receipt.save().then(function(){
-      callback()
-    }).fail(function() {
-      debugger
-    })
+    xlsx_export.save()
+
 
   },
 
@@ -93,5 +111,10 @@ const ExportReceipts = React.createClass({
     )
   }
 })
+var accounting = require('accounting')
+var format_money = function(money) {
+  var acc_format = {symbol : "", decimal : ".", precision : 2, format: "%s%v"}
+  return accounting.formatMoney(money/100, acc_format)
+}
 
 export default ExportReceipts

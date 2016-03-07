@@ -38,7 +38,7 @@ Templates.lien_list = React.createClass
     if !query_params
       return
     if query_params.id
-      query.equalTo("unique_id", query_params.id)
+      query.equalTo("objectId", query_params.id)
     else if query_params.block
       query.equalTo("block", query_params.block)
       query.equalTo("lot", query_params.lot) if query_params.lot
@@ -55,6 +55,11 @@ Templates.lien_list = React.createClass
       return
 
     #TODO What to do with case #?
+    query.include("subs")
+    query.include("checks")
+    query.include("owners")
+    query.include("llcs")
+    query.include("annotations")
     query.find({
     	success : (results) =>
         @setState liens:results
@@ -65,7 +70,7 @@ Templates.lien_list = React.createClass
 
   goToLien: (indices) ->
     lien = @state.liens[indices[0]]
-    @context.router.push('/lien/item/'+lien.get('unique_id'))
+    @context.router.push('/lien/item/'+lien.id)
 
 
   render: ->
@@ -109,7 +114,7 @@ Templates.lien_list = React.createClass
       TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows,
         @state.liens.map (v, k) ->
           TableRow key:k,
-            TableRowColumn null, v.get('unique_id')
+            TableRowColumn null, v.id
             TableRowColumn null, 'Data'
             TableRowColumn null, 'Data'
 

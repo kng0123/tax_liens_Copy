@@ -28,7 +28,7 @@ Templates.lien = React.createClass
 
   componentWillMount: ->
     query = new Parse.Query(App.Models.Lien);
-    query.equalTo("unique_id", this.props.routeParams.id)
+    query.equalTo("objectId", this.props.routeParams.id)
     query.include("subs")
     query.include("checks")
     query.include("owners")
@@ -93,7 +93,7 @@ Templates.lien = React.createClass
             div className:'col-lg-12',
               div className:'container-fluid',
                 h5 null,
-                  span null, "LIEN #{@state.lien.get('unique_id')}"
+                  span null, "LIEN #{@state.lien.id}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   span style:{width:'150px', display:'inline-block'},
                     select name:'status', value:lien.get('status'), options: state_options, onChange:@onChange({type:'select', key:"status"})
@@ -356,7 +356,7 @@ Templates.lien_info = React.createClass
     notes = lien.get('annotations')
 
     general_fields = [
-      [{label: "Lien ID", key:"unique_id"}
+      [{label: "Lien ID", key:"id", id:true}
       {label: "BLOCK/LOT/QUAL", key:"block_lot"}
       {label: "TOWNSHIP", key:"county", editable:false}
       {label: "CERTIFICATE #", key:"cert_number", editable:true}
@@ -413,6 +413,9 @@ Templates.lien_info = React.createClass
               div className:'col-lg-4', key:k,
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
+                  if (field.id)
+                    val = @props.lien.id
+
                   val = "Empty" if val is undefined and field.type != 'bool'
                   gen_editable(field_key, field, val)
                 )

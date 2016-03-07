@@ -45,12 +45,12 @@ Parse.Cloud.beforeSave('Lien', function(request, response) {
   var query;
   if (request.object.isNew()) {
     query = new Parse.Query('Lien');
-    query.equalTo('unique_id', request.object.get('unique_id'));
+    query.equalTo('objectId', request.object.id);
     return query.find().then(function(liens) {
       if (liens.length === 0) {
         return response.success();
       } else {
-        return response.error("Lien already created with this unique_id");
+        return response.error("Lien already created with this objectId");
       }
     }).fail(function(error) {
       return response.error(error);
@@ -70,7 +70,7 @@ Parse.Cloud.beforeSave('LienSub', function(request, response) {
       if (liens.length === 0) {
         return response.success();
       } else {
-        return response.error("LienSub already created with this unique_id");
+        return response.error("LienSub already created with this objectId");
       }
     }).fail(function(error) {
       return response.error(error);
@@ -89,7 +89,7 @@ Parse.Cloud.beforeSave('Township', function(request, response) {
       if (townships.length === 0) {
         return response.success();
       } else {
-        return response.error("township already created with this unique_id");
+        return response.error("township already created with this objectId");
       }
     }).fail(function(error) {
       return response.error(error);

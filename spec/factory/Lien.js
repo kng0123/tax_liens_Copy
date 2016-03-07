@@ -2,7 +2,8 @@
 let Lien = App.Models.Lien
 FactoryPanda.define('lien', Lien, class LienFactory extends FactoryDefinition {
   static build(instance, traits=[], options={}) {
-    instance.set("unique_id", '14AtlanticCity1');
+    instance.set("id", '14AtlanticCity1');
+    // instance.set("unique_id", '14AtlanticCity1');
     instance.set("county", 'Atlantic City');
     instance.set("year", '2014');
     instance.set("llc", 'TTLBL');
