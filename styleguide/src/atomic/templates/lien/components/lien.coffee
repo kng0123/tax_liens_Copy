@@ -360,7 +360,7 @@ Templates.lien_info = React.createClass
       {label: "BLOCK/LOT/QUAL", key:"block_lot"}
       {label: "TOWNSHIP", key:"county", editable:false}
       {label: "CERTIFICATE #", key:"cert_number", editable:true}
-      {label: "MUA ACCOUNT #s", key:"mua_account_number", editable:true}
+      {label: "MUA ACCOUNT #", key:"mua_account_number", editable:true}
       ]
 
       [{label: "ADDRESS", key:"address", editable:true}
