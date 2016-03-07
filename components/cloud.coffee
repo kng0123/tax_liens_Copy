@@ -44,6 +44,8 @@ Parse.Cloud.beforeSave 'Lien', (request, response) ->
     query = new (Parse.Query)('Lien')
     if request.object.get('seq_id')
       query.equalTo 'seq_id', request.object.get('seq_id')
+    else
+      query.equalTo 'seq_id', request.object.get(-1)
     return query.find().then( (liens) ->
       if liens.length == 0
         response.success()
