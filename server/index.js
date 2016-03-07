@@ -15,14 +15,14 @@ var express        = require('express'),
 var ParseServer = require('parse-server').ParseServer;
 
 var databaseUri = process.env.MONGOLAB_URI || process.env.DATABASE_URI || process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/dev';
-
+var baseUri = process.env.ROOT_URL || 'http://localhost:1337'
 var api = new ParseServer({
   databaseURI: databaseUri ,
   cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/../cloud/main.js',
   appId: process.env.APP_ID || 'fake_app',
   javascriptKey: 'javascriptKey',
   masterKey: process.env.MASTER_KEY || 'master_key', //Add your master key here. Keep it secret!
-  serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse'  // Don't forget to change to https if needed
+  serverURL:  baseUri+'/parse' // Don't forget to change to https if needed
 });
 mongoose.connect(databaseUri);
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
