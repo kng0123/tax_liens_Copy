@@ -345,7 +345,7 @@ Templates.lien = React.createClass
 
   componentWillMount: ->
     query = new Parse.Query(App.Models.Lien);
-    query.equalTo("seq_id", this.props.routeParams.id)
+    query.equalTo("seq_id", parseInt(this.props.routeParams.id))
     query.include("subs")
     query.include("checks")
     query.include("owners")
@@ -501,6 +501,12 @@ Templates.lien_llcs = React.createClass
   displayName: 'LienLLCs'
   rowGetter: (i) ->
     owner = @props.lien.get('owners')[i]
+    if !owner
+      return {
+        llc: 'No owner',
+        start: moment(new Date()).format('MM/DD/YYYY'),
+        end: undefined
+      }
     row = {
       llc: owner.get('llc'),
       start: moment(owner.get('start_date')).format('MM/DD/YYYY'),
