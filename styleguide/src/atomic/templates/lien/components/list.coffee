@@ -77,47 +77,26 @@ Templates.lien_list = React.createClass
   render: ->
     {div, h3, h1, p} = React.DOM
     Factory = React.Factory
-
-    table_state = {
-      fixedHeader: true,
-      fixedFooter: true,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: true,
-      multiSelectable: false,
-      enableSelectAll: false,
-      deselectOnClickaway: true,
-      height: '300px',
-    };
-
-    table_props =
-      height: table_state.height
-      fixedHeader: table_state.fixedHeader
-      fixedFooter: table_state.fixedFooter
-      selectable: table_state.selectable
-      multiSelectable: table_state.multiSelectable
-      onRowSelection: @goToLien
-
-    Table = React.createFactory MUI.Table
-    TableHeader = React.createFactory MUI.TableHeader
-    TableRow = React.createFactory MUI.TableRow
-    TableHeaderColumn = React.createFactory MUI.TableHeaderColumn
-    TableBody = React.createFactory MUI.TableBody
-    TableRowColumn = React.createFactory MUI.TableRowColumn
     RaisedButton = React.createFactory MUI.RaisedButton
 
-    table = Table table_props,
-      TableHeader enableSelectAll:table_state.enableSelectAll,
-        TableRow null,
-          TableHeaderColumn null, "ID"
-          TableHeaderColumn null, "Name"
-          TableHeaderColumn null, "Status"
-      TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows,
-        @state.liens.map (v, k) ->
-          TableRow key:k,
-            TableRowColumn null, v.id
-            TableRowColumn null, 'Data'
-            TableRowColumn null, 'Data'
+    sub_headers = ["ID", "TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE"]
+    editable = React.createFactory PlainEditable
+    sub_rows = @state.liens.map (lien, k) =>
+      [
+        lien.id,
+        div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
+        lien.get('block'),
+        lien.get('lot'),
+        lien.get('qualifier'),
+        lien.get('mua_account_number'),
+        lien.get('cert_number'),
+        lien.get('address'),
+        moment(lien.get('sale_date')).format('MM/DD/YYYY')
+      ]
+
+    widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px']
+
+    sub_table = Factory.table widths:widths, selectable:true, headers: sub_headers, rows: sub_rows, onRowSelection:@goToLien
 
     div null,
       @getDialog()
@@ -125,7 +104,7 @@ Templates.lien_list = React.createClass
         div className:'row',
           div style:{width:'1200px', margin:'0 auto'},
             Factory.lien_search @props
-      div className:'container',
+      div className:'container-fluid',
         div className:'row',
           if @state.liens.length
             div className:'col-lg-12',
@@ -134,6 +113,6 @@ Templates.lien_list = React.createClass
         div className:'row',
           div className:'col-lg-12',
             if @state.liens.length
-              table
+              sub_table
             else
               p null, "No liens found. Try uploading some."
