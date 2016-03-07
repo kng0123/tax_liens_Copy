@@ -69,6 +69,7 @@ Templates.lien_process_subs_form = React.createClass
     #TODO WHAT DOES THIS MEAN???
     #Principal Balance > $0
     query.notContainedIn('status', ['redeemed', 'none'])
+    query.limit(1000);
     query.find({
     	success : (liens) =>
         batch = {
@@ -356,7 +357,7 @@ Templates.lien_process_subs_list = React.createClass
       tax_amount = accounting.formatMoney(tax_sub.get('amount')/100, acc_format)
       util_amount = accounting.formatMoney(utility_sub.get('amount')/100, acc_format)
       other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
-      
+
       [
         div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
         lien.get('block'),

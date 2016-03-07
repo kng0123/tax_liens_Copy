@@ -60,6 +60,7 @@ Templates.lien_list = React.createClass
     query.include("owners")
     query.include("llcs")
     query.include("annotations")
+    query.limit(1000);
     query.find({
     	success : (results) =>
         @setState liens:results
