@@ -1501,6 +1501,9 @@ Templates.lien_upload = React.createClass
 
   getInitialState: ->
     lien_xlsx: undefined
+    uploading: false
+    status: ""
+    error: ""
 
   handleFile: (e) ->
     files = e.target.files
@@ -1512,13 +1515,29 @@ Templates.lien_upload = React.createClass
       reader.onload = (e) =>
         data = e.target.result
         lien_xlsx = new App.Utils.LienXLSX(data)
-        @setState lien_xlsx: lien_xlsx
+        @setState({
+          lien_xlsx: lien_xlsx
+          uploading:false
+        })
         # lien_xlsx.create()
       reader.readAsBinaryString f
       ++i
 
   handleCreate: ->
-    @state.lien_xlsx.create()
+    @setState({
+      uploading: true
+      status: "Creating objects..."
+    })
+    @state.lien_xlsx.create().then(() =>
+      @setState({
+        status: "Upload complete"
+      })
+    ).fail((error) =>
+      @setState({
+        status: "Upload failed"
+        error: error
+      })
+    )
 
   handleClick: ->
      fileUploadDom = React.findDOMNode(@refs.fileUpload);
@@ -1553,8 +1572,13 @@ Templates.lien_upload = React.createClass
                   div null,
                    span null, "Liens: "
                    span null, data.objects.length
-                  div null,
-                    RaisedButton label:"Create liens", type:'button', primary:false, onClick:@handleCreate
+                  if !@state.uploading
+                    div key:1,
+                      RaisedButton label:"Create liens", type:'button', primary:false, onClick:@handleCreate
+                  else
+                    div key:1,
+                      span null, @state.status
+                      span null, JSON.stringify(@state.error)
 
 tv4.setErrorReporter (error, data, schema) ->
   switch error.code

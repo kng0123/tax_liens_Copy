@@ -306,7 +306,7 @@ class LienXLSX {
     //Create MUA accounts
     //Create LLCs
 
-    Parse.Promise.when(promises).then( (townships) =>{
+    return Parse.Promise.when(promises).then( (townships) =>{
       var towns = townships.reduce( (m, ts) => { m[ts.get('township')] = ts; return m;}, {})
       return Parse.Object.saveAll(this.objects.map( (lien, k) =>{
       //TODO: UPgrade request limit
@@ -358,8 +358,6 @@ class LienXLSX {
         var batch = sub_batches[key]
         return Models.SubBatch.init_from_json(batch).save()
       }))
-    }).fail( (error) =>{
-      debugger
     })
   }
 }
