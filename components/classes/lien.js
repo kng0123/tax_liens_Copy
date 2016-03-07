@@ -168,9 +168,6 @@ class Lien extends Parse.Object {
     lien.set('township', data.general.township)
     lien.set('2013_yep', 0)
     lien.set('yep_int', 0)
-    if(lien.get('unique_id')) {
-      lien.set('id', lien.get('unique_id'))
-    }
     // lien.subs = data.subs.map( (sub) => LienSub.init_from_json(lien, sub))
     // lien.checks = data.checks.map( (check) => LienCheck.init_from_json(lien, check))
     // lien.annotations = data.annotations.map( (note) => LienNote.init_from_json(lien, note))
