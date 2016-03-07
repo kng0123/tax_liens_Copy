@@ -42,6 +42,65 @@ Action = {
       dispatch type: 'USER_CHANGE'
 }
 
+Templates.table = React.createClass
+  displayName: 'Table'
+
+  render: ->
+
+    Table = React.createFactory MUI.Table
+    TableHeader = React.createFactory MUI.TableHeader
+    TableRow = React.createFactory MUI.TableRow
+    TableHeaderColumn = React.createFactory MUI.TableHeaderColumn
+    TableBody = React.createFactory MUI.TableBody
+    TableRowColumn = React.createFactory MUI.TableRowColumn
+    RaisedButton = React.createFactory MUI.RaisedButton
+
+    table_state = {
+      fixedHeader: false,
+      fixedFooter: false,
+      stripedRows: false,
+      showRowHover: false,
+      selectable: @props.selectable,
+      multiSelectable: false,
+      enableSelectAll: false,
+      adjustForCheckbox: false,
+      deselectOnClickaway: false,
+      displayRowCheckbox: false,
+      height: @props.height || '600px',
+    };
+
+    table_props =
+      height: table_state.height
+      fixedHeader: table_state.fixedHeader
+      fixedFooter: table_state.fixedFooter
+      selectable: table_state.selectable
+      multiSelectable: table_state.multiSelectable
+      onRowSelection: @props.onRowSelection
+
+    # debugger
+
+    headers = @props.headers
+    rows = @props.rows
+
+    table = Table table_props,
+      TableHeader adjustForCheckbox:table_state.adjustForCheckbox, enableSelectAll:table_state.enableSelectAll, displayRowCheckbox:table_state.displayRowCheckbox, displaySelectAll:false,
+        TableRow null,
+          headers.map (header, index) =>
+            props = key:index
+            if @props.widths
+              props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
+            TableHeaderColumn props, header
+
+      TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows, displayRowCheckbox:table_state.displayRowCheckbox,
+        rows.map (row, k) =>
+          style = {padding:0, textAlign:'center'}
+          TableRow key:k,
+            row.map (item, index) =>
+              props = key:index
+              if @props.widths
+                props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
+              TableRowColumn  props, item
+
 DumbTemplates.forgot_password = React.createClass
   displayName: 'ForgotPassword'
 
@@ -286,7 +345,7 @@ Templates.lien = React.createClass
 
   componentWillMount: ->
     query = new Parse.Query(App.Models.Lien);
-    query.equalTo("objectId", this.props.routeParams.id)
+    query.equalTo("seq_id", this.props.routeParams.id)
     query.include("subs")
     query.include("checks")
     query.include("owners")
@@ -352,7 +411,7 @@ Templates.lien = React.createClass
             div className:'col-lg-12',
               div className:'container-fluid',
                 h5 null,
-                  span null, "LIEN #{@state.lien.id}"
+                  span null, "LIEN #{@state.lien.get('seq_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   span style:{width:'150px', display:'inline-block'},
                     select name:'status', value:lien.get('status'), options: state_options, onChange:@onChange({type:'select', key:"status"})
@@ -673,7 +732,7 @@ Templates.lien_info = React.createClass
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
                   if (field.id)
-                    val = @props.lien.id
+                    val = @props.lien.get('seq_id')
 
                   val = "Empty" if val is undefined and field.type != 'bool'
                   gen_editable(field_key, field, val)
@@ -819,7 +878,7 @@ Templates.lien_list = React.createClass
     if !query_params
       return
     if query_params.id
-      query.equalTo("objectId", query_params.id)
+      query.equalTo("seq_id", query_params.id)
     else if query_params.block
       query.equalTo("block", query_params.block)
       query.equalTo("lot", query_params.lot) if query_params.lot
@@ -852,7 +911,7 @@ Templates.lien_list = React.createClass
 
   goToLien: (indices) ->
     lien = @state.liens[indices[0]]
-    @context.router.push('/lien/item/'+lien.id)
+    @context.router.push('/lien/item/'+lien.get('seq_id'))
 
 
   render: ->
@@ -864,8 +923,8 @@ Templates.lien_list = React.createClass
     editable = React.createFactory PlainEditable
     sub_rows = @state.liens.map (lien, k) =>
       [
-        lien.id,
-        div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
+        lien.get('seq_id'),
+        div onClick:@goToLien, 'data-id':lien.get('seq_id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
@@ -1259,7 +1318,7 @@ Templates.lien_process_subs_list = React.createClass
       other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
 
       [
-        div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
+        div onClick:@goToLien, 'data-id':lien.get('seq_id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
@@ -1490,65 +1549,6 @@ Templates.lien_upload = React.createClass
                    span null, data.objects.length
                   div null,
                     RaisedButton label:"Create liens", type:'button', primary:false, onClick:@handleCreate
-
-Templates.table = React.createClass
-  displayName: 'Table'
-
-  render: ->
-
-    Table = React.createFactory MUI.Table
-    TableHeader = React.createFactory MUI.TableHeader
-    TableRow = React.createFactory MUI.TableRow
-    TableHeaderColumn = React.createFactory MUI.TableHeaderColumn
-    TableBody = React.createFactory MUI.TableBody
-    TableRowColumn = React.createFactory MUI.TableRowColumn
-    RaisedButton = React.createFactory MUI.RaisedButton
-
-    table_state = {
-      fixedHeader: false,
-      fixedFooter: false,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: @props.selectable,
-      multiSelectable: false,
-      enableSelectAll: false,
-      adjustForCheckbox: false,
-      deselectOnClickaway: false,
-      displayRowCheckbox: false,
-      height: @props.height || '600px',
-    };
-
-    table_props =
-      height: table_state.height
-      fixedHeader: table_state.fixedHeader
-      fixedFooter: table_state.fixedFooter
-      selectable: table_state.selectable
-      multiSelectable: table_state.multiSelectable
-      onRowSelection: @props.onRowSelection
-
-    # debugger
-
-    headers = @props.headers
-    rows = @props.rows
-
-    table = Table table_props,
-      TableHeader adjustForCheckbox:table_state.adjustForCheckbox, enableSelectAll:table_state.enableSelectAll, displayRowCheckbox:table_state.displayRowCheckbox, displaySelectAll:false,
-        TableRow null,
-          headers.map (header, index) =>
-            props = key:index
-            if @props.widths
-              props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
-            TableHeaderColumn props, header
-
-      TableBody deselectOnClickaway:table_state.deselectOnClickaway, showRowHover:table_state.showRowHover, stripedRows:table_state.stripedRows, displayRowCheckbox:table_state.displayRowCheckbox,
-        rows.map (row, k) =>
-          style = {padding:0, textAlign:'center'}
-          TableRow key:k,
-            row.map (item, index) =>
-              props = key:index
-              if @props.widths
-                props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
-              TableRowColumn  props, item
 
 tv4.setErrorReporter (error, data, schema) ->
   switch error.code

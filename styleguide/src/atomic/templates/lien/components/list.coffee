@@ -38,7 +38,7 @@ Templates.lien_list = React.createClass
     if !query_params
       return
     if query_params.id
-      query.equalTo("objectId", query_params.id)
+      query.equalTo("seq_id", query_params.id)
     else if query_params.block
       query.equalTo("block", query_params.block)
       query.equalTo("lot", query_params.lot) if query_params.lot
@@ -71,7 +71,7 @@ Templates.lien_list = React.createClass
 
   goToLien: (indices) ->
     lien = @state.liens[indices[0]]
-    @context.router.push('/lien/item/'+lien.id)
+    @context.router.push('/lien/item/'+lien.get('seq_id'))
 
 
   render: ->
@@ -83,8 +83,8 @@ Templates.lien_list = React.createClass
     editable = React.createFactory PlainEditable
     sub_rows = @state.liens.map (lien, k) =>
       [
-        lien.id,
-        div onClick:@goToLien, 'data-id':lien.id, lien.get('county')
+        lien.get('seq_id'),
+        div onClick:@goToLien, 'data-id':lien.get('seq_id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),

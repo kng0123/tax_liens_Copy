@@ -39,7 +39,7 @@ const ExportReceipts = React.createClass({
         if(!from || (from && from<check.get('deposit_date') ) ) {
           if(!to || (to && to>check.get('deposit_date') ) ) {
             xlsx_export.addRow([
-              lien.id, county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
+              lien.get('seq_id'), county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
               lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
               lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
               format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
