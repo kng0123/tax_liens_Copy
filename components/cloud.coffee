@@ -42,7 +42,7 @@ Parse.Cloud.define 'delete', (request, response) ->
 Parse.Cloud.beforeSave 'Lien', (request, response) ->
   if request.object.isNew()
     query = new (Parse.Query)('Lien')
-    query.equalTo 'seq_id', request.get('seq_id')
+    query.equalTo 'seq_id', request.object.get('seq_id')
     return query.find().then( (liens) ->
       if liens.length == 0
         response.success()
