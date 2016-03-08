@@ -18,39 +18,61 @@ const ExportReceipts = React.createClass({
     var to = model.to
 
     var xlsx_export = new App.Utils.XLSXExport()
-    xlsx_export.addRow([
-      "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
-      "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
-      "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
-      "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
-      "Total Paid","Sale Date",
-
-      "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
-      "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
-    ])
-
+    var max_checks = 0
     liens.map( (lien) => {
       var county = lien.get('township').get('township')
       var owner = lien.get('owners')[0].get('llc')
       var checks = lien.get('checks')
+      if(checks.length > max_checks) {
+        max_checks = checks.length
+      }
+    })
+
+    //Add header
+    var header = [
+      "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+      "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+      "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+      "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+      "Total Paid","Sale Date"
+    ]
+    for(var i=0; i<max_checks; i++) {
+      header = header.concat([
+        "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
+        "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+      ])
+    }
+
+    debugger
+    xlsx_export.addRow(header)
+
+
+    //Add data
+    liens.map( (lien) => {
+      var county = lien.get('township').get('township')
+      var owner = lien.get('owners')[0].get('llc')
+      var checks = lien.get('checks')
+      var row = [
+        lien.get('seq_id'), county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
+        lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
+        lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
+        format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
+        format_money(lien.total_cash_out()), lien.get('sale_date')
+      ]
 
       checks.map((check) => {
         var diff = check.get('check_amount') - check.expected_amount()
         if(!from || (from && from<check.get('deposit_date') ) ) {
           if(!to || (to && to>check.get('deposit_date') ) ) {
-            xlsx_export.addRow([
-              lien.get('seq_id'), county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
-              lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
-              lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
-              format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
-              format_money(lien.total_cash_out()), lien.get('sale_date'),
-
+            row = row.concat([
               check.get('deposite_date'), check.get('check_date'), check.get('redeem_date'), check.get('account'), check.get('check_number'), format_money(check.get('check_amount')),
               check.get('type'), format_money(check.expected_amount()), format_money(diff), "", "", ""
             ])
           }
         }
       })
+      xlsx_export.addRow(row)
+
     })
 
     xlsx_export.save()

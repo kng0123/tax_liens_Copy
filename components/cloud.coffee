@@ -59,21 +59,7 @@ Parse.Cloud.beforeSave 'Lien', (request, response) ->
   return
 
 Parse.Cloud.beforeSave 'LienSub', (request, response) ->
-  if request.object.isNew()
-    query = new (Parse.Query)('Lien')
-    query.equalTo 'type', request.object.get('type')
-    query.equalTo 'sub_date', request.object.get('sub_date')
-    return query.find().then( (liens) ->
-      if liens.length == 0
-        response.success()
-      else
-        response.error("LienSub already created with this seq_id")
-    ).fail( (error) ->
-      response.error(error)
-    )
-  else
-    response.success()
-  return
+  response.success()
 
 Parse.Cloud.beforeSave 'Township', (request, response) ->
   if request.object.isNew()
