@@ -139,6 +139,7 @@ class LienXLSX {
     if( groups.length < 2) {
       return this.getHeaders.call(this,++row)
     } else {
+      this.header_row = row
       return groups
     }
   }
@@ -254,7 +255,7 @@ class LienXLSX {
     var last = group.last
 
     for( var col of range(first, last+1) ) {
-      var head = this.getCell(col, 2) || {}
+      var head = this.getCell(col, this.header_row) || {}
       var data = this.getCell(col, row)
 
       var notes = []
