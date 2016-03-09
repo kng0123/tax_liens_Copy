@@ -69,6 +69,9 @@ const ExportReceipts = React.createClass({
   },
 
   updateFormState: function(model) {
+    if(model.eventPhase) {
+      return
+    }
     this.setState({model: model})
   },
 

@@ -43,7 +43,6 @@ const ExportReceipts = React.createClass({
       ])
     }
 
-    debugger
     xlsx_export.addRow(header)
 
 
@@ -95,6 +94,9 @@ const ExportReceipts = React.createClass({
   },
 
   updateFormState: function(model) {
+    if(model.eventPhase) {
+      return
+    }
     this.setState({model: model})
   },
 
