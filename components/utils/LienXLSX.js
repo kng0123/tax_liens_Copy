@@ -148,7 +148,7 @@ class LienXLSX {
     var {rows, cols} = this.getRange()
 
     var objects = []
-    for( var row of range(3, rows) ) {
+    for( var row of range(this.header_row+1, rows+1) ) {
       var object = {annotations:[], general:{}, subs:[], checks:[], season:[]}
       objects.push(object)
 
