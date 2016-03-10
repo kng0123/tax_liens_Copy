@@ -6,11 +6,25 @@ var MyOwnInput = React.createClass({
 
   // setValue() will set the value of the component, which in
   // turn will validate it and the rest of the form
-  changeValue: function (event) {
-    if(event == null) {
-      return
+  getInitialState: function() {
+    var val = ""
+    var date_string = ""
+    if (!this.props.value) {
+      val = ""
+    } else {
+      val = moment(this.props.value).format('MM/DD/YYYY')
+      date_string = moment(val).format('MM/DD/YYYY')
     }
-    this.setValue(moment(event).toDate());
+    return {
+      value: val,
+      date_string: date_string
+    }
+  },
+  changeValue: function(event) {
+    this.setState({
+      value: event.target.value,
+      date_string: moment(event.target.value).format('MM/DD/YYYY')
+    })
   },
 
   render: function () {
@@ -30,16 +44,11 @@ var MyOwnInput = React.createClass({
       width: this.props.width || '100px',
       marginTop:"10px"
     }
-    var val = ""
-    if(!this.getValue()) {
-      val = ""
-    } else {
-      val = moment(this.getValue())
-    }
 
     return (
       <div className={className} style={style}>
-        <DatePicker className='form-control datepicker' selected={val} onChange={this.changeValue}/>
+        <input type="text" className='form-control' value={this.state.value}  onChange={this.changeValue} onBlur={this.updateValue}/>
+        <span>{this.state.date_string}</span>
         <span>{errorMessage}</span>
       </div>
     );
