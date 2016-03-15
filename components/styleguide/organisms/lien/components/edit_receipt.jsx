@@ -1,5 +1,5 @@
 import Molecules from '../../../molecules'
-
+var accounting = require('accounting')
 const FMUI = require('formsy-material-ui');
 const { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup, FormsySelect, FormsyText, FormsyTime, FormsyToggle } = FMUI;
 const RaisedButton = require('material-ui/lib/raised-button');
@@ -19,7 +19,7 @@ const EditReceipt = React.createClass({
     var callback = this.props.callback
     Object.keys(model).map(function(key) {
       if(key == 'check_amount') {
-         return receipt.set(key,Math.round(accounting.unformat($(data.target).html()) * 100))
+         return receipt.set(key,Math.round(accounting.unformat(model.check_amount) * 100))
       } else {
         return receipt.set(key, model[key])
       }
@@ -85,6 +85,7 @@ const EditReceipt = React.createClass({
       return {label: sub.name(), value:sub}
     })
 
+    var check_amount = accounting.formatMoney(check.get('check_amount')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var form_rows = [
       {
         label: 'Code',
@@ -113,7 +114,7 @@ const EditReceipt = React.createClass({
       },
       {
         label: 'Check amount',
-        element: <FormsyText name='check_amount' type="number" value={check.get('check_amount').toString()} required hintText="Check amount"/>
+        element: <FormsyText name='check_amount' type="text" value={check_amount} required hintText="Check amount"/>
       }
     ]
     var form_body = form_rows.map( (row, key) => {
