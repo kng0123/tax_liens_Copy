@@ -466,6 +466,7 @@ Templates.lien_cash = React.createClass
         {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true, type:'money'}
         {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true, type:'money'}
         #TODO Calculate expected amt
+        {label: "REDEMPTION AMT", key:"county_redemption_amt", editable:true, type:'money'}
         {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'money'}
         #TODO: No longer required
         # {label: "MZ CHECK", type:'money', key:"total_check", is_function:true}

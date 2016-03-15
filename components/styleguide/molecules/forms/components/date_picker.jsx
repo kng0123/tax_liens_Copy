@@ -21,10 +21,17 @@ var MyOwnInput = React.createClass({
     }
   },
   changeValue: function(event) {
+    var date_string = moment(event.target.value)
+    var year = moment(event.target.value).year()
+    if( year < 2002) {
+      date_string.year(moment().year())
+    }
+
     this.setState({
       value: event.target.value,
-      date_string: moment(event.target.value).format('MM/DD/YYYY')
+      date_string: date_string.format('MM/DD/YYYY')
     })
+    event.target.value = date_string.format('MM/DD/YYYY')
     if(this.props.onChange) {
       this.props.onChange(event)
     }
