@@ -451,10 +451,11 @@ Templates.lien_cash = React.createClass
         {label: "RECORDING FEE", key:"recording_fee", editable:true, type:'money'}
         {label: "SEARCH FEE", type:'money', key:"search_fee", is_function:true, editable:true}
         {label: "YEAR END PENALTY", key:"2013_yep", editable:true, type:'money'}
+        {label: "FACE VALUE", key:"cert_fv", editable:false, type:'money'}
       ]
       [
-        {label: "FACE VALUE", key:"cert_fv", editable:false, type:'money'}
         {label: "PREMIUM", key:"premium", editable:false, type:'money'}
+        {label: "PRINCIPAL BALANCE", key:"principal_balance", is_function:true, type:'money'}
         {label: "TOTAL PAID", key:"total_paid", editable:false, type:'money'}
         {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'money'}
         {label: "CERT INT", key:"cert_interest", is_function:true, type:'money'}

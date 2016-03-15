@@ -62,6 +62,9 @@ class Lien extends Parse.Object {
     }
     return this.flat_rate()  + this.cert_interest() + this.sub_interest()
   }
+  principal_balance() {
+    return this.total_cash_out()-this.total_check();
+  }
   expected_amount() {
     return this.total_cash_out()  + this.total_interest_due() + this.get('search_fee')
   }
