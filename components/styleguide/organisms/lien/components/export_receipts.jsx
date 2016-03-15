@@ -69,11 +69,11 @@ const ExportReceipts = React.createClass({
       ]
 
       checks.map((check) => {
-        var diff = check.get('check_amount') - check.expected_amount()
+        var diff = check.amount() - check.expected_amount()
         if(!from || (from && from<check.get('deposit_date') ) ) {
           if(!to || (to && to>check.get('deposit_date') ) ) {
             row = row.concat([
-              format_date(check.get('deposite_date')), format_date(check.get('check_date')), format_date(check.get('redeem_date')), check.get('account'), check.get('check_number'), format_money(check.get('check_amount')),
+              format_date(check.get('deposite_date')), format_date(check.get('check_date')), format_date(check.get('redeem_date')), check.get('account'), check.get('check_number'), format_money(check.amount()),
               check.get('type'), format_money(check.expected_amount()), format_money(diff), "", "", ""
             ])
           }

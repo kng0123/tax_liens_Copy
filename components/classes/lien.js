@@ -70,7 +70,7 @@ class Lien extends Parse.Object {
   }
   total_check() {
     return this.get('checks').reduce((total, check) =>{
-      return total + check.get('check_amount')
+      return total + check.amount()
     }, 0)
   }
   diff() {

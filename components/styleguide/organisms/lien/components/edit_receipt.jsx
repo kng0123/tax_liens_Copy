@@ -85,7 +85,7 @@ const EditReceipt = React.createClass({
       return {label: sub.name(), value:sub}
     })
 
-    var check_amount = accounting.formatMoney(check.get('check_amount')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var form_rows = [
       {
         label: 'Code',

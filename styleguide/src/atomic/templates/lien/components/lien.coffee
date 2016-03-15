@@ -232,8 +232,10 @@ Templates.lien_llcs = React.createClass
 
 Templates.lien_check_actions = React.createClass
   displayName: 'LienCheckActions'
-  click: ->
-    alert(1)
+  toggle_void: ->
+    receipt = this.props.value.receipt
+    receipt.set('void', !receipt.get('void'))
+    receipt.save()
   render: ->
     {div} = React.DOM
     fi = React.createFactory MUI.Libs.FontIcons
@@ -241,9 +243,13 @@ Templates.lien_check_actions = React.createClass
       color: '#FB8C00'
       marginRight: 10,
     };
+    void_state = 'clear'
+    if(this.props.value.receipt.get('void'))
+      void_state = 'add'
 
     div null,
       fi onClick:@props.value.onClick, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "edit"
+      fi onClick:@toggle_void, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, void_state
 
 Templates.lien_checks = React.createClass
   displayName: 'LienChecks'
@@ -286,12 +292,12 @@ Templates.lien_checks = React.createClass
       check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       check_number: receipt.get('check_number')
       redeem_date: if receipt.get('redeem_date') then moment(receipt.get('redeem_date')).format('MM/DD/YYYY') else ""
-      check_amount: accounting.formatMoney(receipt.get('check_amount')/100, acc_format)
+      check_amount: accounting.formatMoney(receipt.amount()/100, acc_format)
       principal: receipt.get('check_principal')
       subs: receipt.get('check_interest')
       code: receipt.get('type')
       expected_amt: accounting.formatMoney(receipt.expected_amount()/100, acc_format)
-      dif: accounting.formatMoney((receipt.expected_amount() - receipt.get('check_amount'))/100, acc_format)
+      dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
       actions: {onClick:@openEdit.bind(@, receipt), receipt:receipt}
     }
 

@@ -6,6 +6,14 @@ class LienCheck extends Parse.Object {
     super('LienCheck');
   }
 
+  amount() {
+    if(this.get('void')){
+      return 0
+    } else {
+      return this.get('check_amount')
+    }
+  }
+
   expected_amount() {
     var type = (this.get('type') || "").toLowerCase()
     //TODO Sub Payment Only
