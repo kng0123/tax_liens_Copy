@@ -129,7 +129,7 @@ const ExportReceipts = React.createClass({
 var accounting = require('accounting')
 var format_money = function(money) {
   var acc_format = {symbol : "", decimal : ".", precision : 2, format: "%s%v"}
-  return accounting.formatMoney(money/100, acc_format)
+  return money/100
 }
 
 export default ExportReceipts

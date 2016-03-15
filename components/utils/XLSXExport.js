@@ -64,7 +64,7 @@ class XLSXExport {
 
   addRow(row) {
     var filtered_row = row.map( (val) => {
-      return (val || "").toString()
+      return (val)
     })
     this.rows.push(filtered_row)
   }
