@@ -41,7 +41,11 @@ const CreateReceipt = React.createClass({
   },
 
   updateFormState: function(model) {
+    if(model.target) {
+      return
+    }
     this.setState({model: model})
+    return model
   },
 
   render: function () {
@@ -81,15 +85,15 @@ const CreateReceipt = React.createClass({
         {
           label: 'Sub',
           filter: (function(){ return this.state.model.type != 'sub_only'}).bind(this),
-          element: <Styleguide.Molecules.Forms.ReactSelect renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} required name={"sub"}/>
+          element: <Styleguide.Molecules.Forms.ReactSelect renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"sub"}/>
         },
       {
         label: 'Deposit Date',
-        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='deposit_date' selected={deposit_date} required/>
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='deposit_date' value={deposit_date} required/>
       },
       {
         label: 'Check Date',
-        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='check_date' selected={check_date} required/>
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='check_date' value={check_date} required/>
       },
       {
         label: 'Redeem Date',
@@ -119,7 +123,7 @@ const CreateReceipt = React.createClass({
 
     return (
       <div style={paperStyle}>
-        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+        <Formsy.Form onValidSubmit={this.submitForm}, onChange={this.updateFormState}>
           {form_body}
           <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
         </Formsy.Form>

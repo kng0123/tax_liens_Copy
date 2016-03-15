@@ -31,6 +31,7 @@ var MyOwnInput = React.createClass({
       value: event.target.value,
       date_string: date_string.format('MM/DD/YYYY')
     })
+    this.setValue(date_string.toDate())
     event.target.value = date_string.format('MM/DD/YYYY')
     if(this.props.onChange) {
       this.props.onChange(event)
