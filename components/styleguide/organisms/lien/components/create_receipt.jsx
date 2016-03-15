@@ -66,10 +66,7 @@ const CreateReceipt = React.createClass({
     if(this.state.receipt.get('check_date')) {
       check_date = (this.state.receipt.get('check_date'))
     }
-    var redeem_date = undefined
-    if(this.state.receipt.get('redeem_date')) {
-      redeem_date = (this.state.receipt.get('redeem_date'))
-    }
+    var redeem_date  = moment().format('MM/DD/YYYY')
 
     var code_options = App.Models.LienCheck.code_options()
     var sub_options = this.props.lien.get('subs').map( (sub) => {
@@ -96,7 +93,7 @@ const CreateReceipt = React.createClass({
       },
       {
         label: 'Redeem Date',
-        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='redeem_date' selected={redeem_date}/>
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='redeem_date' value={redeem_date}/>
       },
       {
         label: 'Check number',
