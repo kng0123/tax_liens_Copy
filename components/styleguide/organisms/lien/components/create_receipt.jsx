@@ -123,7 +123,7 @@ const CreateReceipt = React.createClass({
 
     return (
       <div style={paperStyle}>
-        <Formsy.Form onValidSubmit={this.submitForm}, onChange={this.updateFormState}>
+        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
           {form_body}
           <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
         </Formsy.Form>

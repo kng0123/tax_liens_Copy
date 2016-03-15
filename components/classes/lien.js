@@ -190,6 +190,11 @@ class Lien extends Parse.Object {
     checks.push(check)
     this.set('checks', checks)
   }
+  add_sub(sub) {
+    var subs = this.get('subs')
+    subs.push(sub)
+    this.set('subs', subs)
+  }
 }
 
 

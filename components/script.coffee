@@ -335,6 +335,11 @@ Templates.lien = React.createClass
       open: true
       modal: React.createFactory(Styleguide.Organisms.Lien.CreateReceipt) Object.assign {lien:@state.lien, callback:=>@setState open:false}, @props, ""
       # modal_actions: [React.createFactory(MUI.FlatButton) label:"Create", secondary:true, onTouchTap: @handleClose]
+  openSubCreate: ->
+    @setState
+      open: true
+      modal: React.createFactory(Styleguide.Organisms.Lien.CreateSub) Object.assign {lien:@state.lien, callback:=>@setState open:false}, @props, ""
+      # modal_actions: [React.createFactory(MUI.FlatButton) label:"Create", secondary:true, onTouchTap: @handleClose]
 
   getDialog: ->
     modal = @state.modal
@@ -413,6 +418,7 @@ Templates.lien = React.createClass
                 h5 null,
                   span null, "LIEN #{@state.lien.get('seq_id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
+                  React.createFactory(MUI.FlatButton) label:"Add sub", secondary:true, onTouchTap:@openSubCreate
                   span style:{width:'150px', display:'inline-block'},
                     select name:'status', value:lien.get('status'), options: state_options, onChange:@onChange({type:'select', key:"status"})
                   # React.createFactory(MUI.FlatButton) label:"Add LLC", secondary:true, onTouchTap:@openCreate

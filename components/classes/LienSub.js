@@ -10,6 +10,14 @@ class LienSub extends Parse.Object {
     }
   }
 
+  static code_options() {
+    return [
+      {label: 'Tax', value:'tax'},
+      {label: 'Utility', value:'utility'},
+      {label: 'Other', value:'other'}
+    ]
+  }
+
   name() {
     return this.get('type')+" "+this.get('amount')+" "+moment(this.get('sub_date')).format('MM/DD/YYYY')
   }
@@ -45,7 +53,7 @@ class LienSub extends Parse.Object {
     return interest
   }
   static init_from_json(lien, data) {
-    var sub = new LienSub()
+    var sub = new LienSub(data)
     sub.set("lien", lien);
 
     data = JSON.parse(JSON.stringify(data), ( (k,v) => {
