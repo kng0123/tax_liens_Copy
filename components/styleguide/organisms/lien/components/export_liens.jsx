@@ -5,6 +5,14 @@ const { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup, FormsySelect,
 const RaisedButton = require('material-ui/lib/raised-button');
 const Paper = require('material-ui/lib/paper');
 
+function format_date(date) {
+  if(date) {
+    return moment(date).format('M/D/Y')
+  } else {
+    return ""
+  }
+}
+
 const ExportReceipts = React.createClass({
   getInitialState: function() {
     return {
@@ -41,9 +49,9 @@ const ExportReceipts = React.createClass({
         lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
         lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
         format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
-        format_money(lien.total_cash_out()), lien.get('sale_date'),
+        format_money(lien.total_cash_out()), format_date(lien.get('sale_date')),
 
-        format_money(lien.subs_paid()), lien.get('redemption_date'), format_money(lien.expected_amount()), format_money(lien.total_cash_out()), format_money(lien.total_interest_due()),
+        format_money(lien.subs_paid()), format_date(lien.get('redemption_date')), format_money(lien.expected_amount()), format_money(lien.total_cash_out()), format_money(lien.total_interest_due()),
         format_money(lien.total_check()), format_money(lien.diff())
       ])
     })
