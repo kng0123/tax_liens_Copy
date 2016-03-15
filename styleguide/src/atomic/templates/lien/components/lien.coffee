@@ -42,7 +42,7 @@ Templates.lien = React.createClass
   onChange: (item) ->
     (data) =>
       val = switch item.type
-        when 'date' then data.toDate()
+        when 'date' then moment(data.target.value).toDate()
         when 'bool' then $(data.target).is(':checked')
         when 'select' then data.value
         when 'money' then Math.round(accounting.unformat($(data.target).html()) * 100)
@@ -386,11 +386,13 @@ Templates.lien_info = React.createClass
     editable = React.createFactory PlainEditable
     date_picker = React.createFactory DatePicker
     checkbox = React.createFactory MUI.Checkbox
+    dp = React.createFactory Styleguide.Molecules.Forms.DatePicker
     gen_editable = (key, item, val) =>
       edit = switch(item.type)
         when 'date'
           div style:{display: 'block', position: 'relative', width: '100px'},
-            date_picker className:'form-control datepicker', selected:moment(val), onChange:@props.onChange(item)
+            dp style:{width:'150px'}, name:'redeem_date', value:val, onChange:@props.onChange(item)
+
         when 'bool'
           checkbox onCheck: @props.onChange(item), checked:!!val
         when 'number'
@@ -412,9 +414,10 @@ Templates.lien_info = React.createClass
           label style:{marginBottom:'0px'}, item.label
         edit
 
+    f = React.createFactory Formsy.Form
     div className:'panel panel-default',
       div className:'panel-heading',
-        form className:'container-fluid',
+        f className:'container-fluid',
           div className:'row',
             general_fields.map( (fields,k) =>
               div className:'col-lg-4', key:k,

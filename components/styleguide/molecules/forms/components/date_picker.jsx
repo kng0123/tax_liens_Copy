@@ -9,7 +9,7 @@ var MyOwnInput = React.createClass({
   getInitialState: function() {
     var val = ""
     var date_string = ""
-    if (!this.props.value) {
+    if (!this.props.value || this.props.value == 'Empty') {
       val = ""
     } else {
       val = moment(this.props.value).format('MM/DD/YYYY')
@@ -25,6 +25,9 @@ var MyOwnInput = React.createClass({
       value: event.target.value,
       date_string: moment(event.target.value).format('MM/DD/YYYY')
     })
+    if(this.props.onChange) {
+      this.props.onChange(event)
+    }
   },
 
   render: function () {
