@@ -101,7 +101,7 @@ class LienXLSX {
     var group = null
 
     var last = undefined;
-    for( var col of range(0, cols) ) {
+    for( var col of range(0, cols+1) ) {
       var cell = this.getCell(col, row)
 
       //If this cell is empty add it to the group and move to the next one
@@ -109,6 +109,7 @@ class LienXLSX {
         if(group == null) {
           break;
         }
+        group.last = col
         group.push(undefined)
         continue
       }
@@ -130,8 +131,11 @@ class LienXLSX {
         }
         group = []
         group.first = col
+        group.last = col
         group.theme = fg_color
         groups.push(group)
+      } else {
+        group.last = col
       }
       last = col
       group.push(cell.w)
@@ -228,7 +232,6 @@ class LienXLSX {
       } else if (type == 'cert only') {
         type = 'cert_w_interest'
       } else {
-        debugger
         throw new Error('Undefined check type')
       }
       var check = {
