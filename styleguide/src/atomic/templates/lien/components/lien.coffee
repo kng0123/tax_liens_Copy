@@ -118,20 +118,24 @@ Templates.lien = React.createClass
 
 Templates.formatter = React.createClass
   displayName: 'formatter'
-  click: ->
-    alert(1)
+
+  toggle_void: ->
+    sub = this.props.value.sub
+    sub.set('void', !sub.get('void'))
+    sub.save()
+
   render: ->
-    {div} = React.DOM
+    {div,p} = React.DOM
+    void_state = 'clear'
     fi = React.createFactory MUI.Libs.FontIcons
     iconStyles = {
       color: '#FB8C00'
       marginRight: 10,
     };
+    if(this.props.value.sub.get('void'))
+      void_state = 'add'
     div null,
-      fi onClick:@click, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
-      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
-      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
-      fi className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, "face"
+      fi onClick:@toggle_void, className:"muidocs-icon-action-home material-icons orange600", style:iconStyles, void_state
 
 Templates.lien_subs = React.createClass
   displayName: 'LienSubs'
@@ -148,7 +152,7 @@ Templates.lien_subs = React.createClass
       amt: accounting.formatMoney(amount/100, acc_format) ,
       int: accounting.formatMoney(sub.interest()/100, acc_format) ,
       number: "",
-      actions: {g:2}
+      actions: {sub:sub}
     }
   render: ->
     {div, h3, h1, ul, li, span, i, p} = React.DOM
@@ -373,13 +377,15 @@ Templates.lien_info = React.createClass
       [{label: "ADDRESS", key:"address", editable:true}
       {label: "CITY", key:"city", editable:true}
       {label: "STATE", key:"state", editable:true}
-      {label: "ZIP", key:"zip", editable:true}]
+      {label: "ZIP", key:"zip", editable:true}
+      {label: "REDEEM IN 10?", key:"redeem_in_10", editable:true, type:'bool'}
+      ]
 
       [
         {label: "SALE DATE", key:"sale_date", editable:true, type:'date'}
         {label: "RECORDING DATE", key:"recording_date", editable:true, type:'date'}
         {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'}
-        {label: "REDEEM IN 10?", key:"redeem_in_10", editable:true, type:'bool'}
+
       ]
     ]
 
