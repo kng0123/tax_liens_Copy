@@ -30,7 +30,7 @@ global.injectTapEventPlugin = require("react-tap-event-plugin")
 global.Recompose = require('recompose')
 global.moment = require('moment')
 global.tv4 = require('tv4')
-global.Parse = require('parse')
+global.Parse = require('./parse.js')
 global.ParseReact = require('parse-react')
 global.moment = require('moment')
 global.XLSX = require('xlsx-browserify-shim');
@@ -46,6 +46,7 @@ require('./app.css')
 // Parse.initialize("4jhLXmNyrqVvhHBfYpAR5wtNtqTLY6o0kt10dICm", "w0DVkEdklERduqzIVTWpUU3hIpn7uUpi58iXux9F");
 Parse.initialize("fake_app", "javascriptKey");
 Parse.serverURL = ('/parse');
+require('react.backbone')
 
 injectTapEventPlugin = require("react-tap-event-plugin");
 global.MUI = require('material-ui');
@@ -65,6 +66,7 @@ global.App = {
   Models: require('./classes'),
   Utils: require('./utils'),
 }
+require('./backbone')
 import ReactDataGrid from 'react-data-grid'
 global.ReactDataGrid = ReactDataGrid
 global.Styleguide = require('./styleguide')

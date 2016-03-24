@@ -5,6 +5,7 @@ reducer = Redux.combineReducers({
   routing: routeReducer,
   user: function(state, action) {
     var user;
+    return {id:5}
     user = Parse.User.current() || {};
     if (!state) {
       return Object.assign({}, user || {});

@@ -101,228 +101,26 @@ Templates.table = React.createClass
                 props.style = {width:@props.widths[index], textAlign:'center', paddingLeft:0, paddingRight:0}
               TableRowColumn  props, item
 
-DumbTemplates.forgot_password = React.createClass
-  displayName: 'ForgotPassword'
-
-  getErrors: ->
-    @props.schema.reduce (acc, val) ->
-      acc[val.dataPath] = val.message
-      return acc
-    , {}
-
-  render: ->
-    {div, h3, p, form, input, span, ul, li} = React.DOM
-    link = React.createFactory ReactRouter.Link
-    Factory = React.Factory
-
-    TextField = React.createFactory MUI.TextField
-    RaisedButton = React.createFactory MUI.RaisedButton
-
-    forgot_password_error = @props.forgot_password_error
-    busy = @props.busy
-    errors = @getErrors()
-
-    Factory.pagebox null,
-      h3 className:'strong text-center text-grey', "Sign In"
-      if forgot_password_error
-        div className:'alert alert-danger', role:'alert',
-          span className:'glyphicon glyphicon-exlamation-sign', ""
-          span null, "Error: " + forgot_password_errors
-      div null,
-        form onSubmit:@props.signIn.bind(@),
-          TextField errorStyle:{bottom:'10px'}, fullWidth: true, name:'email',    value:@props.forgot_password_form.email, errorText:errors['/email'],    type:'email', hintText:"Email", floatingLabelText:"Email", onChange:@props.inputStream
-          TextField errorStyle:{bottom:'10px'}, fullWidth: true, name:'password', value:@props.forgot_password_form.password, errorText:errors['/password'], type:'password', hintText:"Password", floatingLabelText:"Password", onChange:@props.inputStream
-          div style:{textAlign:'right', marginTop:'10px'},
-            RaisedButton label:"Sign in", type:'submit', disabled:busy, primary:true
-        ul className:'extra-links',
-          li null,
-            link to:'/auth/forgot_password', "Forgot password?"
-          li null,
-            link to:'/auth/forgot_password', "Not registered? Sign up"
-
-SmartTemplates.forgot_password = Recompose.compose(
-  observeProps( (props$) =>
-    email$ = new Rx.BehaviorSubject('')
-    password$ = new Rx.BehaviorSubject('')
-    busy$ = new Rx.BehaviorSubject(false)
-    schema$ = new Rx.BehaviorSubject([])
-    forgot_password_error$ = new Rx.BehaviorSubject('')
-    form_forgot_password$ = Rx.Observable.combineLatest(
-      email$, password$,
-      (email, password) =>
-        Object.assign({},
-          forgot_password_form:
-            email: email
-            password: password
-        )
-    )
-
-    signIn$ = RxReact.FuncSubject.create (event) ->
-      event.preventDefault()
-      return false
-
-    signIn$
-      .filter () ->
-        schema =
-          type: 'object'
-          properties:
-            email: type: 'string', 'check-required':1, label:'Email'
-            password: type: 'string', 'check-required':1, label:'Password'
-          required: ['email', 'password']
-        result = tv4.validateMultiple(password: password$.value, email:email$.value, schema)
-        schema$.onNext result.errors
-        return result.valid
-      .subscribe () ->
-        props$.combineLatest (props) -> props
-        .take(1)
-        .subscribe (props) ->
-          busy$.onNext(true)
-          action = Action.attempt_forgot_password (email: email$.value, password:password$.value)
-          action.subject.subscribe (result) ->
-            busy$.onNext(false)
-            forgot_password_error$.onNext(result.error.reason) if result.error
-            forgot_password_error$.onNext("") if !result.error
-          props.dispatch(action)
-
-    inputStream$ = createEventHandler()
-    inputStream$.subscribe (event) ->
-      name = event.target.name
-      value = event.target.value
-      switch name
-        when 'email' then email$.onNext(value)
-        when 'password' then password$.onNext(value)
-
-    return Rx.Observable.combineLatest(
-      props$, form_forgot_password$, schema$, forgot_password_error$, busy$
-      (props, form_forgot_password, schema, forgot_password_error, busy) =>
-        Object.assign {},
-          props,
-          form_forgot_password,
-          busy: busy,
-          schema: schema
-          signIn: signIn$,
-          forgot_password_error: forgot_password_error,
-          inputStream: inputStream$
-    );
-  )
-)
-
-Templates.forgot_password = SmartTemplates.forgot_password(DumbTemplates.forgot_password)
-
-DumbTemplates.sign_up = React.createClass
-  displayName: 'SignUp'
-
-  getErrors: ->
-    @props.schema.reduce (acc, val) ->
-      acc[val.dataPath] = val.message
-      return acc
-    , {}
-
-  render: ->
-    {div, h3, p, form, input, span, ul, li} = React.DOM
-    link = React.createFactory ReactRouter.Link
-    Factory = React.Factory
-
-    TextField = React.createFactory MUI.TextField
-    RaisedButton = React.createFactory MUI.RaisedButton
-
-    sign_up_error = @props.sign_up_error
-    busy = @props.busy
-    errors = @getErrors()
-
-    Factory.pagebox null,
-      h3 className:'strong text-center text-grey', "Sign Up"
-      if sign_up_error
-        div className:'alert alert-danger', role:'alert',
-          span className:'glyphicon glyphicon-exlamation-sign', ""
-          span null, "Error: " + sign_up_errors
-      div null,
-        form onSubmit:@props.signUp.bind(@),
-          TextField errorStyle:{bottom:'10px'}, fullWidth: true, name:'username',    value:@props.sign_up_form.username, errorText:errors['/username'],    type:'username', hintText:"Username", floatingLabelText:"Username", onChange:@props.inputStream
-          TextField errorStyle:{bottom:'10px'}, fullWidth: true, name:'password', value:@props.sign_up_form.password, errorText:errors['/password'], type:'password', hintText:"Password", floatingLabelText:"Password", onChange:@props.inputStream
-          div style:{textAlign:'right', marginTop:'10px'},
-            RaisedButton label:"Register", type:'submit', disabled:busy, primary:true
-        ul className:'list-unstyled',
-          li className:'text-center',
-            link to:'/auth/sign_in', "Already registered? Sign in"
-
-SmartTemplates.sign_up = Recompose.compose(
-  observeProps( (props$) =>
-    username$ = new Rx.BehaviorSubject('')
-    password$ = new Rx.BehaviorSubject('')
-    busy$ = new Rx.BehaviorSubject(false)
-    schema$ = new Rx.BehaviorSubject([])
-    sign_up_error$ = new Rx.BehaviorSubject('')
-    form_sign_up$ = Rx.Observable.combineLatest(
-      username$, password$,
-      (username, password) =>
-        Object.assign({},
-          sign_up_form:
-            username: username
-            password: password
-        )
-    )
-
-    signUp$ = RxReact.FuncSubject.create (event) ->
-      event.preventDefault()
-      return false
-
-    signUp$
-      .filter () ->
-        schema =
-          type: 'object'
-          properties:
-            username: type: 'string', 'check-required':1, label:'Username'
-            password: type: 'string', 'check-required':1, label:'Password'
-          required: ['username', 'password']
-        result = tv4.validateMultiple(password: password$.value, username:username$.value, schema)
-        schema$.onNext result.errors
-        return result.valid
-      .subscribe () ->
-        props$.combineLatest (props) -> props
-        .take(1)
-        .subscribe (props) ->
-          busy$.onNext(true)
-          action = Action.attempt_sign_up (username: username$.value, password:password$.value)
-          action.subject.subscribe (result) ->
-            busy$.onNext(false)
-            sign_up_error$.onNext(result.error.reason) if result.error
-            sign_up_error$.onNext("") if !result.error
-          props.dispatch(action)
-
-    inputStream$ = createEventHandler()
-    inputStream$.subscribe (event) ->
-      name = event.target.name
-      value = event.target.value
-      switch name
-        when 'username' then username$.onNext(value)
-        when 'password' then password$.onNext(value)
-
-    return Rx.Observable.combineLatest(
-      props$, form_sign_up$, schema$, sign_up_error$, busy$
-      (props, form_sign_up, schema, sign_up_error, busy) =>
-        Object.assign {},
-          props,
-          form_sign_up,
-          busy: busy,
-          schema: schema
-          signUp: signUp$,
-          sign_up_error: sign_up_error,
-          inputStream: inputStream$
-    );
-  )
-)
-
-Templates.sign_up = SmartTemplates.sign_up(DumbTemplates.sign_up)
-
 accounting = require('accounting')
-Templates.lien = React.createClass
-
+Templates.lien = React.createBackboneClass
   displayName: 'Lien'
+  getInitialState: ->
+    lien = BackboneApp.Models.Lien.findOrCreate(id:@props.routeParams.id)
+    lien.fetch()
+    lien: lien
+
+  render: ->
+    return React.Factory.lien_helper(Object.assign({}, @props, lien:@state.lien))
+
+Templates.lien_helper = React.createBackboneClass
+  displayName: 'LienHelper'
+  mixins: [
+      React.BackboneMixin("lien")
+  ],
 
   getInitialState: ->
     {div} = React.DOM
-    lien: undefined
+    lien: @props.lien
     open: false
     modal: undefined
     modal_actions: div null, ""
@@ -348,19 +146,6 @@ Templates.lien = React.createClass
     dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'500px'},
       modal
 
-  componentWillMount: ->
-    query = new Parse.Query(App.Models.Lien);
-    query.equalTo("seq_id", parseInt(this.props.routeParams.id))
-    query.include("subs")
-    query.include("checks")
-    query.include("owners")
-    query.include("llcs")
-    query.include("annotations")
-    query.limit(1000);
-    query.find({}).then( (results) =>
-      @setState lien: results[0]
-    )
-
   onChange: (item) ->
     (data) =>
       val = switch item.type
@@ -380,9 +165,7 @@ Templates.lien = React.createClass
       @save()
 
   save: ->
-    @state.lien.save().then (data) =>
-      @setState(lien:data)
-    .fail () ->
+    @state.lien.save()
 
   render: ->
     {div, h3, h5, h1, ul, li, span, i, p} = React.DOM
@@ -416,7 +199,7 @@ Templates.lien = React.createClass
             div className:'col-lg-12',
               div className:'container-fluid',
                 h5 null,
-                  span null, "LIEN #{@state.lien.get('seq_id')}"
+                  span null, "LIEN #{@state.lien.get('id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   React.createFactory(MUI.FlatButton) label:"Add sub", secondary:true, onTouchTap:@openSubCreate
                   span style:{width:'150px', display:'inline-block'},
@@ -425,19 +208,19 @@ Templates.lien = React.createClass
           div className:'row',
             div className:'col-md-6',
               Factory.lien_info lien:lien, onChange:@onChange
-            div className:'col-md-6',
-              Factory.lien_cash lien:lien, onChange:@onChange
-          div className:'row',
-            div className:'col-md-6',
-              Factory.lien_subs lien:lien, onChange:@onChange
-            div className:'col-md-6',
-              Factory.lien_notes lien:lien, onChange:@onChange
-          div className:'row',
-            div className:'col-md-12',
-              Factory.lien_checks Object.assign {}, @props, lien:lien
-          div className:'row',
-            div className:'col-md-6',
-              Factory.lien_llcs lien:lien, onChange:@onChange
+          #   div className:'col-md-6',
+          #     Factory.lien_cash lien:lien, onChange:@onChange
+          # div className:'row',
+          #   div className:'col-md-6',
+          #     Factory.lien_subs lien:lien, onChange:@onChange
+          #   div className:'col-md-6',
+          #     Factory.lien_notes lien:lien, onChange:@onChange
+          # div className:'row',
+          #   div className:'col-md-12',
+          #     Factory.lien_checks Object.assign {}, @props, lien:lien
+          # div className:'row',
+          #   div className:'col-md-6',
+          #     Factory.lien_llcs lien:lien, onChange:@onChange
 
 Templates.formatter = React.createClass
   displayName: 'formatter'
@@ -759,7 +542,7 @@ Templates.lien_info = React.createClass
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
                   if (field.id)
-                    val = @props.lien.get('seq_id')
+                    val = @props.lien.get('id')
 
                   val = "Empty" if val is undefined and field.type != 'bool'
                   gen_editable(field_key, field, val)
@@ -867,13 +650,24 @@ Templates.lien_cash = React.createClass
                 )
             )
 
-Templates.lien_list = React.createClass
-  displayName: 'LienList'
+
+Templates.lien_list = React.createBackboneClass
+  displayName: 'Lien'
+  getInitialState: ->
+    liens: new BackboneApp.Collections.LienCollection()
+
+  render: ->
+    return React.Factory.lien_list_helper(Object.assign({}, @props, liens:@state.liens))
+
+Templates.lien_list_helper = React.createClass
+  displayName: 'LienListHelper'
+  mixins: [
+      React.BackboneMixin("liens")
+  ],
   contextTypes: {
     router: React.PropTypes.object
   },
   getInitialState: ->
-    liens: []
     open: false
     modal: undefined
 
@@ -903,44 +697,10 @@ Templates.lien_list = React.createClass
 
   queryLiens: (props)->
     query_params = props.search
-    query = new Parse.Query(App.Models.Lien);
-    if !query_params
-      return
-    if query_params.id
-      query.equalTo("seq_id", query_params.id)
-    else if query_params.block
-      query.equalTo("block", query_params.block)
-      query.equalTo("lot", query_params.lot) if query_params.lot
-      query.equalTo("qualifier", query_params.qualifier) if query_params.qualifier
-    else if query_params.cert
-      query.equalTo("cert_number", query_params.cert)
-    else if query_params.sale_year
-      year = parseInt(query_params.sale_year)
-      query.greaterThan("sale_date", moment([year, 0]).toDate());
-      query.lessThan("sale_date", moment([year+1, 0]).toDate());
-    else if query_params.township
-      query.contains("county", query_params.township)
-    else
-      return
-
-    #TODO What to do with case #?
-    query.include("subs")
-    query.include("checks")
-    query.include("owners")
-    query.include("llcs")
-    query.include("annotations")
-    query.limit(1000);
-    query.find({
-    	success : (results) =>
-        @setState liens:results
-    	,
-    	error : (obj, error) ->
-
-    })
+    props.liens.fetch(query_params)
 
   goToLien: (indices) ->
-    lien = @state.liens[indices[0]]
-    @context.router.push('/lien/item/'+lien.get('seq_id'))
+    @context.router.push('/lien/item/'+indices.target.dataset.id)
 
 
   render: ->
@@ -950,10 +710,10 @@ Templates.lien_list = React.createClass
 
     sub_headers = ["ID", "TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE"]
     editable = React.createFactory PlainEditable
-    sub_rows = @state.liens.map (lien, k) =>
+    sub_rows = @props.liens.models.map (lien, k) =>
       [
-        lien.get('seq_id'),
-        div onClick:@goToLien, 'data-id':lien.get('seq_id'), lien.get('county')
+        lien.get('id'),
+        div onClick:@goToLien, 'data-id':lien.get('id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
@@ -965,7 +725,7 @@ Templates.lien_list = React.createClass
 
     widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px']
 
-    sub_table = Factory.table widths:widths, selectable:true, headers: sub_headers, rows: sub_rows, onRowSelection:@goToLien
+    sub_table = Factory.table widths:widths, selectable:true, headers: sub_headers, rows: sub_rows#, onRowSelection:@goToLien
 
     div null,
       @getDialog()
@@ -975,13 +735,13 @@ Templates.lien_list = React.createClass
             Factory.lien_search @props
       div className:'container-fluid',
         div className:'row',
-          if @state.liens.length
+          if @props.liens.length
             div className:'col-lg-12',
               React.createFactory(MUI.FlatButton) label:"Export receipts", secondary:true, onTouchTap:@exportReceipts
               React.createFactory(MUI.FlatButton) label:"Export liens", secondary:true, onTouchTap:@exportLiens
         div className:'row',
           div className:'col-lg-12',
-            if @state.liens.length
+            if @props.liens.length
               sub_table
             else
               p null, "No liens found. Try uploading some."
@@ -1444,85 +1204,6 @@ convert_to_xlsx_json = (data, opts) ->
     ws['!ref'] = XLSX.utils.encode_range(range)
   ws
 
-Templates.lien_search = React.createClass
-  displayName: 'LienSearch'
-
-  contextTypes: {
-    router: React.PropTypes.object
-  },
-
-  getInitialState: ->
-    townships: []
-    data: Object.assign {}, @props.search
-
-  componentWillMount: () ->
-    query = new Parse.Query('Township');
-    return query.find().then( (townships) =>
-      @setState townships:townships.map( (township) ->
-        label: township.get('township'), value:township.get('township')
-      )
-    )
-
-  componentWillReceiveProps: (props)->
-    @setState data: props.search
-
-  onChange: (event) ->
-    if event.label
-      data = @state.data
-      data['township'] = event.value
-      @setState data: data
-    else
-      name = event.target.name
-      val = event.target.value
-
-      data = @state.data
-      data[name] = val
-      @setState data: data
-
-  onSubmit: (e) ->
-    e.stopPropagation()
-    e.preventDefault()
-    @context.router.push(
-      pathname: '/lien',
-      query: @state.data
-    )
-    this.props.dispatch({type:'SEARCH', data:@state.data})
-    return false
-
-  render: ->
-    {form, div, label, input, button, span} = React.DOM
-    inputs = [
-        label: "Block", type:'text', key:'block'
-      ,
-        label: "Lot", type:'text', key:'lot'
-      ,
-        label: "Qual", type:'text', key:'qualifier'
-      ,
-        label: "Certificate #", type:'text', key:'cert'
-      ,
-        label: "Sale year", type:'text', key:'sale_year'
-      ,
-        label: "Township", type:'text', key:'township'
-      ,
-        label: "Case #", type:'text', key:'case'
-      ,
-        label: "Lien ID", type:'text', key:'id'
-    ]
-
-    select = React.createFactory Select
-
-    form className:'form-inline', onSubmit:@onSubmit,
-      inputs.map (item, index) =>
-        div key:index, className:'form-group',
-          div style:{display:'block'},
-            div null,
-              span null, item.label
-            if item.key != 'township'
-              input onChange:@onChange, style:{width:'130px'}, type:item.type, name:item.key, value:@state.data[item.key], className:'form-control'
-            else
-              select name:'status', style:{width:'130px'},value:@state.data[item.key], name:item.key, options:@state.townships, onChange:@onChange
-      button type:'submit', style:{marginTop:'20px', marginLeft:'10px'}, className:'btn btn-primary', "Go"
-
 Templates.lien_upload = React.createClass
   displayName: 'LienUpload'
 
@@ -1614,186 +1295,6 @@ tv4.setErrorReporter (error, data, schema) ->
 tv4.defineKeyword 'check-required', (data, props, schema) ->
   if !data
     return code:tv4.errorCodes.OBJECT_REQUIRED, message:{}
-
-DumbTemplates.header = React.createClass
-  displayName: 'Header'
-
-  contextTypes: {
-    router: React.PropTypes.object
-  },
-
-  logout: ->
-    @props.dispatch(Action.logout())
-
-  login: ->
-    @context.router.push('/auth/sign_in')
-
-  render: ->
-    {div, button, p, span, a, ul, li, nav} = React.DOM
-    link = React.createFactory ReactRouter.Link
-
-    user_email = "test"
-    logged_in = @props.user.id
-    RaisedButton = React.createFactory MUI.RaisedButton
-
-    Toolbar = React.createFactory MUI.Toolbar
-    ToolbarGroup = React.createFactory MUI.ToolbarGroup
-    ToolbarSeparator = React.createFactory MUI.ToolbarSeparator
-    ToolbarTitle = React.createFactory MUI.ToolbarTitle
-
-    linkStyles = {lineHeight:'56px', marginRight:'10px'}
-
-    Toolbar style:{marginBottom:'10px'},
-      ToolbarGroup null,
-        ToolbarTitle text:'TTG Lien'
-      ToolbarGroup null,
-        if @props.user.id
-          div null,
-            link style:linkStyles, to:'/', 'Home'
-            link style:linkStyles, to:'/lien/upload', 'Upload'
-            link style:linkStyles, to:'/lien/subs', 'Batch subs'
-        else
-          div null,
-            link style:linkStyles, to:'/', 'Home'
-
-      ToolbarGroup float:'right',
-        ToolbarSeparator null
-        if logged_in
-          RaisedButton label:"Log out", onClick:@logout, type:'button', disabled:false, primary:true
-        else
-          RaisedButton label:"Log in", onClick:@login, type:'button', disabled:false, primary:true
-
-SmartTemplates.header = Recompose.compose(
-)
-Templates.header = SmartTemplates.header DumbTemplates.header
-Templates.footer = React.createClass
-  displayName: 'Footer'
-
-  render: ->
-    {div, p} = React.DOM
-    div className:'document-footer-container',
-      p null, "Footer"
-
-Templates.document = React.createClass
-  displayName: 'Documnet'
-
-  getInitialState: ->
-    windowWidth: window.innerWidth
-
-  componentDidMount: ->
-    window.addEventListener('resize', @handleResize)
-
-  componentWillUnmount: ->
-    window.removeEventListener('resize')
-
-  handleResize: ->
-    @setState windowWidth:window.innerWidth
-
-  render: ->
-    {div, h1, p} = React.DOM
-    Factory = React.Factory
-
-    $(".document-header-container").height()
-    div className:'document', id:'wrapper',
-      Factory.header Object.assign({}, @props, {windowWidth:@state.windowWidth}), ""
-      div className: 'document-body-container', id:'page-wrapper',
-        div className:'document-body-content',
-          this.props.children || Factory.page
-
-
-Templates.document_box = React.createClass
-  displayName: 'DocumnetBox'
-
-  contextTypes: {
-    router: React.PropTypes.object
-  },
-
-  getInitialState: ->
-    windowWidth: window.innerWidth
-
-  componentDidMount: ->
-    window.addEventListener('resize', @handleResize)
-
-  componentWillUnmount: ->
-    window.removeEventListener('resize')
-
-  handleResize: ->
-    @setState windowWidth:window.innerWidth
-
-  render: ->
-    {div, h1, p} = React.DOM
-    Factory = React.Factory
-
-    $(".document-header-container").height()
-    div className:'document', id:'wrapper',
-      Factory.header Object.assign({}, @props, {windowWidth:@state.windowWidth}), ""
-      div className: 'document-body-container', id:'page-wrapper',
-        div className:'document-body-content', style:{margin:'0 auto'},
-          this.props.children || Factory.page
-
-Templates.loading_document = React.createClass
-  displayName: 'LoadingDocumnet'
-  render: ->
-    {div, h4} = React.DOM
-    Factory = React.Factory
-    Factory.document @props,
-      Factory.pagebox @props,
-        div style:{margin:'0 auto'}, className:'sprite sprite-icon', ""
-        h4 className:'text-center', "Welcome!"
-
-Templates.page = React.createClass
-  displayName: 'page'
-
-  render: ->
-    {div, h1, p} = React.DOM
-    div className: 'page-container',
-      div className: 'page-content',
-        this.props.children || "Content"
-
-Templates.pagebox = React.createClass
-  displayName: 'pagebox'
-
-  render: ->
-    {div, h1, p} = React.DOM
-    div className: 'page-container',
-      div className: 'page-content',
-        div className: 'page-box', style: @props.style,
-          this.props.children || "Content"
-
-
-Templates.verify_email = React.createClass
-  displayName: 'VerifyEmail'
-
-  componentWillMount: ->
-    @props.dispatch(Action.attempt_email_verification())
-
-  render: ->
-    {div, h3, p, form, input, span, ul, li} = React.DOM
-    error = if @props.form.error
-      @props.form.error.reason
-    busy = @props.form.busy
-    Factory = React.Factory
-    Factory.pagebox null,
-      h3 className:'strong text-center text-grey', "Verifying your email..."
-      if error
-        div className:'alert alert-danger', role:'alert',
-          span className:'glyphicon glyphicon-exlamation-sign', ""
-          span null, "Error: " + error
-
-
-Templates.authorization = React.createClass
-  displayName: 'Authorization'
-
-  render: ->
-    Factory = React.Factory
-    {div} = React.DOM
-    return div null
-    page = switch @props.auth_link.authorization_type
-      when "enroll" then Factory.enroll_account @props
-      when "email_verification" then Factory.verify_email @props
-      when "reset_password" then Factory.reset_password @props
-    Factory.document @props,
-      page
 
 React.Factory = {}
 for x, y of Templates

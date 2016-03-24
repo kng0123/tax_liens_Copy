@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HELLO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=5">
+  <link rel="stylesheet" href="/vendor/bootstrap/dist/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- your own minifed css -->
+  <link rel="stylesheet" href="/css/all.css"/>
+
+  <!-- Bootstrap Core CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <!-- <link href="/css/sb-admin.css" rel="stylesheet"> -->
+
+  <!-- Morris Charts CSS -->
+  <link href="/css/plugins/morris.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<div id="content"></div>
+
+
+<!-- React latest-->
+<script src="/js/bundle.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  injectTapEventPlugin()
+  var element = React.createElement(App.Root)
+  ReactDOM.render(element, $("#content")[0]);
+  var query = App.store.getState().routing.location.query
+  App.store.dispatch({type:'SEARCH', data:query})
+})
+</script>
+</body>
+</html>

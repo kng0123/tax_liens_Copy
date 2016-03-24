@@ -1,10 +1,21 @@
-Templates.lien_list = React.createClass
-  displayName: 'LienList'
+
+Templates.lien_list = React.createBackboneClass
+  displayName: 'Lien'
+  getInitialState: ->
+    liens: new BackboneApp.Collections.LienCollection()
+
+  render: ->
+    return React.Factory.lien_list_helper(Object.assign({}, @props, liens:@state.liens))
+
+Templates.lien_list_helper = React.createClass
+  displayName: 'LienListHelper'
+  mixins: [
+      React.BackboneMixin("liens")
+  ],
   contextTypes: {
     router: React.PropTypes.object
   },
   getInitialState: ->
-    liens: []
     open: false
     modal: undefined
 
@@ -34,44 +45,10 @@ Templates.lien_list = React.createClass
 
   queryLiens: (props)->
     query_params = props.search
-    query = new Parse.Query(App.Models.Lien);
-    if !query_params
-      return
-    if query_params.id
-      query.equalTo("seq_id", query_params.id)
-    else if query_params.block
-      query.equalTo("block", query_params.block)
-      query.equalTo("lot", query_params.lot) if query_params.lot
-      query.equalTo("qualifier", query_params.qualifier) if query_params.qualifier
-    else if query_params.cert
-      query.equalTo("cert_number", query_params.cert)
-    else if query_params.sale_year
-      year = parseInt(query_params.sale_year)
-      query.greaterThan("sale_date", moment([year, 0]).toDate());
-      query.lessThan("sale_date", moment([year+1, 0]).toDate());
-    else if query_params.township
-      query.contains("county", query_params.township)
-    else
-      return
-
-    #TODO What to do with case #?
-    query.include("subs")
-    query.include("checks")
-    query.include("owners")
-    query.include("llcs")
-    query.include("annotations")
-    query.limit(1000);
-    query.find({
-    	success : (results) =>
-        @setState liens:results
-    	,
-    	error : (obj, error) ->
-
-    })
+    props.liens.fetch(query_params)
 
   goToLien: (indices) ->
-    lien = @state.liens[indices[0]]
-    @context.router.push('/lien/item/'+lien.get('seq_id'))
+    @context.router.push('/lien/item/'+indices.target.dataset.id)
 
 
   render: ->
@@ -81,10 +58,10 @@ Templates.lien_list = React.createClass
 
     sub_headers = ["ID", "TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE"]
     editable = React.createFactory PlainEditable
-    sub_rows = @state.liens.map (lien, k) =>
+    sub_rows = @props.liens.models.map (lien, k) =>
       [
-        lien.get('seq_id'),
-        div onClick:@goToLien, 'data-id':lien.get('seq_id'), lien.get('county')
+        lien.get('id'),
+        div onClick:@goToLien, 'data-id':lien.get('id'), lien.get('county')
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
@@ -96,7 +73,7 @@ Templates.lien_list = React.createClass
 
     widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px']
 
-    sub_table = Factory.table widths:widths, selectable:true, headers: sub_headers, rows: sub_rows, onRowSelection:@goToLien
+    sub_table = Factory.table widths:widths, selectable:true, headers: sub_headers, rows: sub_rows#, onRowSelection:@goToLien
 
     div null,
       @getDialog()
@@ -106,13 +83,13 @@ Templates.lien_list = React.createClass
             Factory.lien_search @props
       div className:'container-fluid',
         div className:'row',
-          if @state.liens.length
+          if @props.liens.length
             div className:'col-lg-12',
               React.createFactory(MUI.FlatButton) label:"Export receipts", secondary:true, onTouchTap:@exportReceipts
               React.createFactory(MUI.FlatButton) label:"Export liens", secondary:true, onTouchTap:@exportLiens
         div className:'row',
           div className:'col-lg-12',
-            if @state.liens.length
+            if @props.liens.length
               sub_table
             else
               p null, "No liens found. Try uploading some."

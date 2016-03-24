@@ -5,8 +5,6 @@ const { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup, FormsySelect,
 const RaisedButton = require('material-ui/lib/raised-button');
 const Paper = require('material-ui/lib/paper');
 
-console.log(Molecules);
-
 const CreateReceipt = React.createClass({
   getInitialState: function() {
     return {

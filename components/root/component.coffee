@@ -27,19 +27,13 @@ Root = React.createClass
     provider store:store,
       Router history:RouteContext,
         Route path:'/test', component:conn(Styleguide.Molecules.Grids.Example)
-        Route path:'/', onEnter:redirect('/lien'), component:conn(Templates.document),
+        Route path:'/', onEnter:redirect('/lien'), component:conn(Styleguide.Organisms.Document.DocumentBox),
           IndexRoute component:conn(Styleguide.Organisms.Auth.SignIn)
-        Route path:'auth', component:conn(Templates.document_box), onEnter:onEnter(conditions:['logged_out'], errorRoute:'/lien'),
-          IndexRoute component:conn(Styleguide.Organisms.Auth.SignIn)
-          Route path:'sign_in', component:conn(Styleguide.Organisms.Auth.SignIn)
-          Route path:'sign_up', component:conn(Templates.sign_up)
-        Route path:'lien', component:conn(Templates.document_box), onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
-          IndexRoute component:conn(Templates.lien_list)
+        Route path:'lien', component:conn(Styleguide.Organisms.Document.DocumentBox), onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
+          IndexRoute component:conn(Styleguide.Pages.LienList)
           Route path:'upload', component:conn(Templates.lien_upload)
           Route path:'subs', component:conn(Templates.lien_process_subs)
           Route path:'batch/:id', component:conn(Templates.lien_process_subs_list)
-          Route path:'item/:id', component:conn(Templates.lien)
-
-          # Route path:'forgot_password', component:conn(Templates.forgot_password)
+          Route path:'item/:id', component:conn(Styleguide.Pages.Lien)
 
 module.exports = Root

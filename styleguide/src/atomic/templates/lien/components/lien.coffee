@@ -1,11 +1,23 @@
 accounting = require('accounting')
-Templates.lien = React.createClass
-
+Templates.lien = React.createBackboneClass
   displayName: 'Lien'
+  getInitialState: ->
+    lien = BackboneApp.Models.Lien.findOrCreate(id:@props.routeParams.id)
+    lien.fetch()
+    lien: lien
+
+  render: ->
+    return React.Factory.lien_helper(Object.assign({}, @props, lien:@state.lien))
+
+Templates.lien_helper = React.createBackboneClass
+  displayName: 'LienHelper'
+  mixins: [
+      React.BackboneMixin("lien")
+  ],
 
   getInitialState: ->
     {div} = React.DOM
-    lien: undefined
+    lien: @props.lien
     open: false
     modal: undefined
     modal_actions: div null, ""
@@ -31,19 +43,6 @@ Templates.lien = React.createClass
     dialog open:@state.open, actions: @state.modal_actions, onRequestClose:@handleClose, contentStyle:{width:'500px'},
       modal
 
-  componentWillMount: ->
-    query = new Parse.Query(App.Models.Lien);
-    query.equalTo("seq_id", parseInt(this.props.routeParams.id))
-    query.include("subs")
-    query.include("checks")
-    query.include("owners")
-    query.include("llcs")
-    query.include("annotations")
-    query.limit(1000);
-    query.find({}).then( (results) =>
-      @setState lien: results[0]
-    )
-
   onChange: (item) ->
     (data) =>
       val = switch item.type
@@ -63,9 +62,7 @@ Templates.lien = React.createClass
       @save()
 
   save: ->
-    @state.lien.save().then (data) =>
-      @setState(lien:data)
-    .fail () ->
+    @state.lien.save()
 
   render: ->
     {div, h3, h5, h1, ul, li, span, i, p} = React.DOM
@@ -99,7 +96,7 @@ Templates.lien = React.createClass
             div className:'col-lg-12',
               div className:'container-fluid',
                 h5 null,
-                  span null, "LIEN #{@state.lien.get('seq_id')}"
+                  span null, "LIEN #{@state.lien.get('id')}"
                   React.createFactory(MUI.FlatButton) label:"Add receipt", secondary:true, onTouchTap:@openCreate
                   React.createFactory(MUI.FlatButton) label:"Add sub", secondary:true, onTouchTap:@openSubCreate
                   span style:{width:'150px', display:'inline-block'},
@@ -108,19 +105,19 @@ Templates.lien = React.createClass
           div className:'row',
             div className:'col-md-6',
               Factory.lien_info lien:lien, onChange:@onChange
-            div className:'col-md-6',
-              Factory.lien_cash lien:lien, onChange:@onChange
-          div className:'row',
-            div className:'col-md-6',
-              Factory.lien_subs lien:lien, onChange:@onChange
-            div className:'col-md-6',
-              Factory.lien_notes lien:lien, onChange:@onChange
-          div className:'row',
-            div className:'col-md-12',
-              Factory.lien_checks Object.assign {}, @props, lien:lien
-          div className:'row',
-            div className:'col-md-6',
-              Factory.lien_llcs lien:lien, onChange:@onChange
+          #   div className:'col-md-6',
+          #     Factory.lien_cash lien:lien, onChange:@onChange
+          # div className:'row',
+          #   div className:'col-md-6',
+          #     Factory.lien_subs lien:lien, onChange:@onChange
+          #   div className:'col-md-6',
+          #     Factory.lien_notes lien:lien, onChange:@onChange
+          # div className:'row',
+          #   div className:'col-md-12',
+          #     Factory.lien_checks Object.assign {}, @props, lien:lien
+          # div className:'row',
+          #   div className:'col-md-6',
+          #     Factory.lien_llcs lien:lien, onChange:@onChange
 
 Templates.formatter = React.createClass
   displayName: 'formatter'
@@ -442,7 +439,7 @@ Templates.lien_info = React.createClass
                 fields.map( (field, field_key) =>
                   val = @props.lien.get(field.key)
                   if (field.id)
-                    val = @props.lien.get('seq_id')
+                    val = @props.lien.get('id')
 
                   val = "Empty" if val is undefined and field.type != 'bool'
                   gen_editable(field_key, field, val)
