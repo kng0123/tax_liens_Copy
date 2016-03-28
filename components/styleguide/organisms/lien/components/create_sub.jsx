@@ -8,7 +8,7 @@ const Paper = require('material-ui/lib/paper');
 const CreateSub = React.createClass({
   getInitialState: function() {
     return {
-      receipt: new App.Models.LienCheck(),
+      receipt: new BackboneApp.Models.Subsequent(),
       model: {}
     }
   },
@@ -54,7 +54,7 @@ const CreateSub = React.createClass({
     let error = <div></div>
 
     var sub_date  = moment().format('MM/DD/YYYY')
-    var code_options = App.Models.LienSub.code_options()
+    var code_options = BackboneApp.Models.Subsequent.code_options()
 
     var form_rows = [
       {

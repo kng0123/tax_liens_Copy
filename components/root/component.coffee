@@ -16,8 +16,7 @@ Root = React.createClass
     provider = React.createFactory ReactRedux.Provider
     Factory = React.Factory
     {div} = React.DOM
-    { DevTools, DebugPanel, LogMonitor } = ReduxDevLibs
-    DevTools = React.createFactory DevTools
+
     DebugPanel = React.createFactory DebugPanel
     LogMonitor = React.createFactory LogMonitor
 

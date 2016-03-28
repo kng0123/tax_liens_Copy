@@ -8,7 +8,7 @@ const Paper = require('material-ui/lib/paper');
 const CreateReceipt = React.createClass({
   getInitialState: function() {
     return {
-      receipt: new App.Models.LienCheck(),
+      receipt: new BackboneApp.Models.Receipt(),
       model: {}
     }
   },

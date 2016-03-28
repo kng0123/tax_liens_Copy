@@ -17,8 +17,7 @@ import { syncHistory, routeReducer } from 'redux-simple-router'
 const reduxRouterMiddleware = syncHistory(ReactRouter.hashHistory)
 
 var store = Redux.compose(
-  Redux.applyMiddleware(thunk, reduxRouterMiddleware),
-  ReduxDevtools.devTools()
+  Redux.applyMiddleware(thunk, reduxRouterMiddleware)
 )(Redux.createStore)(reducer)
 
 reduxRouterMiddleware.listenForReplays(store)

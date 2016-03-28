@@ -8,7 +8,6 @@ const Paper = require('material-ui/lib/paper');
 const EditReceipt = React.createClass({
   getInitialState: function() {
     return {
-      receipt: new App.Models.LienCheck(),
       model: {}
     }
   },
