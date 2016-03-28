@@ -122,7 +122,7 @@ class Lien < ActiveRecord::Base
       end
       liens.push(lien)
     end
-    puts test
+
     if !test
       ActiveRecord::Base.transaction do
         liens.each do |lien|
