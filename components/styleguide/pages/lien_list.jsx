@@ -67,7 +67,8 @@ var LienListHelper = React.createClass({
   },
 
   goToLien: function(indices) {
-    this.context.router.push('/lien/item/'+indices[0]+1)
+    var lien = this.props.liens.models[indices[0]]
+    this.context.router.push('/lien/item/'+lien.get('id'))
   },
 
 

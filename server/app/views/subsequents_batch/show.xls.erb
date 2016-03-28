@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+     <Style ss:ID="1">
+
+     </Style>
+     <ss:Style ss:ID="sub">
+        <ss:Font ss:Bold="1"/>
+        <ss:NumberFormat ss:Format="Currency"/>
+    </ss:Style>
+    <ss:Style ss:ID="header">
+       <ss:Font ss:Bold="1"/>
+       <ss:Alignment ss:Horizontal="Center"/>
+   </ss:Style>
+  </Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row>
+        <Cell  ss:StyleID="header" ss:MergeAcross="10"><Data ss:Type="String" >Sub Request</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Interest Date: <%= @batches.sub_date %></Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Township</Data></Cell>
+        <Cell><Data ss:Type="String">Block</Data></Cell>
+        <Cell><Data ss:Type="String">Lot</Data></Cell>
+        <Cell><Data ss:Type="String">Qualifier</Data></Cell>
+        <Cell><Data ss:Type="String">MUA Acct 1</Data></Cell>
+        <Cell><Data ss:Type="String">Certificate #</Data></Cell>
+        <Cell><Data ss:Type="String">Address</Data></Cell>
+        <Cell><Data ss:Type="String">Sale Date</Data></Cell>
+        <Cell><Data ss:Type="String">Tax Amount</Data></Cell>
+        <Cell><Data ss:Type="String">Utility Amount</Data></Cell>
+        <Cell><Data ss:Type="String">Other Amount</Data></Cell>
+      </Row>
+
+      <%
+      lien_subs = {}
+      @batches.liens.each do |lien|
+        lien_subs[lien.id] = {}
+      end
+
+      @batches.subsequents.each do |sub|
+        lien_subs[sub.lien_id][sub.sub_type] = sub
+      end
+
+      %>
+
+      <% @batches.liens.each do |lien|
+        subs = lien_subs[lien.id]
+      %>
+      <Row>
+        <Cell><Data ss:Type="String"><%= lien.township.name %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.block %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.lot %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.qualifier %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.mua_accounts.first.account_number%></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.cert_number %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.address %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= lien.sale_date %></Data></Cell>
+
+        <% if subs['tax'] %>
+        <Cell ss:StyleID="sub"><Data ss:Type="Number" ><%= subs['tax'].amount/100 %></Data></Cell>
+        <% else %>
+        <Cell ><Data ></Data></Cell>
+        <% end %>
+        <% if subs['utility'] %>
+        <Cell ss:StyleID="sub"><Data ss:Type="Number" ><%= subs['utility'].amount/100 %></Data></Cell>
+        <% else %>
+        <Cell ><Data ></Data></Cell>
+        <% end %>
+        <% if subs['other'] %>
+        <Cell ss:StyleID="sub"><Data ss:Type="Number" ><%= subs['other'].amount/100 %></Data></Cell>
+        <% else %>
+        <Cell ><Data ></Data></Cell>
+        <% end %>
+      </Row>
+      <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

@@ -9,10 +9,13 @@ Rails.application.routes.draw do
   end
 
   resources :receipts, defaults: {format: :json}, only: [:show, :update]
-  resources :subsequents, defaults: {format: :json}, only: [:show, :update]
+  resources :subsequents, defaults: {format: :json}, only: [:show, :update, :create]
+  resources :subsequent_batch, defaults: {format: :json}, only: [:index, :show, :update, :create]
   resources :townships, defaults: {format: :json}, only: [:index]
 
   match '/app', :to => 'ttg#index', :via => [:get]
+  match '/lien/export_receipts', :to =>  'liens#export_receipts', :via =>[:get]
+  match '/lien/export_liens', :to =>  'liens#export_liens', :via =>[:get]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

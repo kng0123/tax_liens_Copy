@@ -1,5 +1,5 @@
 import Molecules from '../../../molecules'
-
+var accounting = require('accounting')
 const FMUI = require('formsy-material-ui');
 const { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup, FormsySelect, FormsyText, FormsyTime, FormsyToggle } = FMUI;
 const RaisedButton = require('material-ui/lib/raised-button');
@@ -52,13 +52,6 @@ const CreateReceipt = React.createClass({
     let link = React.createFactory( ReactRouter.Link )
 
     let error = <div></div>
-    if( this.props.form['sign_in'] && this.props.form['sign_in'].error ) {
-      error = <div className="alert alert-danger" role="alert" style={{marginBottom:0}}>
-        <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span className="sr-only">{"Error:"}</span>
-        {"Invalid username/password"}
-      </div>
-      }
 
     var deposit_date = undefined
     if(this.state.receipt.get('deposit_date')) {
@@ -69,16 +62,21 @@ const CreateReceipt = React.createClass({
       check_date = (this.state.receipt.get('check_date'))
     }
     var redeem_date  = moment().format('MM/DD/YYYY')
+    if(this.props.lien.get('redemption_date')) {
+      redeem_date = (this.props.lien.get('redemption_date'))
+    }
 
-    var code_options = App.Models.LienCheck.code_options()
-    var sub_options = this.props.lien.get('subs').map( (sub) => {
+
+    var code_options = BackboneApp.Models.Receipt.code_options()
+    var sub_options = this.props.lien.get('subsequents').models.map( (sub) => {
       return {label: sub.name(), value:sub}
     })
-
+    var expected_amount = accounting.formatMoney(this.props.lien.receipt_expected_amount(this.state.model.receipt_type)/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var form_rows = [
       {
         label: 'Code',
-        element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"receipt_type"}/>,
+        helper: <span><strong>Principal: </strong><span>{expected_amount}</span></span>
       },
         {
           label: 'Sub',
@@ -115,6 +113,7 @@ const CreateReceipt = React.createClass({
           <label htmlFor="type" className="col-sm-3 form-control-label">{row.label}</label>
           <div className="col-sm-9">
             {row.element}
+            {row.helper}
           </div>
         </div>)
     }).filter(function(item){return item})

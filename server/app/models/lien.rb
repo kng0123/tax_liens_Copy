@@ -27,13 +27,13 @@ class Lien < ActiveRecord::Base
     tags = get_tags()
     liens = []
     subs = []
-    mua_accounts = []
+    mua_accounts = {}
     receipts = []
     townships = {}
     owners = {}
     llcs = {}
 
-    (header_row+1..spreadsheet.last_row+1).each do |row|
+    (header_row+1..spreadsheet.last_row).each do |row|
       #For each row iterate through each column
       lien = Lien.new
       (1..spreadsheet.last_column+1).each do |col|
@@ -68,9 +68,9 @@ class Lien < ActiveRecord::Base
           llcs[value] = llc
           lien.llcs <<  llc
         elsif tag.match(/mua_account_number/)
-          mua_account = MuaAccount.new
-          mua_account.account_number = value
-          mua_accounts.push mua_account
+          mua_account = MuaAccount.new(:account_number=>value)
+          mua_accounts[value] = mua_account
+          mua_account.lien = lien
 
         elsif tag.match(/Check Date/)
           amount = spreadsheet.cell(row, col+3)
@@ -102,32 +102,56 @@ class Lien < ActiveRecord::Base
             townships[value] = township
             lien.township = township
           end
+          cash_fields = [
+            "cert_int",
+            "flat_rate",
+            "search_fee",
+            "redemption_amount",
+            "recording_fee",
+            "premium",
+            "total_paid",
+            "cert_fv",
+            "tax_amount",
+            "assessed_value"
+          ]
+          if cash_fields.include?(tag)
+            value = value * 100
+          end
           lien[tag] = value
         end
       end
       liens.push(lien)
     end
     liens.each do |lien|
-      lien.save
+      lien.save!
+    end
+    townships.each do |key, value|
+      value.save!
     end
     subs.each do |sub|
-      sub.save
+      #Find Subsequent batch matching lien
+      township = sub.lien.township
+      sub_batch = SubsequentBatch.where(:township=>township, :sub_date=>sub.sub_date).first
+      if sub_batch.nil?
+        sub_batch = SubsequentBatch.new(:township=>township, :sub_date=>sub.sub_date)
+        sub_batch.save!
+      end
+      sub_batch.liens << sub.lien
+      sub.subsequent_batch = sub_batch
+      sub.save!
     end
     receipts.each do |receipt|
-      receipt.save
+      receipt.save!
     end
-    mua_accounts.each do |receipt|
-      receipt.save
+    mua_accounts.each do |key, value|
+      value.save!
     end
 
-    townships.each do |key, value|
-      value.save
-    end
     owners.each do |key, value|
-      value.save
+      value.save!
     end
     llcs.each do |key, value|
-      value.save
+      value.save!
     end
     return townships
   end
@@ -183,6 +207,8 @@ class Lien < ActiveRecord::Base
       "Sale Date" =>"sale_date",
       "Recording Fee" =>"recording_fee",
       "Recording Date" =>"recording_date",
+      "Redemption Date" =>"redemption_date",
+      "Redemption" =>"redemption_amount",
       "Search Fee" =>"search_fee",
       "Flat Rate" =>"flat_rate",
       "Cert Int" =>"cert_int",
@@ -191,5 +217,4 @@ class Lien < ActiveRecord::Base
       "Picture" =>"picture"
     }
   end
-
 end

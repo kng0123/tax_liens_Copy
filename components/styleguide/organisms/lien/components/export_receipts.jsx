@@ -26,6 +26,9 @@ const ExportReceipts = React.createClass({
     var from = model.from
     var to = model.to
 
+    window.location.assign("/lien/export_receipts.xls?"+$.param(model));
+    this.props.callback()
+
     var xlsx_export = new App.Utils.XLSXExport()
     var max_checks = 0
     liens.map( (lien) => {

@@ -11,7 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160322054057) do
+ActiveRecord::Schema.define(version: 20160328003948) do
+
+  create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
+    t.integer "lien_id",             null: false
+    t.integer "subsequent_batch_id", null: false
+  end
 
   create_table "liens", force: :cascade do |t|
     t.datetime "created_at",                       null: false
@@ -88,7 +93,10 @@ ActiveRecord::Schema.define(version: 20160322054057) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.string   "account_number"
+    t.integer  "lien_id"
   end
+
+  add_index "mua_accounts", ["lien_id"], name: "index_mua_accounts_on_lien_id"
 
   create_table "notes", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -127,24 +135,29 @@ ActiveRecord::Schema.define(version: 20160322054057) do
   add_index "receipts", ["lien_id"], name: "index_receipts_on_lien_id"
 
   create_table "subsequent_batches", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
     t.date     "sub_date"
     t.boolean  "void"
+    t.integer  "township_id"
   end
 
+  add_index "subsequent_batches", ["township_id"], name: "index_subsequent_batches_on_township_id"
+
   create_table "subsequents", force: :cascade do |t|
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
     t.integer  "lien_id"
     t.integer  "subsequent_id"
     t.date     "sub_date"
     t.string   "sub_type"
     t.integer  "amount"
     t.boolean  "void"
+    t.integer  "subsequent_batch_id"
   end
 
   add_index "subsequents", ["lien_id"], name: "index_subsequents_on_lien_id"
+  add_index "subsequents", ["subsequent_batch_id"], name: "index_subsequents_on_subsequent_batch_id"
   add_index "subsequents", ["subsequent_id"], name: "index_subsequents_on_subsequent_id"
 
   create_table "townships", force: :cascade do |t|

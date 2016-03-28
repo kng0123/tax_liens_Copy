@@ -15,10 +15,19 @@ const CreateSub = React.createClass({
   submitForm: function(model) {
     // let action = Actions.attempt_sign_in(model)
     // this.props.dispatch(action)
-    var sub = App.Models.LienSub.init_from_json(this.props.lien, model)
-    this.props.lien.add_sub(sub)
-    this.props.lien.save()
-    this.props.callback()
+    var data = {
+      type: model.sub_type,
+      sub_date: moment(model.sub_date),
+      amount: model.amount,
+      lien_id: this.props.lien.get('id')
+    }
+    //TODO: Create sub
+    var new_sub = new BackboneApp.Models.Subsequent(data)
+    var res = new_sub.save()
+    var self = this
+    res.success(function() {
+      self.props.callback()
+    })
   },
 
   styles: {
@@ -50,7 +59,7 @@ const CreateSub = React.createClass({
     var form_rows = [
       {
         label: 'Type',
-        element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"sub_type"}/>
       },
       {
         label: 'Sub Date',

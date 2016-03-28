@@ -26,6 +26,7 @@ class ReceiptsController < ApplicationController
 
   # PUT/PATCH /api/lists/:list_id/todos/:id
   def update
-    respond_with Receipt.find(params[:id]).update_attributes!(params)
+    data = params.permit(Lien.column_names)
+    respond_with Receipt.find(params[:id]).update_attributes!(data)
   end
 end

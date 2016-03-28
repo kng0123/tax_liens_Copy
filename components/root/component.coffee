@@ -31,9 +31,9 @@ Root = React.createClass
           IndexRoute component:conn(Styleguide.Organisms.Auth.SignIn)
         Route path:'lien', component:conn(Styleguide.Organisms.Document.DocumentBox), onEnter:onEnter(conditions:['logged_in'], errorRoute:'/auth'),
           IndexRoute component:conn(Styleguide.Pages.LienList)
-          Route path:'upload', component:conn(Templates.lien_upload)
-          Route path:'subs', component:conn(Templates.lien_process_subs)
-          Route path:'batch/:id', component:conn(Templates.lien_process_subs_list)
+          Route path:'upload', component:conn(Styleguide.Pages.LienUpload)
+          Route path:'subs', component:conn(Styleguide.Pages.ProcessSubs)
+          Route path:'batch/:id', component:conn(Styleguide.Pages.SubsequentBatch)
           Route path:'item/:id', component:conn(Styleguide.Pages.Lien)
 
 module.exports = Root

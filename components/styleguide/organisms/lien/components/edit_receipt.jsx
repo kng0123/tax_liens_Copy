@@ -27,7 +27,6 @@ const EditReceipt = React.createClass({
     return receipt.save().then(function(){
       callback()
     }).fail(function() {
-      debugger
     })
 
   },
@@ -58,13 +57,6 @@ const EditReceipt = React.createClass({
     let link = React.createFactory( ReactRouter.Link )
 
     let error = <div></div>
-    if( this.props.form['sign_in'] && this.props.form['sign_in'].error ) {
-      error = <div className="alert alert-danger" role="alert" style={{marginBottom:0}}>
-        <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span className="sr-only">{"Error:"}</span>
-        {"Invalid username/password"}
-      </div>
-      }
 
     var check = this.props.receipt
     var deposit_date = undefined
@@ -80,16 +72,18 @@ const EditReceipt = React.createClass({
       redeem_date = (check.get('redeem_date'))
     }
 
-    var code_options = App.Models.LienCheck.code_options()
-    var sub_options = this.props.lien.get('subs').map( (sub) => {
+    var code_options = BackboneApp.Models.Receipt.code_options()
+    var sub_options = this.props.lien.get('subsequents').models.map( (sub) => {
       return {label: sub.name(), value:sub}
     })
 
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var expected_amount = accounting.formatMoney(check.expected_amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var form_rows = [
       {
         label: 'Code',
-        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('type')} options={code_options} required name={"type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
+        helper: <span><strong>Principal: </strong><span>{expected_amount}</span></span>
       },
         {
           label: 'Sub',
@@ -126,6 +120,7 @@ const EditReceipt = React.createClass({
           <label htmlFor="type" className="col-sm-3 form-control-label">{row.label}</label>
           <div className="col-sm-9">
             {row.element}
+            {row.helper}
           </div>
         </div>)
     }).filter(function(item){return item})

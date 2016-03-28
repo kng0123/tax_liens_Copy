@@ -10,10 +10,18 @@ class SubsequentsController < ApplicationController
 
   # POST /api/lists/:list_id/todos
   def create
+    puts params
     if params[:lien_id]
       lien = Lien.find(params[:lien_id])
-      subsequent = Subsequent.create!(params)
-      subsequent.lien = lien
+      subsequent = Subsequent.new(
+        :sub_type => params[:type],
+        :amount => Float(params[:amount]) * 100,
+        :sub_date => params[:sub_date]
+      )
+      if params[:subsequent_batch_id]
+        subsequent.subsequent_batch = SubsequentBatch.find(params[:subsequent_batch_id])
+      end
+      subsequent.lien = Lien.find(params[:lien_id])
       subsequent.save!
       respond_with subsequent
     end
@@ -26,6 +34,7 @@ class SubsequentsController < ApplicationController
 
   # PUT/PATCH /api/lists/:list_id/todos/:id
   def update
-    respond_with Subsequent.find(params[:id]).update_attributes!(params)
+    data = params.permit(Subsequent.column_names)
+    respond_with Subsequent.find(params[:id]).update_attributes!(data)
   end
 end

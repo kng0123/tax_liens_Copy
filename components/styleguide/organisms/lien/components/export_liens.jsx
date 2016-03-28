@@ -24,6 +24,9 @@ const ExportReceipts = React.createClass({
     var liens = this.props.liens
     var redemption_date = model.redemption_date
 
+    window.location.assign("/lien/export_liens.xls?"+$.param(model));
+    this.props.callback()
+
     var xlsx_export = new App.Utils.XLSXExport()
     xlsx_export.addRow([
       "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",

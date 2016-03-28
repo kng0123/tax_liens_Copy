@@ -1,6 +1,6 @@
 
 class LiensController < ApplicationController
-  respond_to :json
+  respond_to :json, :xls
 
   # GET /api/lists/:list_id/todos
   def index
@@ -20,8 +20,8 @@ class LiensController < ApplicationController
 
   # GET /api/lists/:list_id/todos/:id
   def show
-    respond_with Lien.includes(:township, :subsequents, :receipts, :owners).find(params[:id]),
-      :include => [:township, :subsequents, :receipts, :owners]
+    respond_with Lien.includes(:township, :subsequents, :receipts, :owners, :llcs).find(params[:id]),
+      :include => [:township, :subsequents, :receipts, :owners, :llcs]
   end
 
   # PUT/PATCH /api/lists/:list_id/todos/:id
@@ -35,6 +35,16 @@ class LiensController < ApplicationController
     d = {:data => liens}
     render json: d
     # redirect_to root_url, notice: "Liens imported."
+  end
+
+  def export_liens
+    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners)
+    respond_with @liens, :template => 'liens/export_liens', :include => [:township, :subsequents, :receipts, :owners]
+  end
+
+  def export_receipts
+    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners)
+    respond_with @liens, :template => 'liens/export_receipts', :include => [:township, :subsequents, :receipts, :owners]
   end
 
 end
