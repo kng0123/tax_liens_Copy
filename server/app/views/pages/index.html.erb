@@ -2,10 +2,18 @@
   <div class="jumbotron">
     <div class="container">
       <h1>Welcome!</h1>
+      <% if user_signed_in? %>
+        <p>Jump into the app.</p>
+        <p>
+          <%= link_to 'Go', app_path, class: 'btn btn-primary btn-lg' %>
+        </p>
+        <div> show content here </div>
+      <%else %>
       <p>Register to get started.</p>
       <p>
         <%= link_to 'Register', new_user_registration_path, class: 'btn btn-primary btn-lg' %>
       </p>
+      <%end %>
     </div>
   </div>
 <% end %>
