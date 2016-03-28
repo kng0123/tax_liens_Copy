@@ -288,7 +288,7 @@ var SubsequentBatchRelations = [{
   relatedModel: Township,
   key: 'township',
   keySource: 'township_id',
-  includeInJSON: 'township_id'
+  includeInJSON: 'id'
 },{
   type: Backbone.HasMany,
   key: 'liens',
@@ -333,13 +333,19 @@ class LlcCollection extends Backbone.Collection{
   }
   url() { return '/llcs' }
 }
-var ReceiptRelations = [{
-  type: Backbone.HasOne,
-  key: 'lien',
-  keySource: 'lien_id',
-  includeInJSON: 'lien_id',
-  relatedModel: Lien
-}]
+class MuaAccount extends Backbone.RelationalModel {
+  constructor(options) { super(options); }
+  url() { return '/mua_accounts/'+this.get('id')}
+  defaults() { return {}; }
+}
+class MuaAccountCollection extends Backbone.Collection{
+  constructor(options) {
+    super(options);
+    this.model = Llc;
+  }
+  url() { return '/mua_accounts' }
+}
+
 class Receipt extends Backbone.RelationalModel {
   constructor(options) { super(options); }
   static relations() {
@@ -348,7 +354,13 @@ class Receipt extends Backbone.RelationalModel {
   relations() {
     return ReceiptRelations
   }
-  url() { return '/receipts/'+this.get('id')}
+  url() {
+    if(this.get('id')) {
+       return '/receipts/'+this.get('id')
+    } else {
+      return '/receipts'
+    }
+  }
   defaults() { return {}; }
   amount() {
     if(this.get('void')){
@@ -411,7 +423,15 @@ var LienRelations = [{
   type: Backbone.HasMany,
   key: 'receipts',
   relatedModel: Receipt,
-  collectionType: ReceiptCollection
+  collectionType: ReceiptCollection,
+  reverseRelation: {
+    key: 'lien'
+  }
+},{
+  type: Backbone.HasMany,
+  key: 'mua_accounts',
+  relatedModel: MuaAccount,
+  collectionType: MuaAccountCollection
 }]
 var SubsequentRelations = [{
   type: Backbone.HasOne,
@@ -423,6 +443,18 @@ var SubsequentRelations = [{
     key: 'subsequents',
     relatedModel: Subsequent,
     collectionType: SubsequentCollection
+  }
+}]
+var ReceiptRelations = [{
+  type: Backbone.HasOne,
+  key: 'lien',
+  keySource: 'lien_id',
+  includeInJSON: 'id',
+  relatedModel: Lien,
+  reverseRelation: {
+    key: 'receipts',
+    relatedModel: Receipt,
+    collectionType: ReceiptCollection
   }
 }]
 

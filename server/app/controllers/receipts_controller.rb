@@ -11,8 +11,10 @@ class ReceiptsController < ApplicationController
   # POST /api/lists/:list_id/todos
   def create
     if params[:lien_id]
+      data = params.permit(Receipt.column_names)
       lien = Lien.find(params[:lien_id])
-      receipt = Receipt.create!(params)
+      data[:check_amount] = data[:check_amount].to_f * 100
+      receipt = Receipt.create!(data)
       receipt.lien = lien
       receipt.save!
       respond_with receipt

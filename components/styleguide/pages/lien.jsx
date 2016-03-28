@@ -528,7 +528,7 @@ const LienLlcs = React.createBackboneClass({
 const LienReceiptActions = React.createBackboneClass({
   displayName: 'LienCheckActions',
   mixins: [
-    React.BackboneMixin('receipt')
+    React.BackboneMixin('receipt', 'change')
   ],
   toggle_void: function() {
     var receipt = this.props.value.receipt

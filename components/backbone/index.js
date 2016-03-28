@@ -11,6 +11,13 @@ Backbone.sync = function(method, model, options) {
   };
   return _sync.call(this, method, model, options);
 };
+// 
+//
+// $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+//   var token = $("meta[name='csrf-token']").attr('content');;
+//   jqXHR.setRequestHeader('Content-Type', 'application/vnd.api+json')
+//   jqXHR.setRequestHeader('X-CSRF-Token', token);
+// });
 
 //GOTCHA Must specify full path Name or watchify wont work
 global.BackboneApp = {

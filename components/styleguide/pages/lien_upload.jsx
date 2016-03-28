@@ -5,6 +5,8 @@ const LienUpload = React.createClass({
     return {
       lien_xlsx: undefined,
       uploading: false,
+      file: undefined,
+      data: undefined,
       status: "",
       error: ""
     }
@@ -15,23 +17,45 @@ const LienUpload = React.createClass({
     var i = 0
     var f = files[i]
     var self = this
-    while(i != files.length) {
-      var reader = new FileReader()
-      var name = f.name
-      reader.onload = function(e) {
-        var data = e.target.result
-        var lien_xlsx = new App.Utils.LienXLSX(data)
+    var fd = new FormData()
+    fd.append('file', f)
+    fd.append('test', true)
+
+    $.ajax({
+      url: '/liens/import',
+      data: fd,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data){
         self.setState({
-          lien_xlsx: lien_xlsx,
-          uploading:false
+          data: data.data
         })
       }
-      reader.readAsBinaryString(f)
-      ++i
-    }
+    });
+    this.setState({
+      file:f,
+      uploading:false,
+      data: undefined
+    })
   },
   handleCreate: function() {
+    var fd = new FormData()
+    fd.append('file', this.state.file)
     var self = this
+    $.ajax({
+      url: '/liens/import',
+      data: fd,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data){
+        self.setState({
+          data: undefined,
+          status: "Upload complete"
+        })
+      }
+    });
     self.setState({
       uploading: true,
       status: "Creating objects..."
@@ -56,17 +80,16 @@ const LienUpload = React.createClass({
     var RaisedButton = MUI.RaisedButton
 
     var upload_status = <div></div>
-    if(this.state.lien_xlsx) {
-      var status = <div key={1}>
-        <RaisedButton label="Create liens" type='button' primary={false} onClick={this.handleCreate} />
+    var status = ""
+    if( this.state.uploading ){
+      status = <div key={1}>
+        <span>{this.state.status}</span>
+        <span>{JSON.stringify(this.state.error)}</span>
       </div>
-      if( this.state.uploading ){
-        status = <div key={1}>
-          <span>{this.state.status}</span>
-          <span>{JSON.stringify(this.state.error)}</span>
-        </div>
-      }
-      <div className='row'>
+    }
+    if(this.state.data) {
+      var data = this.state.data
+      upload_status = <div className='row'>
         <div className='col-lg-12'>
           <div className='panel panel-default'>
             <div className='panel-heading'>
@@ -78,13 +101,30 @@ const LienUpload = React.createClass({
               <div style={{width:'100%'}}>
                 <div>
                  <span>Townships: </span>
-                 <span>{data.townships.length}</span>
+                 <span>{Object.keys(this.state.data.townships).length}</span>
+                </div>
+                <div>
+                 <span>Owners: </span>
+                 <span>{Object.keys(this.state.data.owners).length}</span>
+                </div>
+                <div>
+                 <span>Llcs: </span>
+                 <span>{Object.keys(this.state.data.llcs).length}</span>
+                </div>
+                <div>
+                 <span>Subsequents: </span>
+                 <span>{data.subsequents.length}</span>
+                </div>
+                <div>
+                 <span>Receipts: </span>
+                 <span>{data.receipts.length}</span>
                 </div>
                 <div>
                  <span>Liens: </span>
-                 <span>{data.objects.length}</span>
+                 <span>{data.liens.length}</span>
                 </div>
               </div>
+              <RaisedButton label="Create" type='button' primary={true} onClick={this.handleCreate} />
             </div>
           </div>
         </div>
@@ -101,6 +141,7 @@ const LienUpload = React.createClass({
             <input ref="fileUpload" style={{display:'none'}} type='file' onChange={this.handleFile} />
           </div>
         </div>
+        {status}
         {upload_status}
       </div>
     </div>

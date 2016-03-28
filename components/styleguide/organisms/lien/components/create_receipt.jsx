@@ -16,10 +16,13 @@ const CreateReceipt = React.createClass({
     // let action = Actions.attempt_sign_in(model)
     // this.props.dispatch(action)
 
-    var check = App.Models.LienCheck.init_from_json(this.props.lien, model)
-    this.props.lien.add_check(check)
-    this.props.lien.save()
-    this.props.callback()
+    model.lien_id = this.props.lien.get('id')
+    var new_check = new BackboneApp.Models.Receipt(model)
+    var res = new_check.save()
+    var self = this
+    res.success(function() {
+      self.props.callback()
+    })
   },
 
   styles: {

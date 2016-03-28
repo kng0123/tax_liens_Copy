@@ -79,13 +79,17 @@ var LienListHelper = React.createClass({
     var sub_headers = ["ID", "TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE"]
     var editable = PlainEditable
     var sub_rows = this.props.liens.models.map(function(lien, k) {
+      var mua_account_number
+      if (lien.get('mua_accounts').models.length) {
+        mua_account_number = lien.get('mua_accounts').models[0].get('account_number')
+      }
       return [
         lien.get('id'),
         <div onClick={self.goToLien} data-id={lien.get('id')}>{ lien.get('county')}</div>,
         lien.get('block'),
         lien.get('lot'),
         lien.get('qualifier'),
-        lien.get('mua_account_number'),
+        mua_account_number,
         lien.get('cert_number'),
         lien.get('address'),
         moment(lien.get('sale_date')).format('MM/DD/YYYY')

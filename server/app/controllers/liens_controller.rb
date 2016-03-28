@@ -1,16 +1,19 @@
 
 class LiensController < ApplicationController
   respond_to :json, :xls
+  skip_before_action :verify_authenticity_token
 
   # GET /api/lists/:list_id/todos
   def index
     puts params
-    if params[:township]
-      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners).where(townships:{name:params[:township]})
+    if params[:id]
+      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).find(params[:id])
+    elsif params[:township]
+      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).where(townships:{name:params[:township]})
     else
       data = Lien.includes(:township, :subsequents, :receipts, :owners)
     end
-    respond_with data, :include => [:township, :subsequents, :receipts, :owners]
+    respond_with data, :include => [:township, :subsequents, :receipts, :owners, :mua_accounts]
   end
 
   # POST /api/lists/:list_id/todos
@@ -31,7 +34,7 @@ class LiensController < ApplicationController
   end
 
   def import
-    liens = Lien.import(params[:file])
+    liens = Lien.import(params[:file], params[:test])
     d = {:data => liens}
     render json: d
     # redirect_to root_url, notice: "Liens imported."

@@ -10,7 +10,7 @@ class Lien < ActiveRecord::Base
   has_and_belongs_to_many :llcs
   has_and_belongs_to_many :notes
 
-  def self.import(file)
+  def self.import(file, test=false)
     spreadsheet = open_spreadsheet(file)
 
     header = []
@@ -122,38 +122,51 @@ class Lien < ActiveRecord::Base
       end
       liens.push(lien)
     end
-    liens.each do |lien|
-      lien.save!
-    end
-    townships.each do |key, value|
-      value.save!
-    end
-    subs.each do |sub|
-      #Find Subsequent batch matching lien
-      township = sub.lien.township
-      sub_batch = SubsequentBatch.where(:township=>township, :sub_date=>sub.sub_date).first
-      if sub_batch.nil?
-        sub_batch = SubsequentBatch.new(:township=>township, :sub_date=>sub.sub_date)
-        sub_batch.save!
-      end
-      sub_batch.liens << sub.lien
-      sub.subsequent_batch = sub_batch
-      sub.save!
-    end
-    receipts.each do |receipt|
-      receipt.save!
-    end
-    mua_accounts.each do |key, value|
-      value.save!
-    end
+    puts test
+    if !test
+      ActiveRecord::Base.transaction do
+        liens.each do |lien|
+          lien.save!
+        end
+        townships.each do |key, value|
+          value.save!
+        end
+        subs.each do |sub|
+          #Find Subsequent batch matching lien
+          township = sub.lien.township
+          sub_batch = SubsequentBatch.where(:township=>township, :sub_date=>sub.sub_date).first
+          if sub_batch.nil?
+            sub_batch = SubsequentBatch.new(:township=>township, :sub_date=>sub.sub_date)
+            sub_batch.save!
+          end
+          sub_batch.liens << sub.lien
+          sub.subsequent_batch = sub_batch
+          sub.save!
+        end
+        receipts.each do |receipt|
+          receipt.save!
+        end
+        mua_accounts.each do |key, value|
+          value.save!
+        end
 
-    owners.each do |key, value|
-      value.save!
+        owners.each do |key, value|
+          value.save!
+        end
+        llcs.each do |key, value|
+          value.save!
+        end
+      end
     end
-    llcs.each do |key, value|
-      value.save!
-    end
-    return townships
+    return {
+      :townships => townships,
+      :llcs => llcs,
+      :owners => owners,
+      # :subsequent_batches => sub_batch,
+      :subsequents => subs,
+      :liens => liens,
+      :receipts => receipts
+    }
   end
 
   def self.open_spreadsheet(file)
