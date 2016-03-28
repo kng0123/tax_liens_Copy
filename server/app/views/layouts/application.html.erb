@@ -11,7 +11,7 @@
   <nav class="navbar navbar-inverse">
   <div class="container">
     <div class="navbar-header">
-      <%= link_to 'Devise Demo', root_path, class: 'navbar-brand' %>
+      <%= link_to 'Tax Liens', root_path, class: 'navbar-brand' %>
     </div>
     <div id="navbar">
       <ul class="nav navbar-nav">
@@ -45,13 +45,6 @@
       </div>
     <% end %>
   </div>
-
-  <h2>Import Products</h2>
-
-  <%= form_tag import_liens_path, multipart: true do %>
-    <%= file_field_tag :file %>
-    <%= submit_tag "Import" %>
-  <% end %>
 
   <%= yield :top_content %>
 
