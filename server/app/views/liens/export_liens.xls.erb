@@ -145,7 +145,7 @@
         <Cell ss:StyleID="money"><Data ss:Type="Number" ><%= (lien.total_paid or 0) / 100  %></Data></Cell>
         <Cell><Data ss:Type="String" ><%= lien.sale_date %></Data></Cell>
 
-        <% (1..max_number_subs).each do |i|
+        <% (0..max_number_subs-1).each do |i|
           sub = lien.subsequents[i]
           if sub.nil?
             (1..15).each do |e|
@@ -181,7 +181,7 @@
         <Cell><Data ss:Type="String">Notes</Data></Cell>
         <Cell><Data ss:Type="String">Mailed Cert</Data></Cell>
 
-        <% (1..max_number_receipt).each do |i|
+        <% (0..max_number_receipt-1).each do |i|
           receipt = lien.receipts[i]
           if receipt.nil?
             (1..12).each do |e|
