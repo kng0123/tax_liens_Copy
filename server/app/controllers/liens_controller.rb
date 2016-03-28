@@ -6,9 +6,9 @@ class LiensController < ApplicationController
   # GET /api/lists/:list_id/todos
   def index
     puts params
-    if params[:id]
+    if !(params[:id].nil? or params[:id].empty?)
       data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).find(params[:id])
-    elsif params[:township]
+    elsif !(params[:township].nil? or params[:township].empty?)
       data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).where(townships:{name:params[:township]})
     else
       data = Lien.includes(:township, :subsequents, :receipts, :owners)
