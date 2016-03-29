@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160328003948) do
+ActiveRecord::Schema.define(version: 20160329062411) do
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -118,6 +118,21 @@ ActiveRecord::Schema.define(version: 20160328003948) do
     t.datetime "updated_at", null: false
     t.string   "name"
   end
+
+  create_table "profiles", force: :cascade do |t|
+    t.integer "user_id"
+    t.string  "first_name"
+    t.string  "last_name"
+    t.string  "cid"
+    t.date    "birthday"
+    t.string  "sex"
+    t.string  "tel"
+    t.string  "address"
+    t.string  "tagline"
+    t.text    "introduction"
+  end
+
+  add_index "profiles", ["user_id"], name: "index_profiles_on_user_id"
 
   create_table "receipts", force: :cascade do |t|
     t.datetime "created_at",   null: false
