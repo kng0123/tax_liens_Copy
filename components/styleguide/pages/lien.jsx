@@ -47,6 +47,14 @@ const LienHelper = React.createBackboneClass({
       modal: <CreateSub {...this.props} callback={function(){self.setState({open:false})}} />
     })
   },
+  openNoteCreate: function() {
+    var self = this
+    var CreateNote = Styleguide.Organisms.Lien.CreateNote
+    this.setState({
+      open: true,
+      modal: <CreateNote {...this.props} callback={function(){self.setState({open:false})}} />
+    })
+  },
 
   getDialog: function() {
     var modal = this.state.modal
@@ -122,6 +130,7 @@ const LienHelper = React.createBackboneClass({
                 <span>{"LIEN #"+this.props.lien.get('id')}</span>
                 <MUI.FlatButton label="Add receipt" secondary={true} onTouchTap={this.openCreate}/>
                 <MUI.FlatButton label="Add sub" secondary={true} onTouchTap={this.openSubCreate}/>
+                <MUI.FlatButton label="Add note" secondary={true} onTouchTap={this.openNoteCreate}/>
                 <span style={{width:'150px', display:'inline-block'}}>
                   <Select name={'status'} value={lien.get('status')} options={state_options} onChange={this.onChange({type:'select', key:"status"})} />
                 </span>
@@ -478,7 +487,7 @@ const LienLlcs = React.createBackboneClass({
     React.BackboneMixin('llcs', 'change')
   ],
   rowGetter: function(i) {
-    var llc = this.props.lien.get('llcs')[i]
+    var llc = this.props.lien.get('llcs').models[i]
     if( !llc) {
       return {
         llc: 'No owner',
@@ -487,12 +496,12 @@ const LienLlcs = React.createBackboneClass({
       }
     }
     var row = {
-      llc: llc.get('llc'),
+      llc: llc.get('name'),
       start: moment(llc.get('start_date')).format('MM/DD/YYYY'),
       end: ""
     }
     if( llc.get('end_date')) {
-      row.end = moment(owner.get('end_date')).format('MM/DD/YYYY')
+      row.end = moment(llc.get('end_date')).format('MM/DD/YYYY')
     }
     return row
   },

@@ -6,13 +6,33 @@ class LiensController < ApplicationController
   # GET /api/lists/:list_id/todos
   def index
     puts params
+    data = Lien.includes(:township, :subsequents, :receipts, :owners, :mua_accounts)
     if !(params[:id].nil? or params[:id].empty?)
       data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).find(params[:id])
-    elsif !(params[:township].nil? or params[:township].empty?)
-      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).where(townships:{name:params[:township]})
     else
-      data = Lien.includes(:township, :subsequents, :receipts, :owners)
+      if !(params[:township].nil? or params[:township].empty?)
+        data = data.where(townships:{name:params[:township]})
+      end
+      if !(params[:block].nil? or params[:block].empty?)
+        data = data.where({block:params[:block]})
+      end
+      if !(params[:lot].nil? or params[:lot].empty?)
+        data = data.where({lot:params[:lot]})
+      end
+      if !(params[:qualifer].nil? or params[:qualifer].empty?)
+        data = data.where({qualifer:params[:qualifer]})
+      end
+      if !(params[:cert].nil? or params[:cert].empty?)
+        data = data.where({cert_number:params[:cert]})
+      end
+      if !(params[:sale_year].nil? or params[:sale_year].empty?)
+        year = params[:sale_year].to_i
+        year_begin = Date.new(year, 1, 1)
+        year_end = Date.new(year, 12, 31)
+        data = data.where(:sale_date => year_begin..year_end)
+      end
     end
+
     respond_with data, :include => [:township, :subsequents, :receipts, :owners, :mua_accounts]
   end
 
