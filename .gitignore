@@ -32,3 +32,4 @@ public/js/bundle.js
 styleguide/bower_components
 styleguide/src_generated
 styleguide/build
+server/public/js/bundle.js
