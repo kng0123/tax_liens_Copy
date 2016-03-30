@@ -69,7 +69,7 @@ const ProcessSubsHelper = React.createClass( {
     var resp=new_batch.save()
     var self = this
     resp.success(function(batch) {
-      self.context.router.push('/lien/batch/'+batch.id)
+      self.context.router.push('/app/lien/batch/'+batch.id)
     })
     self.setState({error:undefined})
     resp.fail(function(obj, code, message) {

@@ -30,7 +30,6 @@
 <script src="/js/bundle.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-  injectTapEventPlugin()
   var element = React.createElement(App.Root)
   ReactDOM.render(element, $("#content")[0]);
   var query = App.store.getState().routing.location.query

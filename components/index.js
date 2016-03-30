@@ -53,3 +53,9 @@ import ReactDataGrid from 'react-data-grid'
 global.ReactDataGrid = ReactDataGrid
 global.Styleguide = require('./styleguide')
 require('./root')(App)
+
+injectTapEventPlugin()
+var element = React.createElement(App.Root)
+ReactDOM.render(element, $("#content")[0]);
+var query = App.store.getState().routing.location.query
+App.store.dispatch({type:'SEARCH', data:query})
