@@ -1,6 +1,6 @@
 var RelationalModel = require('backbone-relational')
 var Backbone = require('backbone');
-
+Backbone.Relational.showWarnings = false
 var _sync;
 _sync = Backbone.sync;
 Backbone.sync = function(method, model, options) {
@@ -11,7 +11,7 @@ Backbone.sync = function(method, model, options) {
   };
   return _sync.call(this, method, model, options);
 };
-// 
+//
 //
 // $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 //   var token = $("meta[name='csrf-token']").attr('content');;

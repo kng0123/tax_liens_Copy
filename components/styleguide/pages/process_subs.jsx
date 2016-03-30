@@ -45,7 +45,7 @@ const ProcessSubsHelper = React.createClass( {
 
   goToBatch: function(indices){
     var batch = this.props.batches.models[indices[0]]
-    this.context.router.push('/lien/batch/'+batch.id)
+    this.context.router.push('/app/lien/batch/'+batch.id)
   },
 
   updateBatchDate: function(event) {

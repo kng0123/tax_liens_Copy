@@ -65,4 +65,6 @@ gem 'roo'
 gem 'iconv'
 group :production do
    gem 'heroku-deflater'
-end 
+end
+gem 'rails-patch-json-encode'
+gem 'oj'

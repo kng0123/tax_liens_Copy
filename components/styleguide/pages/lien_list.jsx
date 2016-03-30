@@ -2,18 +2,18 @@ var PlainEditable = require('react-plain-editable');
 const LienList = React.createClass({
   displayName: 'LienList',
   getInitialState: function() {
-    return {liens: new BackboneApp.Collections.LienCollection()}
+    return {json: new BackboneApp.Models.JSON({url:'/liens'})}
   },
 
   render: function()  {
-    return <LienListHelper {...this.props} liens={this.state.liens} />
+    return <LienListHelper {...this.props} json={this.state.json} />
   }
 })
 
 var LienListHelper = React.createClass({
   displayName: 'LienListHelper',
   mixins: [
-      React.BackboneMixin("liens")
+      React.BackboneMixin("json")
   ],
   contextTypes: {
     router: React.PropTypes.object
@@ -41,7 +41,7 @@ var LienListHelper = React.createClass({
     var ExportReceipts = Styleguide.Organisms.Lien.ExportReceipts
     this.setState({
       open: true,
-      modal: <ExportReceipts {...this.props} liens={this.state.liens} callback={function(){self.setState({open:false})}} />
+      modal: <ExportReceipts {...this.props} json={this.state.json} callback={function(){self.setState({open:false})}} />
     })
   },
   exportLiens: function() {
@@ -49,7 +49,7 @@ var LienListHelper = React.createClass({
     var ExportLiens = Styleguide.Organisms.Lien.ExportLiens
     this.setState({
       open: true,
-      modal: <ExportLiens {...this.props} liens={this.state.liens} callback={function(){self.setState({open:false})}} />
+      modal: <ExportLiens {...this.props} json={this.state.json} callback={function(){self.setState({open:false})}} />
     })
   },
 
@@ -63,12 +63,15 @@ var LienListHelper = React.createClass({
 
   queryLiens: function(props){
     var query_params = props.search
-    props.liens.fetch({data: query_params})
+    props.json.fetch(query_params)
   },
 
   goToLien: function(indices) {
-    var lien = this.props.liens.models[indices[0]]
-    this.context.router.push('/lien/item/'+lien.get('id'))
+    if(indices[0] === undefined) {
+      return
+    }
+    var lien = this.props.json.get('data')[indices[0]]
+    this.context.router.push('/app/lien/item/'+lien.id)
   },
 
 
@@ -78,27 +81,31 @@ var LienListHelper = React.createClass({
 
     var sub_headers = ["ID", "TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE"]
     var editable = PlainEditable
-    var sub_rows = this.props.liens.models.map(function(lien, k) {
-      var mua_account_number
-      if (lien.get('mua_accounts').models.length) {
-        mua_account_number = lien.get('mua_accounts').models[0].get('account_number')
-      }
-      return [
-        lien.get('id'),
-        <div onClick={self.goToLien} data-id={lien.get('id')}>{ lien.get('county')}</div>,
-        lien.get('block'),
-        lien.get('lot'),
-        lien.get('qualifier'),
-        mua_account_number,
-        lien.get('cert_number'),
-        lien.get('address'),
-        moment(lien.get('sale_date')).format('MM/DD/YYYY')
-      ]
-    })
+    var sub_table = <div></div>
+    if( this.props.json.get('data') ){
+      var sub_rows = this.props.json.get('data').map(function(lien, k) {
+        var mua_account_number
+        if (lien.mua_accounts.length) {
+          mua_account_number = lien.mua_accounts[0].account_number
+        }
+        return [
+          lien.id,
+          <div onClick={self.goToLien} data-id={lien.id}>{ lien.county}</div>,
+          lien.block,
+          lien.lot,
+          lien.qualifier,
+          mua_account_number,
+          lien.cert_number,
+          lien.address,
+          moment(lien.sale_date).format('MM/DD/YYYY')
+        ]
+      })
+      var widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px']
+      var sub_table = React.Factory.table({ widths:widths, selectable:true, headers: sub_headers, rows: sub_rows, onRowSelection:this.goToLien})
 
-    var widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px']
+    }
 
-    var sub_table = React.Factory.table({ widths:widths, selectable:true, headers: sub_headers, rows: sub_rows, onRowSelection:this.goToLien})
+
 
     return <div>
       {this.getDialog()}

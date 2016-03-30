@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, :controllers => { :registrations => "users/registrations" }
 
   resources :liens, defaults: {format: :json}, only: [:index, :create, :show, :update] do
     collection { post :import }
@@ -14,8 +14,14 @@ Rails.application.routes.draw do
   resources :townships, defaults: {format: :json}, only: [:index]
 
   match '/app', :to => 'ttg#index', :via => [:get]
+  match '/app/:lien', :to => 'ttg#index', :via => [:get]
+  match '/app/:lien/:asdsad', :to => 'ttg#index', :via => [:get]
+  match '/app/lien/item/:asdadsd', :to => 'ttg#index', :via => [:get]
+  match '/app/lien/batch/:asdadsd', :to => 'ttg#index', :via => [:get]
   match '/lien/export_receipts', :to =>  'liens#export_receipts', :via =>[:get]
   match '/lien/export_liens', :to =>  'liens#export_liens', :via =>[:get]
+
+  # config/routes.rb
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

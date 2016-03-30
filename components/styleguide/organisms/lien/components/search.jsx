@@ -58,7 +58,7 @@ var SearchHelper = React.createBackboneClass({
     e.stopPropagation()
     e.preventDefault()
     this.context.router.push({
-      pathname: '/lien',
+      pathname: '/app/lien',
       query: this.state.data
     })
     this.props.dispatch({type:'SEARCH', data:this.state.data})

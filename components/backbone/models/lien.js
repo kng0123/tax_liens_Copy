@@ -458,6 +458,24 @@ var ReceiptRelations = [{
   }
 }]
 
+class JSON extends Backbone.RelationalModel {
+  constructor(options) { super(options); }
+  url() { return this.get('url')}
+  defaults() { return {}; }
+  fetch(data) {
+    var collection = this;
+    var str = $.param( data );
+    $.ajax({
+        type : 'GET',
+        url : this.url()+"?"+str,
+        dataType : 'json',
+        success : function(data) {
+            collection.set({data:data})
+        }
+    });
+  }
+}
+
 Lien.setup()
 Receipt.setup()
 SubsequentBatch.setup()
@@ -467,6 +485,7 @@ Llc.setup()
 
 module.exports = function(b) {
   b.Models.Lien = Lien
+  b.Models.JSON = JSON
   b.Models.SubsequentBatch = SubsequentBatch
   b.Models.Subsequent = Subsequent
   b.Models.Receipt = Receipt

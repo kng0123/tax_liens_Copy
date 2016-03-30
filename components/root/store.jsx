@@ -14,7 +14,7 @@ var thunk = function(store) {
 
 import { Router, Route, browserHistory } from 'react-router'
 import { syncHistory, routeReducer } from 'redux-simple-router'
-const reduxRouterMiddleware = syncHistory(ReactRouter.hashHistory)
+const reduxRouterMiddleware = syncHistory(ReactRouter.browserHistory)
 
 var store = Redux.compose(
   Redux.applyMiddleware(thunk, reduxRouterMiddleware)

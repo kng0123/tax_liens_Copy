@@ -8,7 +8,7 @@ class LiensController < ApplicationController
     puts params
     data = Lien.includes(:township, :subsequents, :receipts, :owners, :mua_accounts)
     if !(params[:id].nil? or params[:id].empty?)
-      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).find(params[:id])
+      data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).where({id:params[:id]})
     else
       if !(params[:township].nil? or params[:township].empty?)
         data = data.where(townships:{name:params[:township]})
@@ -33,7 +33,7 @@ class LiensController < ApplicationController
       end
     end
 
-    respond_with data, :include => [:township, :subsequents, :receipts, :owners, :mua_accounts]
+    respond_with data.to_json(:include => [:township, :subsequents, :receipts, :owners, :mua_accounts])
   end
 
   # POST /api/lists/:list_id/todos

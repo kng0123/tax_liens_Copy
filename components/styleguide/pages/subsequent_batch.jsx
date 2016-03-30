@@ -58,7 +58,7 @@ const SubsequentBatchHelper = React.createClass( {
 
   goToLien: function(event) {
     var id = event.target.dataset.id
-    this.context.router.push('/lien/item/'+id)
+    this.context.router.push('/app/lien/item/'+id)
   },
 
   toggleVoid: function() {

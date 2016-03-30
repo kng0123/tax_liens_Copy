@@ -19,13 +19,13 @@ exports.onEnter = (route_props) ->
     console.log route_props.errorRoute
     console.log global.router_requirements
     if !checkRequirements([route_props])
-      replace route_props.errorRoute
+      # replace route_props.errorRoute
     else
       global.router_requirements = [route_props]
 
 exports.redirect = (route) ->
   (nextState, replace) =>
-    replace(route)
+    # replace(route)
 
 exports.conn = conn = ReactRedux.connect((state) ->
   state
@@ -35,4 +35,4 @@ app_stream.subscribe () ->
   if !checkRequirements()
     last = router_requirements[global.router_requirements.length-1]
     global.router_requirements = []
-    ReactRouter.hashHistory.push(last.errorRoute)
+    # ReactRouter.hashHistory.push(last.errorRoute)

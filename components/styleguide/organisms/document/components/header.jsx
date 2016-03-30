@@ -26,9 +26,9 @@ const Header = React.createClass({
     var auth_button = <RaisedButton label={"Log out"} onClick={this.logout} type={'button'} disabled={false} primary={true} />
     if(logged_in) {
       navigation = <div>
-        <Link style={linkStyles} to='/'>Home</Link>
-        <Link style={linkStyles} to='/lien/upload'>Upload</Link>
-        <Link style={linkStyles} to='/lien/subs'>Batch subs</Link>
+        <Link style={linkStyles} to='/app/lien/'>Home</Link>
+        <Link style={linkStyles} to='/app/lien/upload'>Upload</Link>
+        <Link style={linkStyles} to='/app/lien/subs'>Batch subs</Link>
       </div>
       auth_button = <RaisedButton label={"Log in"} onClick={this.login} type={'button'} disabled={false} primary={true} />
     }

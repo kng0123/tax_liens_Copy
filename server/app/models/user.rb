@@ -6,6 +6,15 @@ class User < ActiveRecord::Base
          :confirmable, :lockable
 
   has_one :profile, dependent: :destroy
+
+  has_one :profile
   accepts_nested_attributes_for :profile
+
+
+  protected
+
+  def profile
+    super || build_profile
+  end
 
 end
