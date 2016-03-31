@@ -105,8 +105,6 @@ var LienListHelper = React.createClass({
 
     }
 
-
-
     return <div>
       {this.getDialog()}
       <div className='container'>

@@ -33,7 +33,7 @@ class LiensController < ApplicationController
       end
     end
 
-    respond_with data.to_json(:include => [:township, :subsequents, :receipts, :owners, :mua_accounts])
+    respond_with data.limit(10).to_json(:include => [:township, :subsequents, :receipts, :owners, :mua_accounts])
   end
 
   # POST /api/lists/:list_id/todos
