@@ -151,7 +151,7 @@ const LienHelper = React.createBackboneClass({
             <LienSubs lien={lien} subsequents={lien.get('subsequents')} onChange={this.onChange}/>
           </div>
           <div className='col-md-6'>
-            <LienNotes lien={lien} onChange={this.onChange}/>
+            <LienNotes lien={lien} notes={lien.get('notes')} onChange={this.onChange}/>
           </div>
         </div>
         <div className='row'>
@@ -293,7 +293,8 @@ const LienCash = React.createBackboneClass({
         {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true, type:'money'},
         {label: "REDEMPTION AMT", key:"redemption_amount", editable:true, type:'money'},
         {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'money'},
-        {label: "DIFFERENCE", key:"diff", is_function:true, type:'money'}
+        {label: "DIFFERENCE", key:"diff", is_function:true, type:'money'},
+        {label: "Total check", key:"total_check", is_function:true, type:'money'}
       ]
     ]
     var editable = PlainEditable
@@ -465,9 +466,13 @@ const LienNotes = React.createClass({
 
   render: function() {
     var lien = this.props.lien
-    var notes = []//lien.get('annotations')
-    var note_html = notes.map(function(note, key) {
-      return <div key={key}>BLLAH</div>
+    var notes = lien.get('notes')
+    var note_html = notes.models.map(function(note, key) {
+      return <div key={key} style={{whiteSpace: 'pre-wrap'}}>
+        <div style={{width:'100px', display:'inline-block'}}>{note.get('name')}</div>
+        <div style={{display:'inline-block'}}>{note.get('comment')}</div>
+
+      </div>
     })
 
     return <div className='panel panel-default'>

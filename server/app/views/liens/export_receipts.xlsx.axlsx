@@ -1,0 +1,52 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Buttons") do |sheet|
+  header = [
+    "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+    "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+    "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+    "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+    "Total Paid","Sale Date"
+  ]
+
+  max_number_receipt = 0
+  @liens.each do |lien|
+    num_receipts = lien.receipts.count
+    if num_receipts > max_number_receipt
+      max_number_receipt = num_receipts
+    end
+  end
+
+  for i in 0..max_number_receipt-1
+    header = header.concat [
+      "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
+      "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+    ]
+  end
+
+  sheet.add_row header
+
+
+  @liens.each do |lien|
+    township = lien.township.name
+    owner = lien.llcs[0].name
+    receipts = lien.receipts
+    mua_account = lien.mua_accounts[0].account_number
+    row = [
+      lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
+      lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
+      lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value,
+      lien.tax_amount, lien.status, lien.address, lien.cert_fv, lien.winning_bid, lien.premium,
+      lien.total_cash_out_calc, lien.sale_date
+    ]
+    receipts.each do |receipt|
+      diff = receipt.check_amount - receipt.expected_amount
+      row = row.concat([
+        receipt.deposit_date, receipt.check_date, receipt.redeem_date, "receipt.account", receipt.check_number, receipt.check_amount,
+        receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, ""
+      ])
+    end
+    sheet.add_row row
+  end
+
+  puts max_number_receipt
+end

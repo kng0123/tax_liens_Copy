@@ -8,7 +8,7 @@ class Lien < ActiveRecord::Base
 
   has_and_belongs_to_many :owners
   has_and_belongs_to_many :llcs
-  has_and_belongs_to_many :notes
+  has_many :notes
 
   def self.import(file, test=false)
     spreadsheet = open_spreadsheet(file)
@@ -55,15 +55,12 @@ class Lien < ActiveRecord::Base
 
         next if tag.class == Fixnum or tag.class == Float
         if tag.match(/owner/)
-          owner = Owner.where(:name=>value).first
-          owner = owners[value] if owner.nil?
-          owner = Owner.new(:name=>value) unless owners[value]
-
+          owner = Owner.new(:name=>value)
           owners[value] = owner
           lien.owners << owner
         elsif tag.match(/llc/)
-          llc = Llc.where(:name=>value).first
-          llc = llcs[value] if llc.nil?
+          llc = llcs[value]
+          llc = Llc.where(:name=>value).first if llc.nil?
           llc = Llc.new(:name=>value) unless llc
           llcs[value] = llc
           lien.llcs <<  llc
@@ -96,8 +93,8 @@ class Lien < ActiveRecord::Base
           subs.push(sub)
         elsif tags[header_key]
           if tag.match(/county/)
-            township = Township.where(:name=>value).first
-            township = townships[value] unless township
+            township = townships[value]
+            township = Township.where(:name=>value).first unless township
             township = Township.new(:name=>value) unless township
             townships[value] = township
             lien.township = township
@@ -230,4 +227,138 @@ class Lien < ActiveRecord::Base
       "Picture" =>"picture"
     }
   end
+
+  def flat_rate
+    if self.redeem_in_10
+      return 0
+    end
+    cert_fv = self.cert_fv
+    rate = 0.06 #If fv >=1000
+    if ( cert_fv < 500000)
+      rate = 0.02
+    elsif (cert_fv >= 500000 and cert_fv < 1000000)
+      rate = 0.04
+    end
+    return cert_fv * rate
+  end
+
+  def search_fee_calc
+    #If redeem within 10 days then 0
+    if (self.redeem_in_10())
+      return 0
+    end
+    return 0
+    return self.search_fee
+  end
+
+  def subs_paid
+    subs_paid = self.subsequents.reduce(0) {|total, sub | total+sub.amount}
+    return subs_paid
+  end
+
+  def total_cash_out_calc
+    cert_fv = self.cert_fv || 0
+    premium = self.premium || 0
+    recording_fee = self.recording_fee || 0
+    subs_paid = self.subsequents.reduce(0) {|total, sub | total+sub.amount() }
+    return cert_fv+premium+recording_fee+subs_paid
+  end
+  #TODO: What is YEP
+  def total_interest_due_calc
+    if self.redemption_date
+      return 0
+    end
+    return self.flat_rate  + self.cert_interest + self.sub_interest
+  end
+
+  def principal_balance
+    if(self.total_cash_out_calc<self.total_check_calc)
+      return 0
+    end
+    return self.total_cash_out_calc - self.total_check_calc
+  end
+  def expected_amount
+    return self.total_cash_out_calc  + self.total_interest_due_calc + self.search_fee_calc
+  end
+
+  def receipt_expected_amount(type, sub_index = 0)
+    case type
+    when 'combined'
+      self.expected_amount
+    when 'cert_w_interest'
+      self.expected_amount - self.premium
+    when 'premium'
+      self.premium
+    when 'sub_only'
+      self.subsequents[sub_index].amount
+    else
+      0
+    end
+  end
+
+  def total_check_calc
+    return self.receipts.reduce(0) {|total, check| total + check.amount() }
+  end
+
+  def diff
+    if self.redemption_date
+      return 0
+    end
+    if self.redemption_amount
+      return self.expected_amount - self.redemption_amount
+    end
+    return self.expected_amount() - self.total_check_calc()
+  end
+
+  def sub_interest
+    return self.subsequents.reduce(0) {|total, sub| total + sub.interest() }
+  end
+
+  def redeem_days(date)
+    if(!date)
+      date = self.sale_date
+    else
+      date = Date.today
+    end
+
+    if self.redemption_date.nil?
+      return 0
+    end
+    redemption_date = Date.parse self.redemption_date
+    duration = redemption_date - date
+    return duration
+  end
+
+  def cert_interest
+    if self.redemption_date
+      return 0
+    end
+    days = self.redeem_days(self.sale_date)
+
+    interest_rate = self.winning_bid / 100
+
+    int =  (days / 365) * interest_rate * self.cert_fv
+    return int
+  end
+
+  def total_subs_before_sub(sub)
+    base_date = sub.sub_date
+
+    subs = self.subsequents
+    total = 0
+
+    subs.each do |sub_item|
+      if sub_item.void
+        next
+      end
+
+      sub_date = sub_item.sub_date
+      if sub_date < base_date
+        total = total + sub_item.amount
+      end
+
+    end
+    total
+  end
+
 end

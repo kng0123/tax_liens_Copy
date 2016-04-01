@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160329062411) do
+ActiveRecord::Schema.define(version: 20160331044354) do
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -99,9 +99,17 @@ ActiveRecord::Schema.define(version: 20160329062411) do
   add_index "mua_accounts", ["lien_id"], name: "index_mua_accounts_on_lien_id"
 
   create_table "notes", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.string   "comment"
+    t.integer  "lien_id"
+    t.integer  "profile_id"
+    t.integer  "external_id"
+    t.string   "note_type"
   end
+
+  add_index "notes", ["lien_id"], name: "index_notes_on_lien_id"
+  add_index "notes", ["profile_id"], name: "index_notes_on_profile_id"
 
   create_table "notes_receipts", id: false, force: :cascade do |t|
     t.integer "receipt_id", null: false

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :receipts, defaults: {format: :json}, only: [:show, :update, :create]
   resources :subsequents, defaults: {format: :json}, only: [:show, :update, :create]
   resources :subsequent_batch, defaults: {format: :json}, only: [:index, :show, :update, :create]
+  resources :notes, defaults: {format: :json}, only: [:index, :show, :update, :create]
   resources :townships, defaults: {format: :json}, only: [:index]
 
   match '/app', :to => 'ttg#index', :via => [:get]

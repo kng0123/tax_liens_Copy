@@ -12,7 +12,6 @@ const CreateNote = React.createClass({
     }
   },
   submitForm: function(model) {
-    debugger
     // let action = Actions.attempt_sign_in(model)
     // this.props.dispatch(action)
     // var data = {
@@ -22,12 +21,16 @@ const CreateNote = React.createClass({
     //   lien_id: this.props.lien.get('id')
     // }
     // //TODO: Create sub
-    // var new_sub = new BackboneApp.Models.Subsequent(data)
-    // var res = new_sub.save()
-    // var self = this
-    // res.success(function() {
+    var data = {
+      comment: model.comment,
+      lien_id: this.props.lien.get('id')
+    }
+    var new_sub = new BackboneApp.Models.Note(data)
+    var res = new_sub.save()
+    var self = this
+    res.success(function() {
       self.props.callback()
-    // })
+    })
   },
 
   styles: {

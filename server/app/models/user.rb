@@ -13,8 +13,8 @@ class User < ActiveRecord::Base
 
   protected
 
-  def profile
-    super || build_profile
-  end
+  # def profile
+  #   super || build_profile
+  # end
 
 end

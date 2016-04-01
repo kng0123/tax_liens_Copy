@@ -43,8 +43,7 @@ class LiensController < ApplicationController
 
   # GET /api/lists/:list_id/todos/:id
   def show
-    respond_with Lien.includes(:township, :subsequents, :receipts, :owners, :llcs).find(params[:id]),
-      :include => [:township, :subsequents, :receipts, :owners, :llcs]
+    respond_with Lien.includes(:township, :subsequents, :receipts, :owners, :llcs, :notes).find(params[:id]).serializable_hash(:include => [:township, :subsequents, :receipts, :owners, :llcs, :notes])
   end
 
   # PUT/PATCH /api/lists/:list_id/todos/:id
@@ -62,12 +61,18 @@ class LiensController < ApplicationController
 
   def export_liens
     @liens =  Lien.includes(:township, :subsequents, :receipts, :owners)
-    respond_with @liens, :template => 'liens/export_liens', :include => [:township, :subsequents, :receipts, :owners]
+    @redemption_date = Date.parse(params[:redemption_date])
+    render xlsx: "export_liens", :include => [:township, :subsequents, :receipts, :owners]
+    # respond_with @liens, :template => 'liens/export_liens', :include => [:township, :subsequents, :receipts, :owners]
   end
 
   def export_receipts
-    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners)
-    respond_with @liens, :template => 'liens/export_receipts', :include => [:township, :subsequents, :receipts, :owners]
+    from = Date.parse(params[:from])
+    to = Date.parse(params[:to])
+    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners).where(:sale_date => from.beginning_of_day..to.end_of_day)
+
+    render xlsx: "export_receipts", :include => [:township, :subsequents, :receipts, :owners]
+    # respond_with @liens, :template => 'liens/export_receipts', :include => [:township, :subsequents, :receipts, :owners]
   end
 
 end

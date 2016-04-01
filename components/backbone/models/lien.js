@@ -95,6 +95,9 @@ class Lien extends Backbone.RelationalModel {
     if (!this.get('redemption_date')) {
       return 0
     }
+    if (this.get('redemption_amount')) {
+      return this.expected_amount() - this.get('redemption_amount')
+    }
     return this.expected_amount() -this.total_check()
   }
 
@@ -429,6 +432,14 @@ var LienRelations = [{
   }
 },{
   type: Backbone.HasMany,
+  key: 'notes',
+  relatedModel: Note,
+  collectionType: NoteCollection,
+  reverseRelation: {
+    key: 'lien'
+  }
+},{
+  type: Backbone.HasMany,
   key: 'mua_accounts',
   relatedModel: MuaAccount,
   collectionType: MuaAccountCollection
@@ -457,6 +468,18 @@ var ReceiptRelations = [{
     collectionType: ReceiptCollection
   }
 }]
+var NoteRelations = [{
+  type: Backbone.HasOne,
+  key: 'lien',
+  keySource: 'lien_id',
+  includeInJSON: 'id',
+  relatedModel: Lien,
+  reverseRelation: {
+    key: 'notes',
+    relatedModel: Note,
+    collectionType: NoteCollection
+  }
+}]
 
 class JSON extends Backbone.RelationalModel {
   constructor(options) { super(options); }
@@ -476,6 +499,32 @@ class JSON extends Backbone.RelationalModel {
   }
 }
 
+class Note extends Backbone.RelationalModel {
+  constructor(options) { super(options); }
+  static relations() {
+    return NoteRelations
+  }
+  relations() {
+    return NoteRelations
+  }
+  url() {
+    if(this.get('id')) {
+       return '/notes/'+this.get('id')
+    } else {
+      return '/notes'
+    }
+  }
+  defaults() { return {}; }
+}
+class NoteCollection extends Backbone.Collection{
+  constructor(options) {
+    super(options);
+    this.model = Note;
+  }
+
+  url() { return '/notes' }
+}
+
 Lien.setup()
 Receipt.setup()
 SubsequentBatch.setup()
@@ -489,6 +538,7 @@ module.exports = function(b) {
   b.Models.SubsequentBatch = SubsequentBatch
   b.Models.Subsequent = Subsequent
   b.Models.Receipt = Receipt
+  b.Models.Note = Note
   b.Collections.LienCollection = LienCollection
   b.Collections.TownshipCollection = TownshipCollection
   b.Collections.SubsequentBatchCollection = SubsequentBatchCollection
