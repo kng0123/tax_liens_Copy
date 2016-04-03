@@ -1,14 +1,12 @@
 class ReceiptsController < ApplicationController
   respond_to :json
 
-  # GET /api/lists/:list_id/todos
   def index
     if params[:lien_id]
       respond_with Lien.includes(:receipts).find(params[:lien_id]).receipts
     end
   end
 
-  # POST /api/lists/:list_id/todos
   def create
     if params[:lien_id]
       data = params.permit(Receipt.column_names)
@@ -16,6 +14,16 @@ class ReceiptsController < ApplicationController
       data[:check_amount] = data[:check_amount].to_f * 100
       receipt = Receipt.create!(data)
       receipt.lien = lien
+      # Allow notes to be defined with receipt
+      if params[:note]
+        note = Note.new(
+          :comment => params[:note],
+          :note_type => 'receipt',
+          :lien => lien,
+          :profile => current_user.profile
+        )
+        receipt.notes << note
+      end
       receipt.save!
       respond_with receipt
     end

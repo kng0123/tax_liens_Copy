@@ -76,7 +76,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
     row.concat [
       lien.total_subs_before_sub(nil), lien.redemption_date, lien.redemption_amount, lien.total_cash_out_calc,
-      lien.total_interest_due_calc, lien.total_check_calc, "Dif", "Not implemented", "Not implemented"
+      lien.total_interest_due_calc, lien.total_check_calc, "Dif", "Not implemented", lien.note_text
     ]
 
     receipts_data = [nil]*max_number_receipt*receipt_header.count
@@ -85,7 +85,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       diff = receipt.check_amount - receipt.expected_amount
       row.concat([
         receipt.deposit_date, receipt.check_date, receipt.redeem_date, "receipt.account", receipt.check_number, receipt.check_amount,
-        receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, ""
+        receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, receipt.note_text
       ])
     end
     row.concat receipts_data

@@ -11,6 +11,13 @@ class Receipt < ActiveRecord::Base
     end
   end
 
+  def note_text
+    notes = self.notes
+    if notes.count != 0
+      return notes.first.comment
+    end
+  end
+
   def expected_amount
     type = self.receipt_type.downcase
     case type

@@ -16,7 +16,7 @@ var TextArea = React.createClass({
       <TextareaAutosize
         name={this.props.name}
         value={val}
-        style={{boxSizing: 'border-box', width:'300px'}}
+        style={{boxSizing: 'border-box', width:'250px'}}
         minRows={10}
         maxRows={15}
         defaultValue={this.props.value}

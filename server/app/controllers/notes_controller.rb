@@ -13,7 +13,6 @@ class NotesController < ApplicationController
       )
 
       note.lien = Lien.find(params[:lien_id])
-      note.profile = current_user.profile
       note.save!
       respond_with note
     end

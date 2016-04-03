@@ -124,8 +124,22 @@ const CreateReceipt = React.createClass({
     return (
       <div style={paperStyle}>
         <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
-          {form_body}
-          <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
+          <div>
+            <div style={{width:'45%', float:'left'}}>
+              {form_body}
+            </div>
+            <div style={{width:'45%', float:'right'}}>
+              <div className="form-group row">
+                <label htmlFor="type" className="col-sm-3 form-control-label">Note</label>
+                <div className="col-sm-9">
+                  <Styleguide.Molecules.Forms.TextArea name="note" rows={5} value=""/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{clear:'both'}}>
+            <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
+          </div>
         </Formsy.Form>
       </div>
     )

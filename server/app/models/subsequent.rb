@@ -55,7 +55,10 @@ class Subsequent < ActiveRecord::Base
   end
 
   def note_text
-    return "Not implemented"
+    notes = self.notes
+    if notes.count != 0
+      return notes.first.comment
+    end
   end
 
 end

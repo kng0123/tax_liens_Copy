@@ -60,7 +60,7 @@ const LienHelper = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'500px'}}>
+    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
       {modal}
     </Dialog>
   },
@@ -415,14 +415,14 @@ const LienSubs = React.createBackboneClass({
     var self = this
     var table_rows = row_data.map(function(llc, index) {
       var row = self.rowGetter(index)
-      var row_cells = columns.map(function(c) {
-        return <th>{row[c.key]}</th>
+      var row_cells = columns.map(function(c, i) {
+        return <th key={i}>{row[c.key]}</th>
       })
-      return <tr>{row_cells}</tr>
+      return <tr key={index}>{row_cells}</tr>
 
     })
-    var table_headers = columns.map(function(c) {
-      return <th>{c.name}</th>
+    var table_headers = columns.map(function(c, i) {
+      return <th key={i}>{c.name}</th>
     })
 
     return <div className='panel panel-default'>
@@ -508,14 +508,14 @@ const LienNotes = React.createClass({
     var row_data = lien.get('notes').models
     var table_rows = row_data.map(function(llc, index) {
       var row = self.rowGetter(index)
-      var row_cells = columns.map(function(c) {
-        return <th>{row[c.key]}</th>
+      var row_cells = columns.map(function(c, i) {
+        return <th key={i}>{row[c.key]}</th>
       })
-      return <tr>{row_cells}</tr>
+      return <tr key={index}>{row_cells}</tr>
 
     })
-    var table_headers = columns.map(function(c) {
-      return <th>{c.name}</th>
+    var table_headers = columns.map(function(c,i) {
+      return <th key={i}>{c.name}</th>
     })
 
     return <div className='panel panel-default'>
@@ -574,14 +574,14 @@ const LienLlcs = React.createBackboneClass({
     var data = lien.get('llcs')
     var table_rows = data.map(function(llc, index) {
       var row = self.rowGetter(index)
-      var row_cells = columns.map(function(c) {
-        return <th>{row[c.key]}</th>
+      var row_cells = columns.map(function(c, i) {
+        return <th key={i}>{row[c.key]}</th>
       })
-      return <tr>{row_cells}</tr>
+      return <tr key={index}>{row_cells}</tr>
 
     })
-    var table_headers = columns.map(function(c) {
-      return <th>{c.name}</th>
+    var table_headers = columns.map(function(c,i) {
+      return <th key={i}>{c.name}</th>
     })
 
     return <div className='panel panel-default'>
@@ -675,7 +675,7 @@ const LienReceipts = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'500px'}}>
+    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
       {modal}
     </Dialog>
   },
@@ -727,14 +727,14 @@ const LienReceipts = React.createBackboneClass({
     var data = lien.get('receipts')
     var table_rows = data.map(function(llc, index) {
       var row = self.rowGetter(index)
-      var row_cells = columns.map(function(c) {
-        return <th>{row[c.key]}</th>
+      var row_cells = columns.map(function(c, i) {
+        return <th key={i}>{row[c.key]}</th>
       })
-      return <tr>{row_cells}</tr>
+      return <tr key={index}>{row_cells}</tr>
 
     })
-    var table_headers = columns.map(function(c) {
-      return <th>{c.name}</th>
+    var table_headers = columns.map(function(c, i) {
+      return <th key={i}>{c.name}</th>
     })
 
     return <div className='panel panel-default'>

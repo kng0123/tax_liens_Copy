@@ -12,15 +12,6 @@ const CreateNote = React.createClass({
     }
   },
   submitForm: function(model) {
-    // let action = Actions.attempt_sign_in(model)
-    // this.props.dispatch(action)
-    // var data = {
-    //   type: model.sub_type,
-    //   sub_date: moment(model.sub_date),
-    //   amount: model.amount,
-    //   lien_id: this.props.lien.get('id')
-    // }
-    // //TODO: Create sub
     var data = {
       comment: model.comment,
       lien_id: this.props.lien.get('id')
@@ -60,14 +51,6 @@ const CreateNote = React.createClass({
     var code_options = BackboneApp.Models.Subsequent.code_options()
 
     var form_rows = [
-      // {
-      //   label: 'Type',
-      //   element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"sub_type"}/>
-      // },
-      // {
-      //   label: 'Sub Date',
-      //   element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='sub_date' value={sub_date} required/>
-      // },
       {
         label: 'Note',
         element: <Styleguide.Molecules.Forms.TextArea name="comment" rows={5} value=""/>

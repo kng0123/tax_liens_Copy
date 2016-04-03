@@ -10,6 +10,13 @@ class Lien < ActiveRecord::Base
   has_and_belongs_to_many :llcs
   has_many :notes
 
+  def note_text
+    notes = self.notes
+    if notes.count != 0
+      return notes.first.comment
+    end
+  end
+
   def self.import(file, test=false)
     spreadsheet = open_spreadsheet(file)
 
