@@ -400,6 +400,12 @@ class Receipt extends Backbone.RelationalModel {
       {label: 'Sold', value:'sold'}
     ]
   }
+  static account_options() {
+    return [
+      {label: 'Checking', value:'checking'},
+      {label: 'Money market', value:'money-market'}
+    ]
+  }
 }
 class ReceiptCollection extends Backbone.Collection{
   constructor(options) {

@@ -690,7 +690,7 @@ const LienReceipts = React.createBackboneClass({
     var props = {onClick:this.openEdit.bind(this, receipt), receipt:receipt}
     return {
       deposit_date: moment(receipt.get('deposit_date')).format('MM/DD/YYYY')
-      ,account: "NA"
+      ,account: receipt.get('account_type')
       ,check_date: moment(receipt.get('check_date')).format('MM/DD/YYYY')
       ,check_number: receipt.get('check_number')
       ,redeem_date: redeem_date

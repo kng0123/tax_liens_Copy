@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160403214030) do
+ActiveRecord::Schema.define(version: 20160403225047) do
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -154,6 +154,7 @@ ActiveRecord::Schema.define(version: 20160403214030) do
     t.string   "receipt_type"
     t.integer  "check_amount"
     t.boolean  "void"
+    t.string   "account_type"
   end
 
   add_index "receipts", ["lien_id"], name: "index_receipts_on_lien_id"

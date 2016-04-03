@@ -72,6 +72,7 @@ const EditReceipt = React.createClass({
     }
 
     var code_options = BackboneApp.Models.Receipt.code_options()
+    var account_options = BackboneApp.Models.Receipt.account_options()
     var sub_options = this.props.lien.get('subsequents').models.map( (sub) => {
       return {label: sub.name(), value:sub}
     })
@@ -83,6 +84,10 @@ const EditReceipt = React.createClass({
         label: 'Code',
         element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
         helper: <span><strong>Principal: </strong><span>{expected_amount}</span></span>
+      },
+      {
+        label: 'Account Type',
+        element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"}/>
       },
         {
           label: 'Sub',
@@ -115,7 +120,7 @@ const EditReceipt = React.createClass({
         if(row.filter && row.filter()) {
           return
         }
-        return (<div className={className} key={key}>
+        return (<div style={{marginBottom:'5px'}} className={className} key={key}>
           <label htmlFor="type" className="col-sm-3 form-control-label">{row.label}</label>
           <div className="col-sm-9">
             {row.element}

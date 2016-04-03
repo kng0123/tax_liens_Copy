@@ -84,7 +84,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       receipts_data.shift receipt_header.count
       diff = receipt.check_amount - receipt.expected_amount
       row.concat([
-        receipt.deposit_date, receipt.check_date, receipt.redeem_date, "receipt.account", receipt.check_number, receipt.check_amount,
+        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount,
         receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, receipt.note_text
       ])
     end
