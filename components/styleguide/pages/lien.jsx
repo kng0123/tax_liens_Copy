@@ -481,23 +481,58 @@ const LienSubActions = React.createBackboneClass({
 const LienNotes = React.createClass({
   displayName: 'LienNotes',
 
+  rowGetter: function(i) {
+    var note = this.props.lien.get('notes').models[i]
+    var note_type = 'General'
+    if(note.get('note_type')) {
+      note_type = note.get('note_type')
+    }
+    return {
+      author: note.get('name'),
+      date: moment(note.get('created_at')).format('MM/DD/YY'),
+      type: note_type,
+      comment: note.get('comment')
+    }
+  },
+
   render: function() {
     var lien = this.props.lien
-    var notes = lien.get('notes')
-    var note_html = notes.models.map(function(note, key) {
-      return <div key={key} style={{whiteSpace: 'pre-wrap'}}>
-        <div style={{width:'100px', display:'inline-block'}}>{note.get('name')}</div>
-        <div style={{display:'inline-block'}}>{note.get('comment')}</div>
 
-      </div>
+    var columns = [
+      {name:"Author", key:'author'},
+      {name:"Date", key:'date'},
+      {name:"Type", key:'type'},
+      {name:"Comment", key:'comment'},
+    ]
+    var self = this
+    var row_data = lien.get('notes').models
+    var table_rows = row_data.map(function(llc, index) {
+      var row = self.rowGetter(index)
+      var row_cells = columns.map(function(c) {
+        return <th>{row[c.key]}</th>
+      })
+      return <tr>{row_cells}</tr>
+
+    })
+    var table_headers = columns.map(function(c) {
+      return <th>{c.name}</th>
     })
 
     return <div className='panel panel-default'>
       <div className='panel-heading'>
         <h3 className='panel-title'>Notes</h3>
-        <ul className='list-group' style={{height:'130px'}}>
-          {note_html}
-        </ul>
+        <div>
+          <table style={{backgroundColor:'white'}} className='table'>
+            <thead>
+              <tr>
+                {table_headers}
+              </tr>
+            </thead>
+            <tbody>
+              {table_rows}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   }
