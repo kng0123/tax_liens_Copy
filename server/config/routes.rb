@@ -1,26 +1,29 @@
 Rails.application.routes.draw do
   devise_for :users, :controllers => { :registrations => "users/registrations" }
 
-  resources :liens, defaults: {format: :json}, only: [:index, :create, :show, :update] do
-    collection { post :import }
-    resources :receipts, only:[:index, :show, :create]
-    resources :subsequents, only:[:index, :show, :create]
-    # resources :todos, only: [:index, :create, :show, :update, :destroy]
+  authenticate :user do
+    resources :liens, defaults: {format: :json}, only: [:index, :create, :show, :update] do
+      collection { post :import }
+      resources :receipts, only:[:index, :show, :create]
+      resources :subsequents, only:[:index, :show, :create]
+      # resources :todos, only: [:index, :create, :show, :update, :destroy]
+    end
+
+    resources :receipts, defaults: {format: :json}, only: [:show, :update, :create]
+    resources :subsequents, defaults: {format: :json}, only: [:show, :update, :create]
+    resources :subsequent_batch, defaults: {format: :json}, only: [:index, :show, :update, :create]
+    resources :notes, defaults: {format: :json}, only: [:index, :show, :update, :create]
+    resources :townships, defaults: {format: :json}, only: [:index]
+
+    match '/app', :to => 'ttg#wrong_url', :via => [:get]
+    match '/app/:lien', :to => 'ttg#index', :via => [:get]
+    match '/app/:lien/:asdsad', :to => 'ttg#index', :via => [:get]
+    match '/app/lien/item/:asdadsd', :to => 'ttg#index', :via => [:get]
+    match '/app/lien/batch/:asdadsd', :to => 'ttg#index', :via => [:get]
+
+    match '/lien/export_receipts', :to =>  'liens#export_receipts', :via =>[:get]
+    match '/lien/export_liens', :to =>  'liens#export_liens', :via =>[:get]
   end
-
-  resources :receipts, defaults: {format: :json}, only: [:show, :update, :create]
-  resources :subsequents, defaults: {format: :json}, only: [:show, :update, :create]
-  resources :subsequent_batch, defaults: {format: :json}, only: [:index, :show, :update, :create]
-  resources :notes, defaults: {format: :json}, only: [:index, :show, :update, :create]
-  resources :townships, defaults: {format: :json}, only: [:index]
-
-  match '/app', :to => 'ttg#index', :via => [:get]
-  match '/app/:lien', :to => 'ttg#index', :via => [:get]
-  match '/app/:lien/:asdsad', :to => 'ttg#index', :via => [:get]
-  match '/app/lien/item/:asdadsd', :to => 'ttg#index', :via => [:get]
-  match '/app/lien/batch/:asdadsd', :to => 'ttg#index', :via => [:get]
-  match '/lien/export_receipts', :to =>  'liens#export_receipts', :via =>[:get]
-  match '/lien/export_liens', :to =>  'liens#export_liens', :via =>[:get]
 
   # config/routes.rb
 
