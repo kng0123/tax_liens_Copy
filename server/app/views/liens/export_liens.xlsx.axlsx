@@ -1,35 +1,62 @@
+max_number_receipt = 0
+max_number_subs = 0
+@liens.each do |lien|
+  num_receipts = lien.receipts.count
+  if num_receipts > max_number_receipt
+    max_number_receipt = num_receipts
+  end
+
+  num_subs = lien.subsequents.count
+  if num_subs > max_number_subs
+    max_number_subs = num_subs
+  end
+end
+
+info_header = [
+  "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+  "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+  "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+  "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+  "Total Paid","Sale Date"
+]
+sub_header = ["Sub Type", "Sub Date", "Interest", "8%", "18%", "Check", "Total", "Notes"]
+sub_sum_header = [
+  "Total subs paid", "Redemption Date", "Redemption amount", "Total Cash Out",
+  "Total Int Due", "MZ Check", "Dif", "Notes", "Mailed Cert"
+]
+receipt_header = [
+  "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
+  "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+]
+final_header = [ "Principal Bal", "Total Interest Earned" ]
+
 wb = xlsx_package.workbook
 wb.add_worksheet(name: "Buttons") do |sheet|
-  header = [
-    "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
-    "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
-    "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
-    "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
-    "Total Paid","Sale Date"
-  ]
+  header = info_header
 
-  max_number_receipt = 0
-  @liens.each do |lien|
-    num_receipts = lien.receipts.count
-    if num_receipts > max_number_receipt
-      max_number_receipt = num_receipts
-    end
+  for i in 0..max_number_subs-1
+    header = header.concat sub_header
   end
+
+  header = header.concat sub_sum_header
 
   for i in 0..max_number_receipt-1
-    header = header.concat [
-      "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
-      "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
-    ]
+    header = header.concat receipt_header
   end
 
-  sheet.add_row header
+  header = header.concat final_header
 
+  sheet.add_row header
 
   @liens.each do |lien|
     township = lien.township.name
     owner = lien.llcs[0].name
     receipts = lien.receipts
+    subs = lien.subsequents
+    if lien.redemption_date.nil?
+      lien.redemption_date = @redemption_date
+    end
+
     mua_account = lien.mua_accounts[0].account_number
     row = [
       lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
@@ -38,13 +65,33 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       lien.tax_amount, lien.status, lien.address, lien.cert_fv, lien.winning_bid, lien.premium,
       lien.total_cash_out_calc, lien.sale_date
     ]
+
+    subs_data = [nil]*max_number_subs*sub_header.count
+    subs.each do |sub|
+      subs_data.shift sub_header.count
+      row.concat [sub.sub_type, sub.sub_date, sub.interest, sub.interest_eight,
+      sub.interest_eighteen, "Check", sub.amount, sub.note_text]
+    end
+    row.concat subs_data
+
+    row.concat [
+      lien.total_subs_before_sub(nil), lien.redemption_date, lien.redemption_amount, lien.total_cash_out_calc,
+      lien.total_interest_due_calc, lien.total_check_calc, "Dif", "Not implemented", "Not implemented"
+    ]
+
+    receipts_data = [nil]*max_number_receipt*receipt_header.count
     receipts.each do |receipt|
+      receipts_data.shift receipt_header.count
       diff = receipt.check_amount - receipt.expected_amount
-      row = row.concat([
+      row.concat([
         receipt.deposit_date, receipt.check_date, receipt.redeem_date, "receipt.account", receipt.check_number, receipt.check_amount,
         receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, ""
       ])
     end
+    row.concat receipts_data
+
+    row.concat [ "Principal Bal", "Total Interest Earned" ]
+
     sheet.add_row row
   end
 

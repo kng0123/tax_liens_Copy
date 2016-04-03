@@ -324,7 +324,7 @@ class Lien < ActiveRecord::Base
     if self.redemption_date.nil?
       return 0
     end
-    redemption_date = Date.parse self.redemption_date
+    redemption_date = self.redemption_date
     duration = redemption_date - date
     return duration
   end
@@ -342,7 +342,13 @@ class Lien < ActiveRecord::Base
   end
 
   def total_subs_before_sub(sub)
-    base_date = sub.sub_date
+    base_date = 0
+    if !sub.nil?
+      base_date = sub.sub_date
+      if base_date.nil?
+        return 0
+      end
+    end
 
     subs = self.subsequents
     total = 0
@@ -353,7 +359,9 @@ class Lien < ActiveRecord::Base
       end
 
       sub_date = sub_item.sub_date
-      if sub_date < base_date
+      if base_date == 0
+        total = total + sub_item.amount
+      elsif !sub_date.nil? and sub_date < base_date
         total = total + sub_item.amount
       end
 

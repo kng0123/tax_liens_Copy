@@ -387,13 +387,14 @@ const LienSubs = React.createBackboneClass({
     var sub = this.props.lien.get('subsequents').models[i]
     var acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
     var amount = sub.amount() || 0
+    var props = {subsequent:sub}
     return {
       type: sub.get('sub_type'),
       date: moment(sub.get('sub_date')).format('MM/DD/YY'),
       amt: accounting.formatMoney(amount/100, acc_format) ,
       int: accounting.formatMoney(sub.interest()/100, acc_format) ,
       number: "",
-      actions: {subsequent:sub}
+      actions: <LienSubActions {...props} />
     }
   },
   render: function() {
@@ -406,41 +407,57 @@ const LienSubs = React.createBackboneClass({
       {name:"Date paid", key:'date'},
       {name:"Amount", key:'amt'},
       {name:"Interest", key:'int'},
-      {name:"Actions", key:'actions', formatter : Formatter}
+      {name:"Actions", key:'actions'}
     ]
 
-    var sub_table = <ReactDataGrid
-      columns={columns}
-      enableCellSelect= {true}
-      rowGetter={this.rowGetter}
-      rowsCount={lien.get('subsequents').models.length}
-      minHeight={130}
-    />
+    var row_data = lien.get('subsequents').models
+
+    var self = this
+    var table_rows = row_data.map(function(llc, index) {
+      var row = self.rowGetter(index)
+      var row_cells = columns.map(function(c) {
+        return <th>{row[c.key]}</th>
+      })
+      return <tr>{row_cells}</tr>
+
+    })
+    var table_headers = columns.map(function(c) {
+      return <th>{c.name}</th>
+    })
 
     return <div className='panel panel-default'>
       <div className='panel-heading'>
         <h3 className='panel-title'>
           <span>Subsequents</span>
         </h3>
-        <div style={{width:'100%'}}>
-          {sub_table}
+        <div>
+          <table style={{backgroundColor:'white'}} className='table'>
+            <thead>
+              <tr>
+                {table_headers}
+              </tr>
+            </thead>
+            <tbody>
+              {table_rows}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   }
 })
-const Formatter = React.createBackboneClass({
-  displayName: 'formatter',
+const LienSubActions = React.createBackboneClass({
+  displayName: 'LienSubActions',
   mixins: [
     React.BackboneMixin({
       modelOrCollection: function(props) {
-          return props.value.subsequent;
+          return props.subsequent;
       }
     })
   ],
 
   toggle_void: function() {
-    var sub = this.props.value.subsequent
+    var sub = this.props.subsequent
     sub.set('void', !sub.get('void'))
     sub.save()
   },
@@ -450,7 +467,7 @@ const Formatter = React.createBackboneClass({
       color: '#FB8C00',
       marginRight: 10
     };
-    if(this.props.value.subsequent.get('void')) {
+    if(this.props.subsequent.get('void')) {
       void_state = 'add'
     }
     return <div>
@@ -518,21 +535,36 @@ const LienLlcs = React.createBackboneClass({
       {name:"End date", key:'end'}
     ]
 
-    var llc_table = <ReactDataGrid
-      columns={columns}
-      enableCellSelect={true}
-      rowGetter={this.rowGetter}
-      rowsCount={lien.get('llcs').length}
-      minHeight={130}
-    />
+    var self = this
+    var data = lien.get('llcs')
+    var table_rows = data.map(function(llc, index) {
+      var row = self.rowGetter(index)
+      var row_cells = columns.map(function(c) {
+        return <th>{row[c.key]}</th>
+      })
+      return <tr>{row_cells}</tr>
+
+    })
+    var table_headers = columns.map(function(c) {
+      return <th>{c.name}</th>
+    })
 
     return <div className='panel panel-default'>
       <div className='panel-heading'>
         <h3 className='panel-title'>
           <span>Owners</span>
         </h3>
-        <div style={{width:'100%'}}>
-          {llc_table}
+        <div>
+          <table style={{backgroundColor:'white'}} className='table'>
+            <thead>
+              <tr>
+                {table_headers}
+              </tr>
+            </thead>
+            <tbody>
+              {table_rows}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -545,7 +577,7 @@ const LienReceiptActions = React.createBackboneClass({
     React.BackboneMixin('receipt', 'change')
   ],
   toggle_void: function() {
-    var receipt = this.props.value.receipt
+    var receipt = this.props.receipt
     receipt.set('void', !receipt.get('void'))
     receipt.save()
   },
@@ -555,12 +587,12 @@ const LienReceiptActions = React.createBackboneClass({
       marginRight: 10,
     }
     var void_state = 'clear'
-    if(this.props.value.receipt.get('void')) {
+    if(this.props.receipt.get('void')) {
       void_state = 'add'
     }
 
     return <div>
-      <MUI.Libs.FontIcons onClick={this.props.value.onClick} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>edit</MUI.Libs.FontIcons>
+      <MUI.Libs.FontIcons onClick={this.props.onClick} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>edit</MUI.Libs.FontIcons>
       <MUI.Libs.FontIcons onClick={this.toggle_void} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>{void_state}</MUI.Libs.FontIcons>
     </div>
   }
@@ -620,6 +652,7 @@ const LienReceipts = React.createBackboneClass({
       redeem_date = moment(receipt.get('redeem_date')).format('MM/DD/YYYY')
     }
     var acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
+    var props = {onClick:this.openEdit.bind(this, receipt), receipt:receipt}
     return {
       deposit_date: moment(receipt.get('deposit_date')).format('MM/DD/YYYY')
       ,account: "NA"
@@ -632,7 +665,7 @@ const LienReceipts = React.createBackboneClass({
       ,code: receipt.get('receipt_type')
       ,expected_amt: accounting.formatMoney(receipt.expected_amount()/100, acc_format)
       ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
-      ,actions: {onClick:this.openEdit.bind(this, receipt), receipt:receipt}
+      ,actions: <LienReceiptActions {...props} />
     }
   },
 
@@ -647,26 +680,42 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Check amount", key:'check_amount'}
       ,{name:"Expected Amt", key:'expected_amt'}
       ,{name:"Dif", key:'dif'}
-      ,{name:"Actions", key:'actions', formatter: LienReceiptActions}
+      ,{name:"Actions", key:'actions'}
     ]
   },
 
   render: function() {
     var lien = this.props.lien
 
-    var receipt_table = <ReactDataGrid
-      columns={this.getColumns()}
-      enableCellSelect={true}
-      rowGetter={this.rowGetter}
-      rowsCount={lien.get('receipts').models.length}
-      minHeight={130}
-    />
+    var columns = this.getColumns()
+    var self = this
+    var data = lien.get('receipts')
+    var table_rows = data.map(function(llc, index) {
+      var row = self.rowGetter(index)
+      var row_cells = columns.map(function(c) {
+        return <th>{row[c.key]}</th>
+      })
+      return <tr>{row_cells}</tr>
+
+    })
+    var table_headers = columns.map(function(c) {
+      return <th>{c.name}</th>
+    })
 
     return <div className='panel panel-default'>
       <div className='panel-heading'>
         {this.getDialog()}
-        <div style={{width:'100%'}}>
-          {receipt_table}
+        <div>
+          <table style={{backgroundColor:'white'}} className='table'>
+            <thead>
+              <tr>
+                {table_headers}
+              </tr>
+            </thead>
+            <tbody>
+              {table_rows}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

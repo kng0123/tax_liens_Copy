@@ -11,10 +11,10 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :profile
 
 
-  protected
+  # protected
 
-  # def profile
-  #   super || build_profile
-  # end
+  def profile
+    super || build_profile
+  end
 
 end
