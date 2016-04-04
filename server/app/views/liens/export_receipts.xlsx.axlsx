@@ -1,11 +1,22 @@
 wb = xlsx_package.workbook
 wb.add_worksheet(name: "Buttons") do |sheet|
+  currency = sheet.styles.add_style(:format_code=>"$#,##0;[Red]$-#,##0",
+                            :border=>Axlsx::STYLE_THIN_BORDER)
+
   header = [
     "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
     "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
     "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
     "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
     "Total Paid","Sale Date"
+  ]
+
+  header_styles = [
+    nil, nil, nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil,
+    nil, nil, nil, nil, nil,
+    nil, nil, nil, currency, nil, currency,
+    currency, nil
   ]
 
   max_number_receipt = 0
@@ -21,12 +32,16 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
       "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
     ]
+    header_styles.concat [
+      nil, nil, nil, nil, nil, currency,
+      nil, currency, currency, currency, currency, nil
+    ]
   end
 
   sheet.add_row header
 
 
-  @liens.each do |lien|
+  @liens.each do |lien, index|
     township = lien.township.name
     owner = lien.llcs[0].name
     receipts = lien.receipts
@@ -36,17 +51,19 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
       lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
       lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value,
-      lien.tax_amount, lien.status, lien.address, lien.cert_fv, lien.winning_bid, lien.premium,
-      lien.total_cash_out_calc, lien.sale_date
+      lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
+      lien.total_cash_out_calc().try('/', 100), lien.sale_date
     ]
     receipts.each do |receipt|
       diff = receipt.check_amount - receipt.expected_amount
       row = row.concat([
-        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount,
-        receipt.receipt_type, receipt.expected_amount, diff, receipt.expected_amount, diff, receipt.note_text
+        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount.try('/', 100),
+        receipt.receipt_type, receipt.expected_amount.try('/', 100), diff.try('/', 100), receipt.expected_amount.try('/', 100), diff.try('/', 100), receipt.note_text
       ])
     end
-    sheet.add_row row
+
+    sheet.add_row row, :style => header_styles
+
   end
 
   puts max_number_receipt

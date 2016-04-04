@@ -28,3 +28,4 @@ db.counters.insert(
 
 
 magic:  git push --force heroku `git subtree split --prefix server HEAD`:master
+heroku run rake db:migrate
