@@ -32,7 +32,7 @@ final_header = [ "Principal Bal", "Total Interest Earned" ]
 
 wb = xlsx_package.workbook
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,##0;[Red]$-#,##0",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
                           :border=>Axlsx::STYLE_THIN_BORDER)
   header = info_header
   header_styles = [
