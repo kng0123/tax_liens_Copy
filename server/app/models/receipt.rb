@@ -28,7 +28,8 @@ class Receipt < ActiveRecord::Base
     when 'premium'
       self.lien.premium
     when 'sub_only'
-      self.subsequent.amount
+      -42
+      # self.subsequent.amount
     else
       0
     end
