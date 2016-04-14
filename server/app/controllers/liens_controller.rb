@@ -14,16 +14,17 @@ class LiensController < ApplicationController
         data = data.where(townships:{name:params[:township]})
       end
       if !(params[:block].nil? or params[:block].empty?)
-        data = data.where({block:params[:block]})
+        data = data.where('block LIKE ?', '%' + params[:block] + '%')
       end
       if !(params[:lot].nil? or params[:lot].empty?)
-        data = data.where({lot:params[:lot]})
+        data = data.where('lot LIKE ?', '%' + params[:lot] + '%')
       end
-      if !(params[:qualifer].nil? or params[:qualifer].empty?)
-        data = data.where({qualifer:params[:qualifer]})
+      if !(params[:qualifier].nil? or params[:qualifier].empty?)
+        # data = data.where({qualifier:params[:qualifier]})
+        data = data.where('qualifier LIKE ?', '%' + params[:qualifier] + '%')
       end
       if !(params[:cert].nil? or params[:cert].empty?)
-        data = data.where({cert_number:params[:cert]})
+        data = data.where('cert_number LIKE ?', '%' + params[:cert] + '%')
       end
       if !(params[:sale_year].nil? or params[:sale_year].empty?)
         year = params[:sale_year].to_i

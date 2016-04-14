@@ -254,7 +254,6 @@ class Lien < ActiveRecord::Base
     if (self.redeem_in_10())
       return 0
     end
-    return 0
     return self.search_fee
   end
 
@@ -279,9 +278,13 @@ class Lien < ActiveRecord::Base
   end
 
   def principal_balance
+    if self.total_cash_out_calc + self.total_interest_due_calc < self.total_check_check
+      return self.total_cash_out_calc + self.total_interest_due_calc - self.total_check_check
+    end
     if(self.total_cash_out_calc<self.total_check_calc)
       return 0
     end
+
     return self.total_cash_out_calc - self.total_check_calc
   end
   def expected_amount
@@ -296,8 +299,6 @@ class Lien < ActiveRecord::Base
       self.expected_amount - self.premium
     when 'premium'
       self.premium
-    when 'sub_only'
-      self.subsequents[sub_index].amount
     else
       0
     end

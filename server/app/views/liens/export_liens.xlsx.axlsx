@@ -106,7 +106,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       diff = receipt.check_amount - receipt.expected_amount
       row.concat([
         receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount().try('/', 100),
-        receipt.receipt_type, receipt.expected_amount().try('/', 100), diff.try('/', 100), receipt.expected_amount().try('/', 100), diff.try('/', 100), receipt.note_text
+        receipt.receipt_type, receipt.total_with_interest().try('/', 100), diff.try('/', 100), receipt.expected_amount().try('/', 100), diff.try('/', 100), receipt.note_text
       ])
     end
     row.concat receipts_data

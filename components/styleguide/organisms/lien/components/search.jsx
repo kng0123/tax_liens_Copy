@@ -40,6 +40,12 @@ var SearchHelper = React.createBackboneClass({
   },
 
   onChange: function(event) {
+    if(!event) {
+      var data = this.state.data
+      data['township'] = ""
+      this.setState({ data: data})
+      return
+    }
     if( event.label) {
       var data = this.state.data
       data['township'] = event.value

@@ -28,40 +28,6 @@ const ExportReceipts = React.createClass({
     this.props.callback()
     return
 
-    var xlsx_export = new App.Utils.XLSXExport()
-    xlsx_export.addRow([
-      "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
-      "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
-      "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
-      "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
-      "Total Paid","Sale Date",
-
-      "Total Subs Paid", "Redemption Date", "Redemption", "Total Cash Out", "Total Int Due",
-      "MZ Check", "Dif"
-    ])
-
-    liens.map( (lien) => {
-      var county = lien.get('township').get('township')
-      var owner = lien.get('owners')[0].get('llc')
-
-      if(!lien.get('redemption_date')) {
-        lien.set('redemption_date', redemption_date)
-      }
-
-      xlsx_export.addRow([
-        lien.get('seq_id'), county, lien.get('year'), owner, lien.get('block_lot'), lien.get('block'), lien.get('lot'),
-        lien.get('qualifier'), lien.get('adv_number'), lien.get('mua_account_number'), lien.get('cert_number'), lien.get('lien_type'),
-        lien.get('list_item'), lien.get('current_owner'), lien.get('longitude'), lien.get('latitude'), format_money(lien.get('assessed_value')),
-        format_money(lien.get('tax_amount')), lien.get('status'), lien.get('address'), format_money(lien.get('cert_fv')), lien.get('winning_bid'), format_money(lien.get('premium')),
-        format_money(lien.total_cash_out()), format_date(lien.get('sale_date')),
-
-        format_money(lien.subs_paid()), format_date(lien.get('redemption_date')), format_money(lien.expected_amount()), format_money(lien.total_cash_out()), format_money(lien.total_interest_due()),
-        format_money(lien.total_check()), format_money(lien.diff())
-      ])
-    })
-    xlsx_export.save()
-
-
   },
 
   styles: {

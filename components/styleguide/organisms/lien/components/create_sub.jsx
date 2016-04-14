@@ -101,7 +101,7 @@ const CreateSub = React.createClass({
           </div>
         </div>
         <div style={{clear:'both'}}>
-          <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
+          <MUI.RaisedButton key={"end"} label={"Create sub"} type={"submit"} primary={true} />
         </div>
         </Formsy.Form>
       </div>

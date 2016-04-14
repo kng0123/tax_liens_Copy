@@ -28,8 +28,30 @@ class Receipt < ActiveRecord::Base
     when 'premium'
       self.lien.premium
     when 'sub_only'
-      -42
-      # self.subsequent.amount
+      sub = self.subsequent
+      return sub.amount if sub
+      return 0
+    when 'misc'
+      return self.misc_principal
+    else
+      0
+    end
+  end
+  def total_with_interest
+    type = self.receipt_type.downcase
+    case type
+    when 'combined'
+      self.lien.expected_amount
+    when 'cert_w_interest'
+      self.lien.expected_amount - self.lien.premium
+    when 'premium'
+      self.lien.premium
+    when 'sub_only'
+      sub = self.subsequent
+      return sub.amount + sub.interest if sub
+      return 0
+    when 'misc'
+      return self.misc_principal
     else
       0
     end

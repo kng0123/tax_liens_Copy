@@ -5,6 +5,7 @@ import ExportLiens from './components/export_liens.jsx';
 import CreateSub from './components/create_sub.jsx';
 import Search from './components/search.jsx'
 import CreateNote from './components/create_note.jsx'
+import EditSub from './components/edit_sub.jsx'
 
 export default {
   CreateSub,
@@ -13,5 +14,6 @@ export default {
   ExportLiens,
   Search,
   CreateNote,
-  ExportReceipts
+  ExportReceipts,
+  EditSub
 };

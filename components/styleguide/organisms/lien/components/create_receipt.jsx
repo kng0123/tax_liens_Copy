@@ -88,8 +88,13 @@ const CreateReceipt = React.createClass({
       },
         {
           label: 'Sub',
-          filter: (function(){ return this.state.model.type != 'sub_only'}).bind(this),
+          filter: (function(){ return this.state.model.receipt_type != 'sub_only'}).bind(this),
           element: <Styleguide.Molecules.Forms.ReactSelect renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"sub"}/>
+        },
+        {
+          label: 'Principal',
+          filter: (function(){ return this.state.model.receipt_type != 'misc'}).bind(this),
+          element: <FormsyText name='misc_principal' required hintText="Principal amount" value=""/>
         },
       {
         label: 'Deposit Date',

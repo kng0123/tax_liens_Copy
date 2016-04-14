@@ -382,12 +382,37 @@ const LienSubs = React.createBackboneClass({
       // React.BackboneMixin("lien")
       React.BackboneMixin("subsequents", 'change')
   ],
+  getInitialState: function() {
+    return {
+      open: false,
+      modal: undefined,
+      modal_actions: <div></div>
+    }
+  },
   onSubState: function(){},
+  handleClose: function() {
+    this.setState({ open: false})
+  },
+  openEdit: function(sub) {
+    var self = this
+    this.setState({
+      open: true,
+      modal: <Styleguide.Organisms.Lien.EditSub {...this.props} sub={sub} callback={function(){self.setState({open:false})}}/>
+    })
+  },
+  getDialog: function() {
+    var modal = this.state.modal
+    var Dialog = MUI.Libs.Dialog
+
+    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
+      {modal}
+    </Dialog>
+  },
   rowGetter: function(i) {
     var sub = this.props.lien.get('subsequents').models[i]
     var acc_format = {symbol : "$", decimal : ".", precision : 2, format: "%s%v"}
     var amount = sub.amount() || 0
-    var props = {subsequent:sub}
+    var props = {onClick:this.openEdit.bind(this, sub), subsequent:sub}
     return {
       type: sub.get('sub_type'),
       date: moment(sub.get('sub_date')).format('MM/DD/YY'),
@@ -427,6 +452,7 @@ const LienSubs = React.createBackboneClass({
 
     return <div className='panel panel-default'>
       <div className='panel-heading'>
+        {this.getDialog()}
         <h3 className='panel-title'>
           <span>Subsequents</span>
         </h3>
@@ -471,9 +497,8 @@ const LienSubActions = React.createBackboneClass({
       void_state = 'add'
     }
     return <div>
-      <MUI.Libs.FontIcons onClick={this.toggle_void} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>
-        {void_state}
-      </MUI.Libs.FontIcons>
+      <MUI.Libs.FontIcons onClick={this.props.onClick} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>edit</MUI.Libs.FontIcons>
+      <MUI.Libs.FontIcons onClick={this.toggle_void} className="muidocs-icon-action-home material-icons orange600" style={iconStyles}>{void_state}</MUI.Libs.FontIcons>
     </div>
   }
 })
@@ -699,6 +724,7 @@ const LienReceipts = React.createBackboneClass({
       ,subs: receipt.get('check_interest')
       ,code: receipt.get('receipt_type')
       ,expected_amt: accounting.formatMoney(receipt.expected_amount()/100, acc_format)
+      ,interest_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
       ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
       ,actions: <LienReceiptActions {...props} />
     }
@@ -713,8 +739,8 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Check #", key:'check_number'}
       ,{name:"Code", key:'code'}
       ,{name:"Check amount", key:'check_amount'}
-      ,{name:"Expected Amt", key:'expected_amt'}
-      ,{name:"Dif", key:'dif'}
+      ,{name:"Principal Amt", key:'expected_amt'}
+      ,{name:"Expected Amt", key:'interest_amt'}
       ,{name:"Actions", key:'actions'}
     ]
   },

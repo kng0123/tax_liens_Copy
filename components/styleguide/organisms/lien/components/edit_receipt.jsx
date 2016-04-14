@@ -19,6 +19,10 @@ const EditReceipt = React.createClass({
     Object.keys(model).map(function(key) {
       if(key == 'check_amount') {
          return receipt.set(key,Math.round(accounting.unformat(model.check_amount) * 100))
+      } else if(key == 'subsequent') {
+         return receipt.set('subsequent_id', model.subsequent.id)
+      }  else if(key == 'misc_principal') {
+         return receipt.set(key,Math.round(accounting.unformat(model.misc_principal) * 100))
       } else {
         return receipt.set(key, model[key])
       }
@@ -79,6 +83,8 @@ const EditReceipt = React.createClass({
 
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var expected_amount = accounting.formatMoney(check.expected_amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    
     var form_rows = [
       {
         label: 'Code',
@@ -87,12 +93,17 @@ const EditReceipt = React.createClass({
       },
       {
         label: 'Account Type',
-        element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"} value={check.get('account_type')}/>
       },
         {
           label: 'Sub',
-          filter: (function(){ return this.state.model.type != 'sub_only'}).bind(this),
-          element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('sub')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} return name={"sub"}/>
+          filter: (function(){ return check.get('receipt_type') != 'sub_only'}).bind(this),
+          element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
+        },
+        {
+          label: 'Principal',
+          filter: (function(){ return check.get('receipt_type') != 'misc'}).bind(this),
+          element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
         },
       {
         label: 'Deposit Date',

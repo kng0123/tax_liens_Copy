@@ -12,6 +12,8 @@ class ReceiptsController < ApplicationController
       data = params.permit(Receipt.column_names)
       lien = Lien.find(params[:lien_id])
       data[:check_amount] = data[:check_amount].to_f * 100
+      data[:misc_principal] = data[:misc_principal].to_f * 100
+      data[:subsequent] = Subsequent.find(params[:subsequent_id]) if params[:subsequent_id]
       receipt = Receipt.create!(data)
       receipt.lien = lien
       # Allow notes to be defined with receipt
@@ -36,7 +38,7 @@ class ReceiptsController < ApplicationController
 
   # PUT/PATCH /api/lists/:list_id/todos/:id
   def update
-    data = params.permit(Lien.column_names)
+    data = params.permit(Receipt.column_names)
     respond_with Receipt.find(params[:id]).update_attributes!(data)
   end
 end

@@ -63,6 +63,9 @@ class Lien extends Backbone.RelationalModel {
     return this.flat_rate()  + this.cert_interest() + this.sub_interest()
   }
   principal_balance() {
+    if((this.total_cash_out() + this.total_interest_due())<this.total_check()) {
+      return (this.total_cash_out() + this.total_interest_due())-this.total_check()
+    }
     if(this.total_cash_out()<this.total_check()) {
       return 0
     }
@@ -81,8 +84,6 @@ class Lien extends Backbone.RelationalModel {
       return this.expected_amount() - this.get('premium')
     } else if (type == 'premium') {
       return this.get('premium')
-    } else if (type == 'sub_only') {
-      return this.get('subsequents').models[sub_index].amount
     }
     return 0
   }
@@ -207,7 +208,8 @@ class Subsequent extends Backbone.RelationalModel {
   }
 
   name() {
-    return this.get('type')+" "+this.get('amount')+" "+moment(this.get('sub_date')).format('MM/DD/YYYY')
+    var amount = accounting.formatMoney(this.get('amount')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    return this.get('sub_type')+" "+amount+" "+moment(this.get('sub_date')).format('MM/DD/YYYY')
   }
 
   amount() {
@@ -385,9 +387,35 @@ class Receipt extends Backbone.RelationalModel {
     } else if (type == 'premium') {
       return this.get('lien').get('premium')
     } else if (type == 'sub_only') {
-      return this.get('sub').amount
+      var sub = this.get('subsequent')
+      if(sub) {
+        return sub.amount()
+      } else {
+        return 0
+      }
+    } else if (type == 'misc') {
+      return this.get('misc_principal')
     }
-    return 0
+  }
+
+  total_with_interest() {
+    var type = (this.get('receipt_type') || "").toLowerCase()
+    if(type == 'combined') {
+      return this.get('lien').total_with_interest()
+    } else if (type == 'cert_w_interest') {
+      return this.get('lien').expected_amount() - this.get('lien').get('premium')
+    } else if (type == 'premium') {
+      return this.get('lien').get('premium')
+    } else if (type == 'sub_only') {
+      var sub = this.get('subsequent')
+      if(sub) {
+        return sub.amount() + sub.interest()
+      } else {
+        return 0
+      }
+    } else if (type == 'misc') {
+      return this.get('misc_principal')
+    }
   }
 
   static code_options() {
@@ -473,6 +501,12 @@ var ReceiptRelations = [{
     relatedModel: Receipt,
     collectionType: ReceiptCollection
   }
+},{
+  type: Backbone.HasOne,
+  key: 'subsequent',
+  keySource: 'subsequent_id',
+  includeInJSON: 'id',
+  relatedModel: Subsequent
 }]
 var NoteRelations = [{
   type: Backbone.HasOne,
