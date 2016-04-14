@@ -401,7 +401,7 @@ class Receipt extends Backbone.RelationalModel {
   total_with_interest() {
     var type = (this.get('receipt_type') || "").toLowerCase()
     if(type == 'combined') {
-      return this.get('lien').total_with_interest()
+      return this.get('lien').expected_amount()
     } else if (type == 'cert_w_interest') {
       return this.get('lien').expected_amount() - this.get('lien').get('premium')
     } else if (type == 'premium') {
