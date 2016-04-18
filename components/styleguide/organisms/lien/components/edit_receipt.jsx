@@ -84,7 +84,7 @@ const EditReceipt = React.createClass({
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var expected_amount = accounting.formatMoney(check.expected_amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
-    
+    var self = this
     var form_rows = [
       {
         label: 'Code',
@@ -97,12 +97,12 @@ const EditReceipt = React.createClass({
       },
         {
           label: 'Sub',
-          filter: (function(){ return check.get('receipt_type') != 'sub_only'}).bind(this),
+          filter: (function(){ return self.state.model.receipt_type != 'sub_only'}).bind(this),
           element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
         },
         {
           label: 'Principal',
-          filter: (function(){ return check.get('receipt_type') != 'misc'}).bind(this),
+          filter: (function(){ return self.state.model.receipt_type != 'misc'}).bind(this),
           element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
         },
       {
