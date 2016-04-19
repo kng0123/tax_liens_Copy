@@ -74,7 +74,11 @@ const LienHelper = React.createBackboneClass({
       } else if (item.type == 'bool') {
         val = $(data.target).is(':checked')
       }else if (item.type == 'select') {
-        val = data.value
+        if(!data) {
+          val = ""
+        } else {
+          val = data.value
+        }
       }else if (item.type == 'money') {
         val = Math.round(accounting.unformat($(data.target).html()) * 100)
       } else {
@@ -723,9 +727,9 @@ const LienReceipts = React.createBackboneClass({
       ,principal: receipt.get('check_principal')
       ,subs: receipt.get('check_interest')
       ,code: receipt.get('receipt_type')
-      ,expected_amt: accounting.formatMoney(receipt.expected_amount()/100, acc_format)
-      ,interest_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
-      ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
+      ,principal_amt: accounting.formatMoney(receipt.principal_balance()/100, acc_format)
+      ,total_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
+      // ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
       ,actions: <LienReceiptActions {...props} />
     }
   },
@@ -739,8 +743,8 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Check #", key:'check_number'}
       ,{name:"Code", key:'code'}
       ,{name:"Check amount", key:'check_amount'}
-      ,{name:"Principal Amt", key:'expected_amt'}
-      ,{name:"Expected Amt", key:'interest_amt'}
+      ,{name:"Principal Amt", key:'principal_amt'}
+      ,{name:"Expected Amt", key:'total_amt'}
       ,{name:"Actions", key:'actions'}
     ]
   },

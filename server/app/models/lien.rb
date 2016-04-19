@@ -270,16 +270,16 @@ class Lien < ActiveRecord::Base
     return cert_fv+premium+recording_fee+subs_paid
   end
   #TODO: What is YEP
-  def total_interest_due_calc
-    if self.redemption_date
+  def total_interest_due_calc(redeem_date = nil)
+    if self.redemption_date.nil?
       return 0
     end
-    return self.flat_rate  + self.cert_interest + self.sub_interest
+    return self.flat_rate()  + self.cert_interest(redeem_date) + self.sub_interest(redeem_date)
   end
 
   def principal_balance
     if self.total_cash_out_calc + self.total_interest_due_calc < self.total_check_check
-      return self.total_cash_out_calc + self.total_interest_due_calc - self.total_check_check
+      return self.total_cash_out_calc - self.search_fee - self.total_check_check
     end
     if(self.total_cash_out_calc<self.total_check_calc)
       return 0
@@ -287,8 +287,8 @@ class Lien < ActiveRecord::Base
 
     return self.total_cash_out_calc - self.total_check_calc
   end
-  def expected_amount
-    return self.total_cash_out_calc  + self.total_interest_due_calc + self.search_fee_calc
+  def expected_amount(redeem_date = nil)
+    return self.total_cash_out_calc()  + self.total_interest_due_calc(redeem_date) + (self.search_fee_calc || 0)
   end
 
   def receipt_expected_amount(type, sub_index = 0)
@@ -318,12 +318,12 @@ class Lien < ActiveRecord::Base
     return self.expected_amount() - self.total_check_calc()
   end
 
-  def sub_interest
-    return self.subsequents.reduce(0) {|total, sub| total + sub.interest() }
+  def sub_interest(redeem_date = nil )
+    return self.subsequents.reduce(0) {|total, sub| total + sub.interest(redeem_date) }
   end
 
-  def redeem_days(date)
-    if(!date)
+  def redeem_days(date, redeem_date=nil)
+    if(date.nil?)
       date = self.sale_date
     else
       date = Date.today
@@ -332,20 +332,26 @@ class Lien < ActiveRecord::Base
     if self.redemption_date.nil?
       return 0
     end
-    redemption_date = self.redemption_date
+
+    redemption_date = (redeem_date or self.redemption_date)
+
     duration = redemption_date - date
     return duration
   end
 
-  def cert_interest
-    if self.redemption_date
+  def cert_interest(redeem_date = nil)
+    redeem_date = redeem_date or self.redemption_date
+    if !redeem_date
       return 0
     end
-    days = self.redeem_days(self.sale_date)
-
+    days = self.redeem_days(self.sale_date, redeem_date)
+    if days < 0
+      return 0
+    end
     interest_rate = self.winning_bid / 100
 
     int =  (days / 365) * interest_rate * self.cert_fv
+    puts int
     return int
   end
 

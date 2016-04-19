@@ -1,6 +1,7 @@
 class Receipt < ActiveRecord::Base
 
   belongs_to :lien
+  belongs_to :subsequent
   has_and_belongs_to_many :notes
 
   def amount
@@ -18,15 +19,15 @@ class Receipt < ActiveRecord::Base
     end
   end
 
-  def expected_amount
+  def principal_balance
     type = self.receipt_type.downcase
     case type
     when 'combined'
-      self.lien.expected_amount
+      return self.lien.total_cash_out_calc
     when 'cert_w_interest'
-      self.lien.expected_amount - self.lien.premium
+      return 0
     when 'premium'
-      self.lien.premium
+      return self.lien.premium
     when 'sub_only'
       sub = self.subsequent
       return sub.amount if sub
@@ -41,19 +42,22 @@ class Receipt < ActiveRecord::Base
     type = self.receipt_type.downcase
     case type
     when 'combined'
-      self.lien.expected_amount
+      return self.lien.expected_amount(self.redeem_date)
     when 'cert_w_interest'
-      self.lien.expected_amount - self.lien.premium
+      return self.lien.expected_amount(self.redeem_date) - self.lien.premium
     when 'premium'
-      self.lien.premium
+      return self.lien.premium
     when 'sub_only'
       sub = self.subsequent
-      return sub.amount + sub.interest if sub
+      return sub.amount + sub.interest(self.redeem_date) if sub
       return 0
     when 'misc'
       return self.misc_principal
     else
       0
     end
+  end
+  def interest_only
+    self.total_with_interest - self.principal_balance
   end
 end

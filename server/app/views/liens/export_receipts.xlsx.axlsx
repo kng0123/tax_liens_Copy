@@ -1,6 +1,11 @@
 wb = xlsx_package.workbook
+
+def display_currency(number)
+  number_with_precision(number.try('/', 100.0), :precision => 2)
+end
+
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
                             :border=>Axlsx::STYLE_THIN_BORDER)
 
   header = [
@@ -14,8 +19,8 @@ wb.add_worksheet(name: "Buttons") do |sheet|
   header_styles = [
     nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil,
-    nil, nil, nil, nil, nil,
-    nil, nil, nil, currency, nil, currency,
+    nil, nil, nil, nil, currency,
+    currency, nil, nil, currency, nil, currency,
     currency, nil
   ]
 
@@ -27,16 +32,14 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     end
   end
 
-  for i in 0..max_number_receipt-1
-    header = header.concat [
-      "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
-      "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
-    ]
-    header_styles.concat [
-      nil, nil, nil, nil, nil, currency,
-      nil, currency, currency, currency, currency, nil
-    ]
-  end
+  header = header.concat [
+    "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
+    "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+  ]
+  header_styles.concat [
+    nil, nil, nil, nil, nil, currency,
+    nil, currency, currency, currency, currency, nil
+  ]
 
   sheet.add_row header
 
@@ -47,22 +50,22 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     receipts = lien.receipts
 
     mua_account = lien.mua_accounts[0].account_number
-    row = [
-      lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
-      lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
-      lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value,
-      lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
-      lien.total_cash_out_calc().try('/', 100), lien.sale_date
-    ]
     receipts.each do |receipt|
-      diff = receipt.check_amount - receipt.expected_amount
-      row = row.concat([
-        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount.try('/', 100),
-        receipt.receipt_type, receipt.total_with_interest.try('/', 100), diff.try('/', 100), receipt.expected_amount.try('/', 100), diff.try('/', 100), receipt.note_text
-      ])
-    end
+      row = [
+        lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
+        lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
+        lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100.0),
+        lien.tax_amount.try('/', 100.0), lien.status, lien.address, lien.cert_fv.try('/', 100.0), lien.winning_bid, lien.premium.try('/', 100.0),
+        lien.total_cash_out_calc().try('/', 100.0), lien.sale_date
+      ]
 
-    sheet.add_row row, :style => header_styles
+      diff = receipt.total_with_interest - receipt.check_amount 
+      row = row.concat([
+        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, display_currency(receipt.check_amount),
+        receipt.receipt_type, display_currency(receipt.total_with_interest), display_currency(diff), display_currency(receipt.principal_balance), display_currency(receipt.interest_only), receipt.note_text
+      ])
+      sheet.add_row row, :style => header_styles
+    end
 
   end
 

@@ -11,16 +11,20 @@ class Subsequent < ActiveRecord::Base
     return self.amount
   end
 
-  def interest()
-    return self.interest_eight + self.interest_eighteen
+  def interest(redeem_date)
+    interest = self.interest_eight(redeem_date) + self.interest_eighteen(redeem_date)
+    if interest < 0
+      interest = 0
+    end
+    return interest
   end
 
-  def interest_eight
+  def interest_eight(redeem_date = nil)
     lien = self.lien
     sub_total_before = lien.total_subs_before_sub(self)
     cert_fv = lien.cert_fv
     sub_amount = self.amount_calc
-    days = lien.redeem_days(self.sub_date)
+    days = lien.redeem_days(self.sub_date, redeem_date)
 
     if (sub_total_before + cert_fv >= 150000)
       0
@@ -34,12 +38,12 @@ class Subsequent < ActiveRecord::Base
     end
   end
 
-  def interest_eighteen
+  def interest_eighteen(redeem_date = nil)
     lien = self.lien
     sub_total_before = lien.total_subs_before_sub(self)
     cert_fv = lien.cert_fv
     sub_amount = self.amount_calc
-    days = lien.redeem_days(self.sub_date)
+    days = lien.redeem_days(self.sub_date, redeem_date)
 
     if (sub_total_before + cert_fv >= 150000)
       self.amount_calc * (days/365) * 0.18

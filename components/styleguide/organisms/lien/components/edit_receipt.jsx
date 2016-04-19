@@ -51,7 +51,12 @@ const EditReceipt = React.createClass({
   },
 
   updateFormState: function(model) {
-    this.setState({model: model})
+    var self = this
+    if(this.state.model.receipt_type != model.receipt_type && model.receipt_type) {
+      setTimeout(function() {
+        // self.setState({model: {receipt_type: model.receipt_type}})
+      })
+    }
   },
 
   render: function () {
@@ -82,14 +87,14 @@ const EditReceipt = React.createClass({
     })
 
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
-    var expected_amount = accounting.formatMoney(check.expected_amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var principal_balance = accounting.formatMoney(check.principal_balance()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var self = this
     var form_rows = [
       {
         label: 'Code',
         element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
-        helper: <span><strong>Principal: </strong><span>{expected_amount}</span></span>
+        helper: <span><strong>Principal: </strong><span>{principal_balance}</span></span>
       },
       {
         label: 'Account Type',

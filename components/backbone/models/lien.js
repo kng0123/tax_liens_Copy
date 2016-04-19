@@ -56,23 +56,23 @@ class Lien extends Backbone.RelationalModel {
     return cert_fv+premium+recording_fee+subs_paid
   }
   //TODO: What is YEP
-  total_interest_due() {
-    if (!this.get('redemption_date')) {
+  total_interest_due(redeem_date) {
+    if (!this.get('redemption_date') && !redeem_date) {
       return 0
     }
-    return this.flat_rate()  + this.cert_interest() + this.sub_interest()
+    return this.flat_rate()  + this.cert_interest(redeem_date) + this.sub_interest(redeem_date)
   }
   principal_balance() {
     if((this.total_cash_out() + this.total_interest_due())<this.total_check()) {
-      return (this.total_cash_out() + this.total_interest_due())-this.total_check()
+      return (this.total_cash_out() - this.search_fee())-this.total_check()
     }
     if(this.total_cash_out()<this.total_check()) {
       return 0
     }
     return this.total_cash_out()-this.total_check();
   }
-  expected_amount() {
-    return this.total_cash_out()  + this.total_interest_due() + this.get('search_fee')
+  expected_amount(redeem_date) {
+    return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
   }
   receipt_expected_amount(type, sub_index) {
     //TODO Sub Payment Only
@@ -102,33 +102,35 @@ class Lien extends Backbone.RelationalModel {
     return this.expected_amount() -this.total_check()
   }
 
-  sub_interest() {
+  sub_interest(redeem_date) {
+    redeem_date = redeem_date || this.get('redemption_date')
     return this.get('subsequents').models.reduce((total, sub) => {
-      return total + sub.interest()
+      return total + sub.interest(redeem_date)
     }, 0)
   }
 
-  redeem_days(date) {
+  redeem_days(date, redeem_date) {
     if(!date) {
       date = moment(this.get('sale_date'))
     } else {
       moment(date)
     }
 
-    if (!this.get('redemption_date')) {
+    if (!this.get('redemption_date') && !redeem_date) {
       return 0
     }
-    var redemption_date = moment(this.get('redemption_date'))
+    var redemption_date = moment(redeem_date || this.get('redemption_date'))
     var duration = moment.duration(redemption_date.diff(date));
     var days = duration.asDays();
     return Math.round(days)
   }
 
-  cert_interest() {
-    if (!this.get('redemption_date')) {
+  cert_interest(redeem_date) {
+    redeem_date = redeem_date || this.get('redemption_date')
+    if (!redeem_date) {
       return 0
     }
-    var days = this.redeem_days()
+    var days = this.redeem_days(undefined, redeem_date)
 
     var interest_rate = this.get('winning_bid')/100
 
@@ -219,14 +221,14 @@ class Subsequent extends Backbone.RelationalModel {
     return this.get('amount')
   }
 
-  interest() {
+  interest(redeem_date) {
     var lien = this.get('lien')
     var sub_total_before = lien.total_subs_before_sub(this)
     var cert_fv = lien.get('cert_fv')
     var sub_amount = this.amount()
 
     var interest = 0
-    var days = lien.redeem_days(this.get('sub_date'))
+    var days = lien.redeem_days(this.get('sub_date'), redeem_date)
 
     if (sub_total_before + cert_fv >= 150000) {
       interest = this.amount() * (days/365) * 0.18
@@ -238,6 +240,9 @@ class Subsequent extends Backbone.RelationalModel {
         var high_interest = sub_amount - low_interest
         interest = low_interest * (days/365) * 0.08 + high_interest * (days/365) * 0.18
       }
+    }
+    if(interest < 0 ) {
+      interest = 0
     }
 
     return interest
@@ -375,15 +380,15 @@ class Receipt extends Backbone.RelationalModel {
     }
   }
 
-  expected_amount() {
+  principal_balance() {
     var type = (this.get('receipt_type') || "").toLowerCase()
     //TODO Sub Payment Only
     //TODO MISC
     //TODO SOLD
     if(type == 'combined') {
-      return this.get('lien').expected_amount()
+      return this.get('lien').total_cash_out()
     } else if (type == 'cert_w_interest') {
-      return this.get('lien').expected_amount() - this.get('lien').get('premium')
+      return 0
     } else if (type == 'premium') {
       return this.get('lien').get('premium')
     } else if (type == 'sub_only') {
@@ -401,15 +406,15 @@ class Receipt extends Backbone.RelationalModel {
   total_with_interest() {
     var type = (this.get('receipt_type') || "").toLowerCase()
     if(type == 'combined') {
-      return this.get('lien').expected_amount()
+      return this.get('lien').expected_amount(this.get('redeem_date'))
     } else if (type == 'cert_w_interest') {
-      return this.get('lien').expected_amount() - this.get('lien').get('premium')
+      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').get('premium')
     } else if (type == 'premium') {
       return this.get('lien').get('premium')
     } else if (type == 'sub_only') {
       var sub = this.get('subsequent')
       if(sub) {
-        return sub.amount() + sub.interest()
+        return sub.amount() + sub.interest(this.get('redeem_date'))
       } else {
         return 0
       }
