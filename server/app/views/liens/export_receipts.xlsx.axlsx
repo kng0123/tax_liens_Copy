@@ -33,12 +33,12 @@ wb.add_worksheet(name: "Buttons") do |sheet|
   end
 
   header = header.concat [
-    "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
-    "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+    "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #",
+    "Code", "Check Amount", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
   ]
   header_styles.concat [
-    nil, nil, nil, nil, nil, currency,
-    nil, currency, currency, currency, currency, nil
+    nil, nil, nil, nil, nil,
+    nil, currency, currency, currency, currency, currency, nil
   ]
 
   sheet.add_row header
@@ -61,8 +61,8 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
       diff = receipt.total_with_interest - receipt.check_amount
       row = row.concat([
-        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, display_currency(receipt.check_amount),
-        receipt.receipt_type, display_currency(receipt.total_with_interest), display_currency(diff), display_currency(receipt.principal_balance), display_currency(receipt.actual_interest), receipt.note_text
+        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number,
+        receipt.receipt_type, display_currency(receipt.check_amount), display_currency(receipt.total_with_interest), display_currency(diff), display_currency(receipt.principal_paid), display_currency(receipt.actual_interest), receipt.note_text
       ])
       sheet.add_row row, :style => header_styles
     end
