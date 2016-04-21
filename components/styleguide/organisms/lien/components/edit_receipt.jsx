@@ -8,7 +8,7 @@ const Paper = require('material-ui/lib/paper');
 const EditReceipt = React.createClass({
   getInitialState: function() {
     return {
-      model: {}
+      receipt_type: undefined
     }
   },
   submitForm: function(model) {
@@ -52,10 +52,8 @@ const EditReceipt = React.createClass({
 
   updateFormState: function(model) {
     var self = this
-    if(this.state.model.receipt_type != model.receipt_type && model.receipt_type) {
-      setTimeout(function() {
-        // self.setState({model: {receipt_type: model.receipt_type}})
-      })
+    if(this.state.receipt_type != model.receipt_type && model.receipt_type) {
+      self.setState({receipt_type: model.receipt_type})
     }
   },
 
@@ -90,6 +88,7 @@ const EditReceipt = React.createClass({
     var principal_balance = accounting.formatMoney(check.principal_balance()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var self = this
+
     var form_rows = [
       {
         label: 'Code',
@@ -97,19 +96,19 @@ const EditReceipt = React.createClass({
         helper: <span><strong>Principal: </strong><span>{principal_balance}</span></span>
       },
       {
+        label: 'Sub',
+        filter: (function(){ return !self.state.receipt_type || self.state.receipt_type != 'sub_only'}).bind(this),
+        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
+      },
+      {
+        label: 'Principal',
+        filter: (function(){ return !self.state.receipt_type || self.state.receipt_type != 'misc'}).bind(this),
+        element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
+      },
+      {
         label: 'Account Type',
         element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"} value={check.get('account_type')}/>
       },
-        {
-          label: 'Sub',
-          filter: (function(){ return self.state.model.receipt_type != 'sub_only'}).bind(this),
-          element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
-        },
-        {
-          label: 'Principal',
-          filter: (function(){ return self.state.model.receipt_type != 'misc'}).bind(this),
-          element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
-        },
       {
         label: 'Deposit Date',
         element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='deposit_date' value={deposit_date} required/>
