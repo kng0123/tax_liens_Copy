@@ -63,13 +63,9 @@ class Lien extends Backbone.RelationalModel {
     return this.flat_rate()  + this.cert_interest(redeem_date) + this.sub_interest(redeem_date)
   }
   principal_balance() {
-    if((this.total_cash_out() + this.total_interest_due())<this.total_check()) {
-      return (this.total_cash_out() - this.search_fee())-this.total_check()
-    }
-    if(this.total_cash_out()<this.total_check()) {
-      return 0
-    }
-    return this.total_cash_out()-this.total_check();
+    return this.get('receipts').models.reduce((total, sub) => {
+      return total + sub.principal_paid()
+    }, 0)
   }
   expected_amount(redeem_date) {
     return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
@@ -401,6 +397,18 @@ class Receipt extends Backbone.RelationalModel {
     } else if (type == 'misc') {
       return this.get('misc_principal')
     }
+  }
+
+  principal_paid() {
+    let left = this.principal_balance() - this.amount()
+    if(left < 0) {
+      return this.principal_balance()
+    } else {
+      return this.amount()
+    }
+  }
+  actual_interest() {
+    return this.amount() - this.principal_balance()
   }
 
   total_with_interest() {

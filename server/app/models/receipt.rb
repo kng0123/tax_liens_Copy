@@ -38,6 +38,17 @@ class Receipt < ActiveRecord::Base
       0
     end
   end
+
+  def principal_paid
+    due = principal_balance - amount
+    if due < 0
+      principal_balance
+    else
+      self.amount
+    end
+  end
+
+
   def total_with_interest
     type = self.receipt_type.downcase
     case type
@@ -57,7 +68,7 @@ class Receipt < ActiveRecord::Base
       0
     end
   end
-  def interest_only
-    self.total_with_interest - self.principal_balance
+  def actual_interest
+    self.amount - self.principal_balance
   end
 end

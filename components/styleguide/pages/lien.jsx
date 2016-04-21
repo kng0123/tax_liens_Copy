@@ -286,8 +286,8 @@ const LienCash = React.createBackboneClass({
         {label: "FACE VALUE", key:"cert_fv", editable:false, type:'money'}
       ],
       [
+        {label: "PRINCIPAL PAID", key:"principal_balance", is_function:true, type:'money'},
         {label: "PREMIUM", key:"premium", editable:false, type:'money'},
-        {label: "PRINCIPAL BALANCE", key:"principal_balance", is_function:true, type:'money'},
         {label: "TOTAL PAID", key:"total_paid", editable:false, type:'money'},
         {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'money'},
         {label: "CERT INT", key:"cert_interest", is_function:true, type:'money'}
@@ -727,7 +727,8 @@ const LienReceipts = React.createBackboneClass({
       ,principal: receipt.get('check_principal')
       ,subs: receipt.get('check_interest')
       ,code: receipt.get('receipt_type')
-      ,principal_amt: accounting.formatMoney(receipt.principal_balance()/100, acc_format)
+      ,principal_amt: accounting.formatMoney(receipt.principal_paid()/100, acc_format)
+      ,interest_amt: accounting.formatMoney(receipt.actual_interest()/100, acc_format)
       ,total_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
       // ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
       ,actions: <LienReceiptActions {...props} />
@@ -743,8 +744,9 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Check #", key:'check_number'}
       ,{name:"Code", key:'code'}
       ,{name:"Check amount", key:'check_amount'}
-      ,{name:"Principal Amt", key:'principal_amt'}
       ,{name:"Expected Amt", key:'total_amt'}
+      ,{name:"Principal Amt", key:'principal_amt'}
+      ,{name:"Actual Interest", key:'interest_amt'}
       ,{name:"Actions", key:'actions'}
     ]
   },
