@@ -12,6 +12,9 @@ const Lien = React.createClass({
   }
 })
 
+const customContentStyle = {
+  width:'800px'
+};
 
 const LienHelper = React.createBackboneClass({
   mixins: [
@@ -60,7 +63,7 @@ const LienHelper = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
+    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={customContentStyle}>
       {modal}
     </Dialog>
   },
@@ -408,7 +411,7 @@ const LienSubs = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
+    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
       {modal}
     </Dialog>
   },
@@ -704,7 +707,7 @@ const LienReceipts = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
+    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
       {modal}
     </Dialog>
   },
@@ -727,7 +730,7 @@ const LienReceipts = React.createBackboneClass({
       ,principal: receipt.get('check_principal')
       ,subs: receipt.get('check_interest')
       ,code: receipt.get('receipt_type')
-      ,principal_amt: accounting.formatMoney(receipt.principal_paid()/100, acc_format)
+      ,principal_bal: accounting.formatMoney((receipt.principal_paid())/100, acc_format)
       ,interest_amt: accounting.formatMoney(receipt.actual_interest()/100, acc_format)
       ,total_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
       // ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
@@ -745,7 +748,7 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Code", key:'code'}
       ,{name:"Check amount", key:'check_amount'}
       ,{name:"Expected Amt", key:'total_amt'}
-      ,{name:"Principal Amt", key:'principal_amt'}
+      ,{name:"Principal Paid", key:'principal_bal'}
       ,{name:"Actual Interest", key:'interest_amt'}
       ,{name:"Actions", key:'actions'}
     ]

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160414045846) do
+ActiveRecord::Schema.define(version: 20160421195440) do
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -143,24 +143,8 @@ ActiveRecord::Schema.define(version: 20160414045846) do
 
   add_index "profiles", ["user_id"], name: "index_profiles_on_user_id"
 
-  create_table "receipts", force: :cascade do |t|
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.integer  "lien_id"
-    t.date     "check_date"
-    t.date     "deposit_date"
-    t.date     "redeem_date"
-    t.string   "check_number"
-    t.string   "receipt_type"
-    t.integer  "check_amount"
-    t.boolean  "void"
-    t.string   "account_type"
-    t.integer  "subsequent_id"
-    t.integer  "misc_principal"
-  end
-
-  add_index "receipts", ["lien_id"], name: "index_receipts_on_lien_id"
-  add_index "receipts", ["subsequent_id"], name: "index_receipts_on_subsequent_id"
+# Could not dump table "receipts" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
 
   create_table "subsequent_batches", force: :cascade do |t|
     t.datetime "created_at",  null: false

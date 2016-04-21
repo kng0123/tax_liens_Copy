@@ -63,8 +63,8 @@ class Lien extends Backbone.RelationalModel {
     return this.flat_rate()  + this.cert_interest(redeem_date) + this.sub_interest(redeem_date)
   }
   principal_balance() {
-    return this.get('receipts').models.reduce((total, sub) => {
-      return total + sub.principal_paid()
+    return this.get('receipts').models.reduce((total, receipt) => {
+      return total + receipt.principal_paid()
     }, 0)
   }
   expected_amount(redeem_date) {
@@ -381,6 +381,9 @@ class Receipt extends Backbone.RelationalModel {
     //TODO Sub Payment Only
     //TODO MISC
     //TODO SOLD
+    if(this.get('is_principal_override')) {
+      return this.get('misc_principal')
+    }
     if(type == 'combined') {
       return this.get('lien').total_cash_out()
     } else if (type == 'cert_w_interest') {

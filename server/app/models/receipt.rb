@@ -21,6 +21,9 @@ class Receipt < ActiveRecord::Base
 
   def principal_balance
     type = self.receipt_type.downcase
+    if self.is_principal_override
+      return self.misc_principal
+    end
     case type
     when 'combined'
       return self.lien.total_cash_out_calc

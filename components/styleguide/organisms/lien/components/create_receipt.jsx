@@ -9,7 +9,8 @@ const CreateReceipt = React.createClass({
   getInitialState: function() {
     return {
       receipt: new BackboneApp.Models.Receipt(),
-      model: {}
+      model: {},
+      editPrincipal: false
     }
   },
   submitForm: function(model) {
@@ -18,6 +19,7 @@ const CreateReceipt = React.createClass({
 
     model.lien_id = this.props.lien.get('id')
     var new_check = new BackboneApp.Models.Receipt(model)
+    new_check.set('is_principal_override', (this.state.editPrincipal || this.state.receipt_type == 'misc'))
     var res = new_check.save()
     var self = this
     res.success(function() {
@@ -47,6 +49,10 @@ const CreateReceipt = React.createClass({
     }
     this.setState({model: model})
     return model
+  },
+
+  editPrincipal: function() {
+    this.setState({editPrincipal:!this.state.editPrincipal})
   },
 
   render: function () {
@@ -80,7 +86,11 @@ const CreateReceipt = React.createClass({
       {
         label: 'Code',
         element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"receipt_type"}/>,
-        helper: <span><strong>Principal: </strong><span>{expected_amount}</span></span>
+        helper: <span>
+          <strong>Principal: </strong>
+          <span>{expected_amount}</span>
+          <a href="#" onClick={this.editPrincipal}>Toggle</a>
+        </span>
       },
       {
         label: 'Account Type',
@@ -93,7 +103,7 @@ const CreateReceipt = React.createClass({
         },
         {
           label: 'Principal',
-          filter: (function(){ return this.state.model.receipt_type != 'misc'}).bind(this),
+          filter: (function(){ return !(this.state.editPrincipal || this.state.model.receipt_type == 'misc')}).bind(this),
           element: <FormsyText name='misc_principal' required hintText="Principal amount" value=""/>
         },
       {

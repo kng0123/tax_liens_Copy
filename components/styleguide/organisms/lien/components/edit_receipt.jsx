@@ -8,7 +8,8 @@ const Paper = require('material-ui/lib/paper');
 const EditReceipt = React.createClass({
   getInitialState: function() {
     return {
-      receipt_type: undefined
+      receipt_type: undefined,
+      editPrincipal: this.props.receipt.get('is_principal_override')
     }
   },
   submitForm: function(model) {
@@ -19,7 +20,7 @@ const EditReceipt = React.createClass({
     Object.keys(model).map(function(key) {
       if(key == 'check_amount') {
          return receipt.set(key,Math.round(accounting.unformat(model.check_amount) * 100))
-      } else if(key == 'subsequent') {
+      } else if(key == 'subsequent' && model.subsequent) {
          return receipt.set('subsequent_id', model.subsequent.id)
       }  else if(key == 'misc_principal') {
          return receipt.set(key,Math.round(accounting.unformat(model.misc_principal) * 100))
@@ -27,6 +28,8 @@ const EditReceipt = React.createClass({
         return receipt.set(key, model[key])
       }
     })
+    receipt.set('is_principal_override', (this.state.editPrincipal || this.state.receipt_type == 'misc'))
+
     return receipt.save().then(function(){
       callback()
     }).fail(function() {
@@ -55,6 +58,10 @@ const EditReceipt = React.createClass({
     if(this.state.receipt_type != model.receipt_type && model.receipt_type) {
       self.setState({receipt_type: model.receipt_type})
     }
+  },
+
+  editPrincipal: function() {
+    this.setState({editPrincipal:!this.state.editPrincipal})
   },
 
   render: function () {
@@ -93,7 +100,11 @@ const EditReceipt = React.createClass({
       {
         label: 'Code',
         element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
-        helper: <span><strong>Principal: </strong><span>{principal_balance}</span></span>
+        helper: <span>
+          <strong>Principal: </strong>
+          <span>{principal_balance}</span>
+          <a href="#" onClick={this.editPrincipal}>Toggle</a>
+        </span>
       },
       {
         label: 'Sub',
@@ -102,7 +113,7 @@ const EditReceipt = React.createClass({
       },
       {
         label: 'Principal',
-        filter: (function(){ return !self.state.receipt_type || self.state.receipt_type != 'misc'}).bind(this),
+        filter: (function(){ return !(self.state.editPrincipal || self.state.receipt_type == 'misc')}).bind(this),
         element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
       },
       {
@@ -132,10 +143,11 @@ const EditReceipt = React.createClass({
     ]
     var form_body = form_rows.map( (row, key) => {
         var className="form-group row"
+        var style={marginBottom:'5px'}
         if(row.filter && row.filter()) {
-          return
+          style.display = 'none'
         }
-        return (<div style={{marginBottom:'5px'}} className={className} key={key}>
+        return (<div style={style} className={className} key={key}>
           <label htmlFor="type" className="col-sm-3 form-control-label">{row.label}</label>
           <div className="col-sm-9">
             {row.element}
