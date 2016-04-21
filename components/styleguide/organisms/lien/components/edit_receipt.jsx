@@ -103,7 +103,7 @@ const EditReceipt = React.createClass({
         helper: <span>
           <strong>Principal: </strong>
           <span>{principal_balance}</span>
-          <a href="#" onClick={this.editPrincipal}>Toggle</a>
+          <span style={{color:"#337ab7", cursor:'pointer'}} onClick={this.editPrincipal}> (Toggle)</span>
         </span>
       },
       {

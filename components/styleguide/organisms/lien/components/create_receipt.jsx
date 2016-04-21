@@ -89,12 +89,8 @@ const CreateReceipt = React.createClass({
         helper: <span>
           <strong>Principal: </strong>
           <span>{expected_amount}</span>
-          <a href="#" onClick={this.editPrincipal}>Toggle</a>
+          <span style={{color:"#337ab7", cursor:'pointer'}} onClick={this.editPrincipal}> (Toggle)</span>
         </span>
-      },
-      {
-        label: 'Account Type',
-        element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"}/>
       },
         {
           label: 'Sub',
@@ -105,6 +101,10 @@ const CreateReceipt = React.createClass({
           label: 'Principal',
           filter: (function(){ return !(this.state.editPrincipal || this.state.model.receipt_type == 'misc')}).bind(this),
           element: <FormsyText name='misc_principal' required hintText="Principal amount" value=""/>
+        },
+        {
+          label: 'Account Type',
+          element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"}/>
         },
       {
         label: 'Deposit Date',
