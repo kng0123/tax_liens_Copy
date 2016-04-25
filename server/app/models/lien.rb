@@ -47,6 +47,11 @@ class Lien < ActiveRecord::Base
         #Skip empty columns
         header_key = header[col-1]
         next unless header_key
+        begin
+          header_key.strip!
+        rescue
+          next
+        end
 
         #Default to the header column name
         tag = tags[header_key]
@@ -116,8 +121,10 @@ class Lien < ActiveRecord::Base
             "total_paid",
             "cert_fv",
             "tax_amount",
-            "assessed_value"
+            "assessed_value",
+            "winning_bid"
           ]
+
           if cash_fields.include?(tag)
             value = value * 100
           end
