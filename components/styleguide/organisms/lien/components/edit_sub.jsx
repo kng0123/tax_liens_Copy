@@ -59,6 +59,7 @@ const EditSub = React.createClass({
     var sub_amount = accounting.formatMoney(sub.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var sub_date  = sub.get('sub_date')
     var code_options = BackboneApp.Models.Subsequent.code_options()
+    var note = sub.get('text_pad')
 
     var form_rows = [
       {
@@ -98,7 +99,7 @@ const EditSub = React.createClass({
             <div className="form-group row">
               <label htmlFor="type" className="col-sm-3 form-control-label">Note</label>
               <div className="col-sm-9">
-                <Styleguide.Molecules.Forms.TextArea name="note" rows={5} value=""/>
+                <Styleguide.Molecules.Forms.TextArea name="text_pad" rows={5} value={note}/>
               </div>
             </div>
           </div>

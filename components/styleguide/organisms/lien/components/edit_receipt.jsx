@@ -94,6 +94,7 @@ const EditReceipt = React.createClass({
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var principal_balance = accounting.formatMoney(check.principal_balance()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var text_pad = check.get('text_pad')
     var self = this
 
     var form_rows = [
@@ -156,11 +157,26 @@ const EditReceipt = React.createClass({
         </div>)
     }).filter(function(item){return item})
 
+
     return (
       <div style={paperStyle}>
         <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
-          {form_body}
-          <MUI.RaisedButton key={"end"} label={"Save receipt"} type={"submit"} primary={true} />
+          <div>
+            <div style={{width:'45%', float:'left'}}>
+              {form_body}
+            </div>
+            <div style={{width:'45%', float:'right'}}>
+              <div className="form-group row">
+                <label htmlFor="type" className="col-sm-3 form-control-label">Note</label>
+                <div className="col-sm-9">
+                  <Styleguide.Molecules.Forms.TextArea name="text_pad" rows={5} value={text_pad}/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{clear:'both'}}>
+            <MUI.RaisedButton key={"end"} label={"Save receipt"} type={"submit"} primary={true} />
+          </div>
         </Formsy.Form>
       </div>
     )

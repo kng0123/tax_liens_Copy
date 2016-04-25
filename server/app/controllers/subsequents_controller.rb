@@ -16,19 +16,11 @@ class SubsequentsController < ApplicationController
       subsequent = Subsequent.new(
         :sub_type => params[:type],
         :amount => Float(params[:amount]) * 100,
-        :sub_date => params[:sub_date]
+        :sub_date => params[:sub_date],
+        :text_pad => params[:note]
       )
       if params[:subsequent_batch_id]
         subsequent.subsequent_batch = SubsequentBatch.find(params[:subsequent_batch_id])
-      end
-      if params[:note]
-        note = Note.new(
-          :comment => params[:note],
-          :note_type => 'subsequent',
-          :lien => lien,
-          :profile => current_user.profile
-        )
-        subsequent.notes << note
       end
       subsequent.lien = Lien.find(params[:lien_id])
       subsequent.save!

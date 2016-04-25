@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160421195440) do
+ActiveRecord::Schema.define(version: 20160425154127) do
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -59,6 +59,7 @@ ActiveRecord::Schema.define(version: 20160421195440) do
     t.string   "state"
     t.string   "zip"
     t.boolean  "redeem_in_10"
+    t.text     "text_pad"
   end
 
   add_index "liens", ["township_id"], name: "index_liens_on_township_id"
@@ -166,6 +167,7 @@ ActiveRecord::Schema.define(version: 20160421195440) do
     t.integer  "amount"
     t.boolean  "void"
     t.integer  "subsequent_batch_id"
+    t.text     "text_pad"
   end
 
   add_index "subsequents", ["lien_id"], name: "index_subsequents_on_lien_id"

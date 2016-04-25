@@ -536,6 +536,13 @@ const LienNotes = React.createClass({
     }
   },
 
+  updateFormState: function(model, b) {
+    if(b === true) {
+      this.props.lien.set('text_pad', model.text_pad)
+      this.props.lien.save()
+    }
+  },
+
   render: function() {
     var lien = this.props.lien
 
@@ -562,18 +569,16 @@ const LienNotes = React.createClass({
     return <div className='panel panel-default'>
       <div className='panel-heading'>
         <h3 className='panel-title'>Notes</h3>
-        <div>
-          <table style={{backgroundColor:'white'}} className='table'>
-            <thead>
-              <tr>
-                {table_headers}
-              </tr>
-            </thead>
-            <tbody>
-              {table_rows}
-            </tbody>
-          </table>
-        </div>
+        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+          <div style={{width:'100%'}}>
+            <div className="form-group row">
+              <label htmlFor="type" className="col-sm-3 form-control-label">Note</label>
+              <div className="col-sm-9">
+                <Styleguide.Molecules.Forms.TextArea name="text_pad" rows={5} value={this.props.lien.get('text_pad')}/>
+              </div>
+            </div>
+          </div>
+        </Formsy.Form>
       </div>
     </div>
   }

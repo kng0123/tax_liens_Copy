@@ -103,7 +103,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
     row.concat [
       lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100), last_sub, lien.redemption_date, lien.redemption_amount().try('/', 100), lien.total_cash_out_calc().try('/', 100),
-      lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), "Dif", "Not implemented", lien.note_text
+      lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), "Dif", "Not implemented", lien.text_pad
     ]
 
     row.concat [ "Principal Bal", "Total Interest Earned" ]
