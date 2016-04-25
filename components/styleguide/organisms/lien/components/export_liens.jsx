@@ -67,13 +67,19 @@ const ExportReceipts = React.createClass({
       </div>
       }
 
-
-    var redemption_date = new Date()
-
     var form_rows = [
       {
-        label: 'Redemption date: ',
-        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='redemption_date' value={redemption_date} required/>
+        label: 'All liens sold until: ',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='sale_date' required/>
+      },
+      {
+        label: 'Effective from: ',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='start_date' required/>
+      }
+      ,
+      {
+        label: 'Effective to: ',
+        element: <Styleguide.Molecules.Forms.DatePicker placeholderText={"Select"} width={'150px'} name='end_date'  required/>
       }
     ]
     var form_body = form_rows.map( (row, key) => {

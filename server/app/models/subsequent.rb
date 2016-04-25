@@ -11,7 +11,7 @@ class Subsequent < ActiveRecord::Base
     return self.amount
   end
 
-  def interest(redeem_date)
+  def interest(redeem_date = nil)
     interest = self.interest_eight(redeem_date) + self.interest_eighteen(redeem_date)
     if interest < 0
       interest = 0

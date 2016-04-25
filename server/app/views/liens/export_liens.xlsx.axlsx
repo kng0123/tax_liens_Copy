@@ -17,11 +17,14 @@ info_header = [
   "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
   "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
   "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
-  "Total Paid","Sale Date"
+  "Total Paid","Sale Date",
+
+  "Recording Fee", "Recording Date", "Search fee", "Flat rate", "Cert int"
 ]
 sub_header = ["Sub Type", "Sub Date", "Interest", "8%", "18%", "Check", "Total", "Notes"]
 sub_sum_header = [
-  "Total subs paid", "Redemption Date", "Redemption amount", "Total Cash Out",
+  "Total subs paid", "Last Date",
+  "Redemption Date", "Redemption amount", "Total Cash Out",
   "Total Int Due", "MZ Check", "Dif", "Notes", "Mailed Cert"
 ]
 receipt_header = [
@@ -31,38 +34,29 @@ receipt_header = [
 final_header = [ "Principal Bal", "Total Interest Earned" ]
 
 wb = xlsx_package.workbook
+
+def display_currency(number)
+  number_with_precision(number.try('/', 100.0), :precision => 2)
+end
+
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
                           :border=>Axlsx::STYLE_THIN_BORDER)
   header = info_header
   header_styles = [
     nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil,
-    nil, nil, nil, nil, nil,
-    nil, nil, nil, currency, nil, currency,
-    currency, nil
+    nil, nil, nil, nil, currency,
+    currency, nil, nil, currency, nil, currency,
+    currency, nil,
+    currency, nil, currency, currency, currency
   ]
-
-  for i in 0..max_number_subs-1
-    header = header.concat sub_header
-    header_styles.concat [
-      nil, nil, currency, currency, currency, nil, currency, nil
-    ]
-  end
 
   header = header.concat sub_sum_header
   header_styles.concat [
-    currency, nil, currency, currency,
+    currency, nil, nil, currency, currency,
     currency, currency, currency, nil, nil
   ]
-
-  for i in 0..max_number_receipt-1
-    header = header.concat receipt_header
-    header_styles.concat [
-      nil, nil, nil, nil, nil, currency,
-      nil, currency, currency, currency, currency, nil
-    ]
-  end
 
   header = header.concat final_header
   header_styles.concat [nil, nil]
@@ -79,37 +73,38 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     end
 
     mua_account = lien.mua_accounts[0].account_number
+    recording_fee = 0
+    if !lien.recording_date.nil? and lien.recording_date > @start_date and lien.recording_date < @end_date
+      recording_fee = lien.recording_fee
+    end
     row = [
       lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
       lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
       lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100),
       lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
-      lien.total_cash_out_calc().try('/', 100), lien.sale_date
+      lien.total_cash_out_calc().try('/', 100), lien.sale_date,
+      recording_fee.try('/', 100), lien.recording_date, lien.search_fee.try('/', 100), lien.flat_rate.try('/', 100), lien.cert_interest.try('/', 100)
     ]
 
-    subs_data = [nil]*max_number_subs*sub_header.count
-    subs.each do |sub|
-      subs_data.shift sub_header.count
-      row.concat [sub.sub_type, sub.sub_date, sub.interest.try('/', 100), sub.interest_eight().try('/', 100),
-      sub.interest_eighteen().try('/', 100), "Check", sub.amount.try('/', 100), sub.note_text]
+    last_sub = nil
+    lien.subsequents.each do |sub|
+      if sub.sub_date.nil? or sub.void
+        next
+      end
+      if (sub.sub_date < @start_date or sub.sub_date > @end_date)
+        next
+      end
+      if last_sub.nil?
+        last_sub = sub.sub_date
+      elsif sub.sub_date > last_sub
+        last_sub = sub.sub_date
+      end
     end
-    row.concat subs_data
 
     row.concat [
-      lien.total_subs_before_sub(nil).try('/', 100), lien.redemption_date, lien.redemption_amount().try('/', 100), lien.total_cash_out_calc().try('/', 100),
+      lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100), last_sub, lien.redemption_date, lien.redemption_amount().try('/', 100), lien.total_cash_out_calc().try('/', 100),
       lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), "Dif", "Not implemented", lien.note_text
     ]
-
-    receipts_data = [nil]*max_number_receipt*receipt_header.count
-    receipts.each do |receipt|
-      receipts_data.shift receipt_header.count
-      diff = receipt.check_amount - receipt.expected_amount
-      row.concat([
-        receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number, receipt.check_amount().try('/', 100),
-        receipt.receipt_type, receipt.total_with_interest().try('/', 100), diff.try('/', 100), receipt.expected_amount().try('/', 100), diff.try('/', 100), receipt.note_text
-      ])
-    end
-    row.concat receipts_data
 
     row.concat [ "Principal Bal", "Total Interest Earned" ]
 

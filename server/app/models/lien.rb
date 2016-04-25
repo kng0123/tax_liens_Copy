@@ -355,7 +355,7 @@ class Lien < ActiveRecord::Base
     return int
   end
 
-  def total_subs_before_sub(sub)
+  def total_subs_before_sub(sub, begin_date = nil, end_date = nil)
     base_date = 0
     if !sub.nil?
       base_date = sub.sub_date
@@ -368,7 +368,13 @@ class Lien < ActiveRecord::Base
     total = 0
 
     subs.each do |sub_item|
-      if sub_item.void
+      if sub_item.void or sub_item.sub_date.nil?
+        next
+      end
+      if !begin_date.nil? and begin_date > sub_item.sub_date
+        next
+      end
+      if !end_date.nil? and end_date < sub_item.sub_date
         next
       end
 
