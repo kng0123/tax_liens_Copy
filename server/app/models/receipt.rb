@@ -52,8 +52,9 @@ class Receipt < ActiveRecord::Base
   end
 
 
-  def total_with_interest
+  def total_with_interest(redeem_date = nil)
     type = self.receipt_type.downcase
+    redeem_date = self.redeem_date if redeem_date.nil?
     case type
     when 'combined'
       return self.lien.expected_amount(self.redeem_date)
@@ -72,6 +73,6 @@ class Receipt < ActiveRecord::Base
     end
   end
   def actual_interest
-    self.amount - self.principal_balance
+    self.amount - self.principal_paid
   end
 end

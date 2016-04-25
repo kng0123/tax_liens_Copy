@@ -414,7 +414,7 @@ class Receipt extends Backbone.RelationalModel {
     }
   }
   actual_interest() {
-    return this.amount() - this.principal_balance()
+    return this.amount() - this.principal_paid()
   }
 
   total_with_interest() {
