@@ -289,7 +289,8 @@ const LienCash = React.createBackboneClass({
         {label: "FACE VALUE", key:"cert_fv", editable:false, type:'money'}
       ],
       [
-        {label: "PRINCIPAL PAID", key:"principal_balance", is_function:true, type:'money'},
+        {label: "PRINCIPAL BAL.", key:"principal_balance", is_function:true, type:'money'},
+        {label: "PRINCIPAL PAID", key:"principal_paid", is_function:true, type:'money'},
         {label: "PREMIUM", key:"premium", editable:false, type:'money'},
         {label: "TOTAL PAID", key:"total_paid", editable:false, type:'money'},
         {label: "FLAT RATE", key:"flat_rate", is_function:true, type:'money'},

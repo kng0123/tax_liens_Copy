@@ -62,10 +62,13 @@ class Lien extends Backbone.RelationalModel {
     }
     return this.flat_rate()  + this.cert_interest(redeem_date) + this.sub_interest(redeem_date)
   }
-  principal_balance() {
+  principal_paid() {
     return this.get('receipts').models.reduce((total, receipt) => {
       return total + receipt.principal_paid()
     }, 0)
+  }
+  principal_balance() {
+    return this.total_cash_out() - this.principal_paid()
   }
   expected_amount(redeem_date) {
     return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
