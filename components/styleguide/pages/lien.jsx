@@ -201,8 +201,8 @@ const LienInfo = React.createBackboneClass({
       [
         {label: "SALE DATE", key:"sale_date", editable:false},
         {label: "RECORDING DATE", key:"recording_date", editable:true, type:'date'},
-        {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'}
-
+        {label: "REDEMPTION DATE", key:"redemption_date", editable:true, type:'date'},
+        {label: "REDEMPTION AMT", key:"redemption_amount", editable:true, type:'money'}
       ]
     ]
 
@@ -217,6 +217,15 @@ const LienInfo = React.createBackboneClass({
         </div>
       } else if(item.type =='bool') {
         edit = <MUI.Checkbox onCheck={self.props.onChange(item)} checked={!!val} />
+      } else if(item.type == 'money') {
+        val = accounting.formatMoney(val/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+        if (item.editable){
+          edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
+            <PlainEditable style={{backgroundColor:'red'}} onBlur={self.props.onChange(item)} value={val} />
+          </span>
+        } else {
+          edit = <span style={{paddingRight:'15px'}}> {val}</span>
+        }
       } else if(item.type =='number') {
         val = accounting.toFixed(val, 2)
         if(item.editable) {
@@ -299,7 +308,6 @@ const LienCash = React.createBackboneClass({
       [
         {label: "TOTAL CASH OUT", key:"total_cash_out", is_function:true, type:'money'},
         {label: "TOTAL INT DUE", key:"total_interest_due", is_function:true, type:'money'},
-        {label: "REDEMPTION AMT", key:"redemption_amount", editable:true, type:'money'},
         {label: "EXPECTED AMT", key:"expected_amount", is_function:true, type:'money'},
         {label: "DIFFERENCE", key:"diff", is_function:true, type:'money'},
         {label: "Total check", key:"total_check", is_function:true, type:'money'}
