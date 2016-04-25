@@ -51,7 +51,6 @@ class Receipt < ActiveRecord::Base
     end
   end
 
-
   def total_with_interest(redeem_date = nil)
     type = self.receipt_type.downcase
     redeem_date = self.redeem_date if redeem_date.nil?

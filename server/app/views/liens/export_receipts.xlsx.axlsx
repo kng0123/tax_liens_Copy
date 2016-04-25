@@ -59,7 +59,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
         lien.total_cash_out_calc().try('/', 100.0), lien.sale_date
       ]
 
-      diff = receipt.total_with_interest - receipt.check_amount
+      diff = receipt.total_with_interest(receipt.redeem_date) - receipt.check_amount
       row = row.concat([
         receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number,
         receipt.receipt_type, display_currency(receipt.check_amount), display_currency(receipt.total_with_interest(receipt.redeem_date)), display_currency(diff), display_currency(receipt.principal_paid), display_currency(receipt.actual_interest), receipt.note_text

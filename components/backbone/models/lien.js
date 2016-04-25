@@ -96,7 +96,7 @@ class Lien extends Backbone.RelationalModel {
       return 0
     }
     if (this.get('redemption_amount')) {
-      return this.get('redemption_amount') - this.total_check()
+      return this.expected_amount() - this.get('redemption_amount')
     }
     return this.expected_amount() -this.total_check()
   }
