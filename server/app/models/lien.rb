@@ -355,7 +355,7 @@ class Lien < ActiveRecord::Base
     if days < 0
       return 0
     end
-    interest_rate = self.winning_bid / 100
+    interest_rate = self.winning_bid / 100.0
 
     int =  (days / 365) * interest_rate * self.cert_fv
     puts int
