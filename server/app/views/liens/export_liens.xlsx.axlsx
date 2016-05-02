@@ -22,10 +22,11 @@ info_header = [
   "Recording Fee", "Recording Date", "Search fee", "Flat rate", "Cert int"
 ]
 sub_header = ["Sub Type", "Sub Date", "Interest", "8%", "18%", "Check", "Total", "Notes"]
+
 sub_sum_header = [
   "Total subs paid", "Last Date",
   "Redemption Date", "Redemption amount", "Total Cash Out",
-  "Total Int Due", "MZ Check", "Dif", "Notes", "Mailed Cert"
+  "Total Int Due", "MZ Check", "Dif",  "Principal balance", "Notes", "Mailed Cert"
 ]
 receipt_header = [
   "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
@@ -55,11 +56,17 @@ wb.add_worksheet(name: "Buttons") do |sheet|
   header = header.concat sub_sum_header
   header_styles.concat [
     currency, nil, nil, currency, currency,
-    currency, currency, currency, nil, nil
+    currency, currency, currency, currency, nil, nil
   ]
 
   header = header.concat final_header
-  header_styles.concat [nil, nil]
+  header_styles.concat [currency, currency]
+
+  (0..max_number_subs).each do | i|
+    header = header.concat sub_header
+    header_styles.concat [nil, nil, currency, currency, currency, nil, currency, nil]
+  end
+
 
   sheet.add_row header
 
@@ -103,10 +110,17 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
     row.concat [
       lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100), last_sub, lien.redemption_date, lien.redemption_amount().try('/', 100), lien.total_cash_out_calc().try('/', 100),
-      lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), "Dif", "Not implemented", lien.text_pad
+      lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), lien.diff.try('/', 100), lien.principal_balance(@effective_date).try('/',100), lien.text_pad, "Not implemented"
     ]
 
-    row.concat [ "Principal Bal", "Total Interest Earned" ]
+    row.concat [ lien.total_principal_paid(@effective_date).try('/', 100), lien.total_actual_interest(@effective_date).try('/', 100) ]
+
+    lien.subsequents.each do |sub|
+      row.concat [
+        sub.sub_type, sub.sub_date, sub.interest.try('/', 100), sub.interest_eight.try('/', 100), sub.interest_eighteen.try('/', 100),
+        "", sub.amount_calc.try('/', 100), sub.text_pad
+      ]
+    end
 
     sheet.add_row row, :style => header_styles
   end

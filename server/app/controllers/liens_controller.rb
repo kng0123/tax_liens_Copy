@@ -61,11 +61,11 @@ class LiensController < ApplicationController
   end
 
   def export_liens
-    @sale_date = Date.parse(params[:sale_date])
+    @effective_date = Date.parse(params[:sale_date])
     @start_date = Date.parse(params[:start_date])
     @end_date = Date.parse(params[:end_date])
 
-    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners).where('sale_date' => (20.years.ago)..@sale_date.end_of_day)
+    @liens =  Lien.includes(:township, :subsequents, :receipts, :owners).where('sale_date' => (20.years.ago)..@effective_date.end_of_day)
     render xlsx: "export_liens", :include => [:township, :subsequents, :receipts, :owners]
   end
 

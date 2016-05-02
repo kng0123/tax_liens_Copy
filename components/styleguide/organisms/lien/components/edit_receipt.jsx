@@ -7,9 +7,12 @@ const Paper = require('material-ui/lib/paper');
 
 const EditReceipt = React.createClass({
   getInitialState: function() {
+    debugger
     return {
       receipt_type: undefined,
-      editPrincipal: this.props.receipt.get('is_principal_override')
+      editPrincipal: this.props.receipt.get('is_principal_override'),
+      lastUpdate: undefined,
+      editPrincipalPaid: false
     }
   },
   submitForm: function(model) {
@@ -28,7 +31,9 @@ const EditReceipt = React.createClass({
         return receipt.set(key, model[key])
       }
     })
-    receipt.set('is_principal_override', (this.state.editPrincipal || this.state.receipt_type == 'misc'))
+    receipt.set('is_principal_override', this.state.editPrincipal)
+    receipt.set('is_principal_paid_override', this.state.editPrincipalPaid)
+    receipt.set('paid_principal', Math.round(accounting.unformat(model.principal_paid) * 100))
 
     return receipt.save().then(function(){
       callback()
@@ -54,14 +59,16 @@ const EditReceipt = React.createClass({
   },
 
   updateFormState: function(model) {
-    var self = this
-    if(this.state.receipt_type != model.receipt_type && model.receipt_type) {
-      self.setState({receipt_type: model.receipt_type})
-    }
+    this.setState({lastUpdate: new Date()})
+    return model
   },
 
   editPrincipal: function() {
     this.setState({editPrincipal:!this.state.editPrincipal})
+  },
+
+  editPrincipalPaid: function() {
+    this.setState({editPrincipalPaid:!this.state.editPrincipalPaid})
   },
 
   render: function () {
@@ -92,30 +99,54 @@ const EditReceipt = React.createClass({
     })
 
     var check_amount = accounting.formatMoney(check.amount()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
-    var principal_balance = accounting.formatMoney(check.principal_balance()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var principal_balance = check.principal_balance() / 100
     var misc_amount = accounting.formatMoney(check.get('misc_principal')/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
     var text_pad = check.get('text_pad')
     var self = this
+
+    var expected_amount = accounting.formatMoney(principal_balance, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var paid_amount = accounting.formatMoney(check.principal_paid()/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+    var receipt_type = undefined
+    if( this.refs.form){
+      var current_values = this.refs.form.getCurrentValues()
+      receipt_type = current_values.receipt_type
+      var principal_balance = 0
+      if( this.state.editPrincipal) {
+        principal_balance = current_values.misc_principal
+        expected_amount = accounting.formatMoney(principal_balance, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+      } else {
+        principal_balance = this.props.lien.receipt_expected_amount(current_values.receipt_type) / 100
+        expected_amount = accounting.formatMoney(principal_balance, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+      }
+
+      if( this.state.editPrincipalPaid) {
+        var principal_paid = accounting.parse(current_values.principal_paid)
+        paid_amount = accounting.formatMoney(principal_paid, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+      } else {
+        var principal_paid = Math.min(accounting.parse(current_values.check_amount),accounting.parse(principal_balance))
+        paid_amount = accounting.formatMoney( principal_paid, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
+      }
+    }
 
     var form_rows = [
       {
         label: 'Code',
         element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
         helper: <span>
-          <strong>Principal: </strong>
-          <span>{principal_balance}</span>
+          <strong>Principal Balance:</strong>
+          <span>{expected_amount}</span>
           <span style={{color:"#337ab7", cursor:'pointer'}} onClick={this.editPrincipal}> (Toggle)</span>
         </span>
       },
       {
-        label: 'Sub',
-        filter: (function(){ return !self.state.receipt_type || self.state.receipt_type != 'sub_only'}).bind(this),
-        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
+        label: 'Principal Balance',
+        filter: (function(){ return !this.state.editPrincipal}).bind(this),
+        element: <FormsyText noValidate name='misc_principal' hintText="Principal amount" value={misc_amount}/>
       },
       {
-        label: 'Principal',
-        filter: (function(){ return !(self.state.editPrincipal || self.state.receipt_type == 'misc')}).bind(this),
-        element: <FormsyText name='misc_principal' required hintText="Principal amount" value={misc_amount}/>
+        label: 'Sub',
+        filter: (function(){ return receipt_type != 'sub_only'}).bind(this),
+        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('subsequent')} renderValue={function(sub){if(sub){return sub.name()}}} options={sub_options} name={"subsequent"}/>
       },
       {
         label: 'Account Type',
@@ -139,8 +170,18 @@ const EditReceipt = React.createClass({
       },
       {
         label: 'Check amount',
-        element: <FormsyText name='check_amount' type="text" value={check_amount} required hintText="Check amount"/>
-      }
+        element: <FormsyText name='check_amount' type="text" value={check_amount} required hintText="Check amount"/>,
+        helper: <span>
+          <strong>Principal Paid: </strong>
+          <span>{paid_amount}</span>
+          <span style={{color:"#337ab7", cursor:'pointer'}} onClick={this.editPrincipalPaid}> (Toggle)</span>
+        </span>
+      },
+      {
+        label: 'Principal Paid',
+        filter: (function(){ return !(this.state.editPrincipalPaid)}).bind(this),
+        element: <FormsyText noValidate name='principal_paid' hintText="Principal paid" value=""/>
+      },
     ]
     var form_body = form_rows.map( (row, key) => {
         var className="form-group row"
@@ -160,7 +201,7 @@ const EditReceipt = React.createClass({
 
     return (
       <div style={paperStyle}>
-        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+        <Formsy.Form ref="form" onValidSubmit={this.submitForm} onChange={this.updateFormState}>
           <div>
             <div style={{width:'45%', float:'left'}}>
               {form_body}

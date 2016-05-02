@@ -406,6 +406,9 @@ class Receipt extends Backbone.RelationalModel {
   }
 
   principal_paid() {
+    if(this.get('is_principal_paid_override')) {
+      return this.get('paid_principal');
+    }
     let left = this.principal_balance() - this.amount()
     if(left < 0) {
       return this.principal_balance()

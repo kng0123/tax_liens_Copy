@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425154127) do
+ActiveRecord::Schema.define(version: 20160502074416) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "lien_subsequent_batches", id: false, force: :cascade do |t|
     t.integer "lien_id",             null: false
@@ -62,7 +65,7 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.text     "text_pad"
   end
 
-  add_index "liens", ["township_id"], name: "index_liens_on_township_id"
+  add_index "liens", ["township_id"], name: "index_liens_on_township_id", using: :btree
 
   create_table "liens_llcs", id: false, force: :cascade do |t|
     t.integer "lien_id", null: false
@@ -97,7 +100,7 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.integer  "lien_id"
   end
 
-  add_index "mua_accounts", ["lien_id"], name: "index_mua_accounts_on_lien_id"
+  add_index "mua_accounts", ["lien_id"], name: "index_mua_accounts_on_lien_id", using: :btree
 
   create_table "notes", force: :cascade do |t|
     t.datetime "created_at",  null: false
@@ -109,8 +112,8 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.string   "note_type"
   end
 
-  add_index "notes", ["lien_id"], name: "index_notes_on_lien_id"
-  add_index "notes", ["profile_id"], name: "index_notes_on_profile_id"
+  add_index "notes", ["lien_id"], name: "index_notes_on_lien_id", using: :btree
+  add_index "notes", ["profile_id"], name: "index_notes_on_profile_id", using: :btree
 
   create_table "notes_receipts", id: false, force: :cascade do |t|
     t.integer "receipt_id", null: false
@@ -142,10 +145,30 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.string  "name"
   end
 
-  add_index "profiles", ["user_id"], name: "index_profiles_on_user_id"
+  add_index "profiles", ["user_id"], name: "index_profiles_on_user_id", using: :btree
 
-# Could not dump table "receipts" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "receipts", force: :cascade do |t|
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "lien_id"
+    t.date     "check_date"
+    t.date     "deposit_date"
+    t.date     "redeem_date"
+    t.string   "check_number"
+    t.string   "receipt_type"
+    t.integer  "check_amount"
+    t.boolean  "void"
+    t.string   "account_type"
+    t.integer  "subsequent_id"
+    t.integer  "misc_principal"
+    t.boolean  "is_principal_override"
+    t.text     "text_pad"
+    t.boolean  "is_principal_paid_override"
+    t.integer  "paid_principal"
+  end
+
+  add_index "receipts", ["lien_id"], name: "index_receipts_on_lien_id", using: :btree
+  add_index "receipts", ["subsequent_id"], name: "index_receipts_on_subsequent_id", using: :btree
 
   create_table "subsequent_batches", force: :cascade do |t|
     t.datetime "created_at",  null: false
@@ -155,7 +178,7 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.integer  "township_id"
   end
 
-  add_index "subsequent_batches", ["township_id"], name: "index_subsequent_batches_on_township_id"
+  add_index "subsequent_batches", ["township_id"], name: "index_subsequent_batches_on_township_id", using: :btree
 
   create_table "subsequents", force: :cascade do |t|
     t.datetime "created_at",          null: false
@@ -170,9 +193,9 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.text     "text_pad"
   end
 
-  add_index "subsequents", ["lien_id"], name: "index_subsequents_on_lien_id"
-  add_index "subsequents", ["subsequent_batch_id"], name: "index_subsequents_on_subsequent_batch_id"
-  add_index "subsequents", ["subsequent_id"], name: "index_subsequents_on_subsequent_id"
+  add_index "subsequents", ["lien_id"], name: "index_subsequents_on_lien_id", using: :btree
+  add_index "subsequents", ["subsequent_batch_id"], name: "index_subsequents_on_subsequent_batch_id", using: :btree
+  add_index "subsequents", ["subsequent_id"], name: "index_subsequents_on_subsequent_id", using: :btree
 
   create_table "townships", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -203,7 +226,18 @@ ActiveRecord::Schema.define(version: 20160425154127) do
     t.datetime "updated_at"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  add_foreign_key "liens", "townships"
+  add_foreign_key "mua_accounts", "liens"
+  add_foreign_key "notes", "liens"
+  add_foreign_key "notes", "profiles"
+  add_foreign_key "profiles", "users"
+  add_foreign_key "receipts", "liens"
+  add_foreign_key "receipts", "subsequents"
+  add_foreign_key "subsequent_batches", "townships"
+  add_foreign_key "subsequents", "liens"
+  add_foreign_key "subsequents", "subsequent_batches"
+  add_foreign_key "subsequents", "subsequents"
 end

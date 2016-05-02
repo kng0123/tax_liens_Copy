@@ -45,7 +45,7 @@ class Subsequent < ActiveRecord::Base
     sub_amount = self.amount_calc
     days = lien.redeem_days(self.sub_date, redeem_date)
 
-    if (sub_total_before + cert_fv >= 150000)
+    int = if (sub_total_before + cert_fv >= 150000)
       self.amount_calc * (days/365) * 0.18
     else
       if (sub_total_before + cert_fv + sub_amount <= 1500)
@@ -55,6 +55,11 @@ class Subsequent < ActiveRecord::Base
         high_interest = sub_amount - low_interest
         high_interest * (days/365) * 0.18
       end
+    end
+    if int < 0
+      return 0
+    else
+      int
     end
   end
 
