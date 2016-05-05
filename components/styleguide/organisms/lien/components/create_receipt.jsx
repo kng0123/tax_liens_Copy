@@ -59,6 +59,10 @@ const CreateReceipt = React.createClass({
     this.setState({editPrincipalPaid:!this.state.editPrincipalPaid})
   },
 
+  componentDidMount: function(){
+    $(this.refs.beginInput.getDOMNode()).find('input').focus()
+  },
+
   render: function () {
     let {paperStyle, switchStyle, submitStyle, linksStyle } = this.styles;
     let {div, span, h3, ul, li, fieldset, label} = React.DOM
@@ -113,7 +117,7 @@ const CreateReceipt = React.createClass({
     var form_rows = [
       {
         label: 'Code',
-        element: <Styleguide.Molecules.Forms.ReactSelect options={code_options} required name={"receipt_type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect ref="beginInput" options={code_options} required name={"receipt_type"}/>
       },
       {
         label: 'Principal Balance',

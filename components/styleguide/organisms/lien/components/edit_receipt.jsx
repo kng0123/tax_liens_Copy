@@ -7,7 +7,6 @@ const Paper = require('material-ui/lib/paper');
 
 const EditReceipt = React.createClass({
   getInitialState: function() {
-    debugger
     return {
       receipt_type: undefined,
       editPrincipal: this.props.receipt.get('is_principal_override'),
@@ -71,6 +70,10 @@ const EditReceipt = React.createClass({
     this.setState({editPrincipalPaid:!this.state.editPrincipalPaid})
   },
 
+  componentDidMount: function(){
+    $(this.refs.beginInput.getDOMNode()).find('input').focus()
+  },
+
   render: function () {
     let {paperStyle, switchStyle, submitStyle, linksStyle } = this.styles;
     let {div, span, h3, ul, li, fieldset, label} = React.DOM
@@ -131,7 +134,7 @@ const EditReceipt = React.createClass({
     var form_rows = [
       {
         label: 'Code',
-        element: <Styleguide.Molecules.Forms.ReactSelect value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect ref="beginInput" value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>
       },
       {
         label: 'Principal Balance',
