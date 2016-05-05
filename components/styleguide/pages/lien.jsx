@@ -137,7 +137,6 @@ const LienHelper = React.createBackboneClass({
                 <span>{"LIEN #"+this.props.lien.get('id')}</span>
                 <MUI.FlatButton label="Add receipt" secondary={true} onTouchTap={this.openCreate}/>
                 <MUI.FlatButton label="Add sub" secondary={true} onTouchTap={this.openSubCreate}/>
-                <MUI.FlatButton label="Add note" secondary={true} onTouchTap={this.openNoteCreate}/>
                 <span style={{width:'150px', display:'inline-block'}}>
                   <Select name={'status'} value={lien.get('status')} options={state_options} onChange={this.onChange({type:'select', key:"status"})} />
                 </span>
