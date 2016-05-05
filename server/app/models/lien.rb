@@ -278,8 +278,6 @@ class Lien < ActiveRecord::Base
         total+ sub.amount()
       end
     } || 0
-    puts subs_paid
-    puts "END"
     return cert_fv+premium+recording_fee+subs_paid
   end
   #TODO: What is YEP
@@ -377,7 +375,6 @@ class Lien < ActiveRecord::Base
     interest_rate = self.winning_bid / 100.0
 
     int =  (days / 365) * interest_rate * self.cert_fv
-    puts int
     return int
   end
 

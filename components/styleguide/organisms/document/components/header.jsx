@@ -3,11 +3,7 @@ const Header = React.createClass({
     router: React.PropTypes.object
   },
   logout: function() {
-    this.props.dispatch(Action.logout())
-  },
-
-  login: function() {
-    this.context.router.push('/auth/sign_in')
+    window.location = '/users/sign_out'
   },
 
   render: function() {
@@ -30,7 +26,7 @@ const Header = React.createClass({
         <Link style={linkStyles} to='/app/lien/upload'>Upload</Link>
         <Link style={linkStyles} to='/app/lien/subs'>Batch subs</Link>
       </div>
-      auth_button = <RaisedButton label={"Log in"} onClick={this.login} type={'button'} disabled={false} primary={true} />
+      auth_button = <RaisedButton label={"Log out"} onClick={this.logout} type={'button'} disabled={false} primary={true} />
     }
 
     return <Toolbar style={{marginBottom:'10px'}}>
