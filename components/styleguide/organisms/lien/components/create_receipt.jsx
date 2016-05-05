@@ -23,6 +23,7 @@ const CreateReceipt = React.createClass({
     var new_check = new BackboneApp.Models.Receipt(model)
     new_check.set('is_principal_override', this.state.editPrincipal)
     new_check.set('is_principal_paid_override', this.state.editPrincipalPaid)
+    new_check.set('paid_principal', Math.round(accounting.unformat(new_check.principal_paid) * 100))
     var res = new_check.save()
     var self = this
     res.success(function() {
