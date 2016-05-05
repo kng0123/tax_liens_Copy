@@ -28,6 +28,10 @@ var SearchHelper = React.createBackboneClass({
     }
   },
 
+  clearFields: function() {
+    this.setState({data: Object.assign( {}, this.props.search)})
+  },
+
   townshipSelect: function() {
     return this.props.townships.models.map(function(township){
       return {label: township.get('name'), value:township.get('name')}
@@ -102,6 +106,7 @@ var SearchHelper = React.createBackboneClass({
     return <form className='form-inline' onSubmit={this.onSubmit}>
       {input_els}
       <button type='submit' style={{marginTop:'20px', marginLeft:'10px'}} className='btn btn-primary'>Go</button>
+      <button onClick={this.clearFields} type='button' style={{marginTop:'20px', marginLeft:'10px'}} className='btn btn-danger'>Clear</button>
     </form>
   }
 })

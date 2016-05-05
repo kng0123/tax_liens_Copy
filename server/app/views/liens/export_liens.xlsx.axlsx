@@ -19,20 +19,19 @@ info_header = [
   "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
   "Total Paid","Sale Date",
 
-  "Recording Fee", "Recording Date", "Search fee", "Flat rate", "Cert int"
+  "Recording Fee", "Recording Date", "Search fee", "Year end penalty", "Flat rate", "Cert int"
 ]
 sub_header = ["Sub Type", "Sub Date", "Interest", "8%", "18%", "Check", "Total", "Notes"]
 
 sub_sum_header = [
-  "Total subs paid", "Last Date",
-  "Redemption Date", "Redemption amount", "Total Cash Out",
-  "Total Int Due", "MZ Check", "Dif",  "Principal balance", "Notes", "Mailed Cert"
+  "Total subs paid",
+  "Total Cash Out",
+  "Total cash received", "Total principal paid",  "Total actual interest", "Total legal fees", "Principal balance"
 ]
 receipt_header = [
   "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
   "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
 ]
-final_header = [ "Principal Bal", "Total Interest Earned" ]
 
 wb = xlsx_package.workbook
 
@@ -50,17 +49,14 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     nil, nil, nil, nil, currency,
     currency, nil, nil, currency, nil, currency,
     currency, nil,
-    currency, nil, currency, currency, currency
+    currency, nil, currency, currency, currency, currency
   ]
 
   header = header.concat sub_sum_header
   header_styles.concat [
-    currency, nil, nil, currency, currency,
-    currency, currency, currency, currency, nil, nil
+    currency, currency,
+    currency, currency, currency, currency, currency
   ]
-
-  header = header.concat final_header
-  header_styles.concat [currency, currency]
 
   (0..max_number_subs).each do | i|
     header = header.concat sub_header
@@ -90,7 +86,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100),
       lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
       lien.total_cash_out_calc().try('/', 100), lien.sale_date,
-      recording_fee.try('/', 100), lien.recording_date, lien.search_fee.try('/', 100), lien.flat_rate.try('/', 100), lien.cert_interest.try('/', 100)
+      recording_fee.try('/', 100), lien.recording_date, lien.search_fee.try('/', 100), 0, lien.flat_rate.try('/', 100), lien.cert_interest.try('/', 100)
     ]
 
     last_sub = nil
@@ -109,11 +105,11 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     end
 
     row.concat [
-      lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100), last_sub, lien.redemption_date, lien.redemption_amount().try('/', 100), lien.total_cash_out_calc().try('/', 100),
-      lien.total_interest_due_calc().try('/', 100), lien.total_check_calc().try('/', 100), lien.diff.try('/', 100), lien.principal_balance(@effective_date).try('/',100), lien.text_pad, "Not implemented"
+      lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100),
+      lien.total_cash_out_calc(@effective_date).try('/', 100),
+      lien.total_check_calc().try('/', 100), lien.total_principal_paid(@effective_date).try('/', 100),
+      lien.total_actual_interest(@effective_date).try('/', 100), "legal fees", lien.principal_balance(@effective_date).try('/',100)
     ]
-
-    row.concat [ lien.total_principal_paid(@effective_date).try('/', 100), lien.total_actual_interest(@effective_date).try('/', 100) ]
 
     lien.subsequents.each do |sub|
       row.concat [

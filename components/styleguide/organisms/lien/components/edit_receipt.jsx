@@ -134,7 +134,11 @@ const EditReceipt = React.createClass({
     var form_rows = [
       {
         label: 'Code',
-        element: <Styleguide.Molecules.Forms.ReactSelect ref="beginInput" value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>
+        element: <Styleguide.Molecules.Forms.ReactSelect ref="beginInput" value={check.get('receipt_type')} options={code_options} required name={"receipt_type"}/>,
+        helper: <span>
+          <strong>Principal Balance: </strong>
+          <span>{expected_amount}</span>
+        </span>
       },
       {
         label: 'Principal Balance',

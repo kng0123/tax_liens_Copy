@@ -275,7 +275,7 @@ class Lien < ActiveRecord::Base
     recording_fee = self.recording_fee || 0
     subs_paid = self.subsequents.reduce(0) {|total, sub |
       if effective_date.nil? or sub.sub_date < effective_date
-        total+ sub.amount()
+        total+ sub.amount_calc
       end
     } || 0
     return cert_fv+premium+recording_fee+subs_paid
@@ -289,7 +289,7 @@ class Lien < ActiveRecord::Base
   end
 
   def principal_balance(effective_date = nil)
-    return self.total_cash_out_calc(effective_date) - (self.search_fee || 0) - self.total_principal_paid(effective_date)
+    return self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) - (self.search_fee || 0))
   end
   def expected_amount(redeem_date = nil, effective_date = nil)
     return self.total_cash_out_calc(effective_date)  + self.total_interest_due_calc(redeem_date) + (self.search_fee_calc || 0)
@@ -321,7 +321,7 @@ class Lien < ActiveRecord::Base
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.principal_paid()
       end
-    }
+    } || 0
   end
 
   def total_actual_interest(effective_date = nil)

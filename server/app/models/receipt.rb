@@ -75,6 +75,9 @@ class Receipt < ActiveRecord::Base
     end
   end
   def actual_interest
+    puts "WHOOO"
+    puts self.amount
+    puts self.principal_paid
     self.amount - self.principal_paid
   end
 end
