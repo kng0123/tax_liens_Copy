@@ -131,7 +131,7 @@ const CreateReceipt = React.createClass({
         },
         {
           label: 'Account Type',
-          element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"}/>
+          element: <Styleguide.Molecules.Forms.ReactSelect options={account_options} required name={"account_type"} value='money-market'/>
         },
       {
         label: 'Deposit Date',
