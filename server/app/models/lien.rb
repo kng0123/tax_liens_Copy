@@ -276,6 +276,8 @@ class Lien < ActiveRecord::Base
     subs_paid = self.subsequents.reduce(0) {|total, sub |
       if effective_date.nil? or sub.sub_date < effective_date
         total+ sub.amount_calc
+      else
+        total
       end
     } || 0
     return cert_fv+premium+recording_fee+subs_paid
