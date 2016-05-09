@@ -286,7 +286,7 @@ class Lien < ActiveRecord::Base
 
   def total_legal_paid_calc(effective_date = nil)
     return self.receipts.reduce(0) {|total, receipt |
-      if receipt.receipt_type == 'legal'
+      if receipt.receipt_type != 'legal'
         total
       elsif effective_date.nil? or receipt.deposit_date < effective_date
         total+ receipt.amount
