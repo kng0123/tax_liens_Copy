@@ -51,9 +51,23 @@ class Lien extends Backbone.RelationalModel {
     var premium = this.get('premium') || 0
     var recording_fee = this.get('recording_fee') || 0
     var subs_paid = this.get('subsequents').models.reduce((total, sub)=>{
-      return total+sub.amount()
+      if(!sub.get('void')) {
+        return total+sub.amount()
+      } else {
+        return total
+      }
     }, 0)
-    return cert_fv+premium+recording_fee+subs_paid
+    return cert_fv+premium+recording_fee+subs_paid+this.total_legal_paid()
+  }
+  total_legal_paid() {
+    var legal_paid = this.get('receipts').models.reduce((total, receipt)=>{
+      if(receipt.get('receipt_type') == 'legal') {
+        return total+receipt.amount()
+      } else {
+        return total
+      }
+    }, 0)
+    return legal_paid
   }
   //TODO: What is YEP
   total_interest_due(redeem_date) {
@@ -388,7 +402,7 @@ class Receipt extends Backbone.RelationalModel {
       return this.get('misc_principal')
     }
     if(type == 'combined') {
-      return this.get('lien').total_cash_out()
+      return this.get('lien').total_cash_out() - this.get('lien').total_legal_paid()
     } else if (type == 'cert_w_interest') {
       return 0
     } else if (type == 'premium') {
@@ -402,6 +416,8 @@ class Receipt extends Backbone.RelationalModel {
       }
     } else if (type == 'misc') {
       return this.get('misc_principal')
+    } else if (type == 'legal') {
+      return 0
     }
   }
 
@@ -417,15 +433,19 @@ class Receipt extends Backbone.RelationalModel {
     }
   }
   actual_interest() {
+    var type = (this.get('receipt_type') || "").toLowerCase()
+    if (type == 'legal') {
+      return 0
+    }
     return this.amount() - this.principal_paid()
   }
 
   total_with_interest() {
     var type = (this.get('receipt_type') || "").toLowerCase()
     if(type == 'combined') {
-      return this.get('lien').expected_amount(this.get('redeem_date'))
+      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').total_legal_paid()
     } else if (type == 'cert_w_interest') {
-      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').get('premium')
+      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').get('premium') - this.get('lien').total_legal_paid()
     } else if (type == 'premium') {
       return this.get('lien').get('premium')
     } else if (type == 'sub_only') {
@@ -437,6 +457,8 @@ class Receipt extends Backbone.RelationalModel {
       }
     } else if (type == 'misc') {
       return this.get('misc_principal')
+    } else if (type == 'legal') {
+      return 0
     }
   }
 
@@ -447,6 +469,7 @@ class Receipt extends Backbone.RelationalModel {
       {label: 'Cert w/ Interest', value:'cert_w_interest'},
       {label: 'Sub Only', value:'sub_only'},
       {label: 'Misc', value:'misc'},
+      {label: 'Legal', value:'legal'},
       {label: 'Sold', value:'sold'}
     ]
   }

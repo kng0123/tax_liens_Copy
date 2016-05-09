@@ -280,7 +280,18 @@ class Lien < ActiveRecord::Base
         total
       end
     } || 0
-    return cert_fv+premium+recording_fee+subs_paid
+
+    return cert_fv+premium+recording_fee+subs_paid+total_legal_paid_calc(effective_date)
+  end
+
+  def total_legal_paid_calc(effective_date = nil)
+    return self.receipts.reduce(0) {|total, receipt |
+      if effective_date.nil? or receipt.deposit_date < effective_date
+        total+ receipt.amount
+      else
+        total
+      end
+    } || 0
   end
   #TODO: What is YEP
   def total_interest_due_calc(redeem_date = nil)
@@ -300,11 +311,13 @@ class Lien < ActiveRecord::Base
   def receipt_expected_amount(type, sub_index = 0)
     case type
     when 'combined'
-      self.expected_amount
+      self.expected_amount - self.total_legal_paid_calc
     when 'cert_w_interest'
       self.expected_amount - self.premium
     when 'premium'
       self.premium
+    when 'legal'
+      0
     else
       0
     end

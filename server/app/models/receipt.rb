@@ -37,6 +37,8 @@ class Receipt < ActiveRecord::Base
       return 0
     when 'misc'
       return self.misc_principal
+    when 'legal'
+      return 0
     else
       0
     end
@@ -59,7 +61,7 @@ class Receipt < ActiveRecord::Base
     redeem_date = self.redeem_date if redeem_date.nil?
     case type
     when 'combined'
-      return self.lien.expected_amount(self.redeem_date)
+      return self.lien.expected_amount(self.redeem_date) - self.lien.total_legal_paid_calc(redeem_date)
     when 'cert_w_interest'
       return self.lien.expected_amount(self.redeem_date) - self.lien.premium
     when 'premium'
@@ -70,6 +72,8 @@ class Receipt < ActiveRecord::Base
       return 0
     when 'misc'
       return self.misc_principal
+    when 'legal'
+      return 0
     else
       0
     end
@@ -78,6 +82,10 @@ class Receipt < ActiveRecord::Base
     puts "WHOOO"
     puts self.amount
     puts self.principal_paid
+    type = self.receipt_type.downcase
+    if (type == 'legal')
+      return 0
+    end
     self.amount - self.principal_paid
   end
 end
