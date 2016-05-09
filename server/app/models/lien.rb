@@ -312,6 +312,8 @@ class Lien < ActiveRecord::Base
     return self.receipts.reduce(0) {|total, check|
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.amount()
+      else
+        total
       end
     }
   end
@@ -320,6 +322,8 @@ class Lien < ActiveRecord::Base
     return self.receipts.reduce(0) {|total, check|
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.principal_paid()
+      else
+        total
       end
     } || 0
   end
@@ -328,6 +332,8 @@ class Lien < ActiveRecord::Base
     return self.receipts.reduce(0) {|total, check|
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.actual_interest()
+      else
+        total
       end
     }
   end
