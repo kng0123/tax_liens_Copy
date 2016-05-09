@@ -108,7 +108,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100),
       lien.total_cash_out_calc(@effective_date).try('/', 100),
       lien.total_check_calc().try('/', 100), lien.total_principal_paid(@effective_date).try('/', 100),
-      lien.total_actual_interest(@effective_date).try('/', 100), lien.total_legal_paid(@effective_date).try('/', 100), lien.principal_balance(@effective_date).try('/',100)
+      lien.total_actual_interest(@effective_date).try('/', 100), lien.total_legal_paid_calc(@effective_date).try('/', 100), lien.principal_balance(@effective_date).try('/',100)
     ]
 
     lien.subsequents.each do |sub|
