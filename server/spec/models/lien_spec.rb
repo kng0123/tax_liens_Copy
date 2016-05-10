@@ -1,5 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Lien, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'lien' do
+    before :each do
+      @lien = create :lien
+    end
+
+    it 'should work' do
+      expect(@lien.id).to eq(@lien.id)
+    end
+  end
 end

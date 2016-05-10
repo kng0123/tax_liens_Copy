@@ -15,6 +15,8 @@ Rails.application.routes.draw do
     resources :notes, defaults: {format: :json}, only: [:index, :show, :update, :create]
     resources :townships, defaults: {format: :json}, only: [:index]
 
+    resources :ttg
+
     match '/app', :to => 'ttg#wrong_url', :via => [:get]
     match '/app/:lien', :to => 'ttg#index', :via => [:get]
     match '/app/:lien/:asdsad', :to => 'ttg#index', :via => [:get]

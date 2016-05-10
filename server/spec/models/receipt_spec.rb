@@ -1,5 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Receipt, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'receipt' do
+    before :each do
+      @receipt = create :receipt
+    end
+
+    it 'should work' do
+      expect(@receipt.id).to eq(@receipt.id)
+    end
+  end
 end
