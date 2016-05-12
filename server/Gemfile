@@ -61,6 +61,7 @@ gem 'bootstrap-sass'
 gem 'jsonapi-resources'
 gem 'factory_girl_rails'
 gem 'roo'
+gem 'roo-xls'
 # gem 'csv'
 gem 'iconv'
 group :production do

@@ -1,11 +1,11 @@
 
 class LiensController < ApplicationController
   respond_to :json, :xls
+  before_action :authenticate_user!
   skip_before_action :verify_authenticity_token
 
   # GET /api/lists/:list_id/todos
   def index
-    puts params
     data = Lien.includes(:township, :subsequents, :receipts, :owners, :mua_accounts)
     if !(params[:id].nil? or params[:id].empty?)
       data = Lien.joins(:township).includes(:township, :subsequents, :receipts, :owners, :mua_accounts).where({id:params[:id]})
@@ -37,11 +37,6 @@ class LiensController < ApplicationController
     respond_with data.limit(10).to_json(:include => [:township, :subsequents, :receipts, :owners, :mua_accounts])
   end
 
-  # POST /api/lists/:list_id/todos
-  def create
-    respond_with Lien.create!(params.data)
-  end
-
   # GET /api/lists/:list_id/todos/:id
   def show
     respond_with Lien.includes(:township, :subsequents, :receipts, :owners, :llcs, :notes).find(params[:id]).serializable_hash(:include => [:township, :subsequents, :receipts, :owners, :llcs, :notes])
@@ -50,7 +45,8 @@ class LiensController < ApplicationController
   # PUT/PATCH /api/lists/:list_id/todos/:id
   def update
     data = params.permit(Lien.column_names)
-    respond_with Lien.find(params[:id]).update_attributes!(data)
+    Lien.find(params[:id]).update_attributes!(data)
+    render json: Lien.find(params[:id])
   end
 
   def import
