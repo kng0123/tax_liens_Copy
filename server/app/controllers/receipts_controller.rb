@@ -1,5 +1,6 @@
 class ReceiptsController < ApplicationController
   respond_to :json
+  before_action :authenticate_user!
 
   def index
     if params[:lien_id]
@@ -13,7 +14,9 @@ class ReceiptsController < ApplicationController
       lien = Lien.find(params[:lien_id])
       data[:check_amount] = data[:check_amount].to_f * 100
       data[:misc_principal] = data[:misc_principal].to_f * 100
-      data[:subsequent] = Subsequent.find(params[:subsequent_id]) if params[:subsequent_id]
+      if params[:sub]
+        data[:subsequent] = Subsequent.find(params[:sub][:id])
+      end
       data[:text_pad] = params[:note]
       receipt = Receipt.create!(data)
       receipt.lien = lien
