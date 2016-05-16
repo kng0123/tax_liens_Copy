@@ -19,8 +19,8 @@ const customContentStyle = {
 const LienHelper = React.createBackboneClass({
   mixins: [
       React.BackboneMixin("lien"),
-      React.BackboneMixin("receipts", 'change'),
-      React.BackboneMixin("subsequents", 'change')
+      React.BackboneMixin("receipts", 'change add remove'),
+      React.BackboneMixin("subsequents", 'change add remove')
   ],
   getInitialState: function() {
     return {

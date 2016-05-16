@@ -20,6 +20,7 @@ const CreateReceipt = React.createClass({
     // let action = Actions.attempt_sign_in(model)
     // this.props.dispatch(action)
     model.lien_id = this.props.lien.get('id')
+    var lien = this.props.lien
     var new_check = new BackboneApp.Models.Receipt(model)
     new_check.set('is_principal_override', this.state.editPrincipal)
     new_check.set('is_principal_paid_override', this.state.editPrincipalPaid)
@@ -28,6 +29,9 @@ const CreateReceipt = React.createClass({
     var self = this
     res.success(function() {
       self.props.callback()
+    })
+    res.error(function() {
+      lien.get('receipts').remove(new_check);
     })
   },
 

@@ -23,11 +23,15 @@ const CreateSub = React.createClass({
       note: model.note
     }
     //TODO: Create sub
+    var lien = this.props.lien;
     var new_sub = new BackboneApp.Models.Subsequent(data)
     var res = new_sub.save()
     var self = this
     res.success(function() {
       self.props.callback()
+    })
+    res.error(function() {
+      lien.get('subsequents').remove(new_sub);
     })
   },
 
