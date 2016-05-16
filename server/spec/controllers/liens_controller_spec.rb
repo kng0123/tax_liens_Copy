@@ -15,6 +15,7 @@ RSpec.describe LiensController, type: :controller do
   describe "logged in user" do
     before :each do
       @user = create(:user)
+      @township = create(:township, :name => "Atlantic City")
       login_with @user
     end
 
@@ -71,21 +72,49 @@ RSpec.describe LiensController, type: :controller do
         expect(Township.count).to eq(1)
         expect(Lien.count).to eq(10)
       end
+    end
+
+    describe "export" do
+      before :each do
+        @lien = create(:lien, :has_receipt,
+          :receipt_count => 2,
+          :sale_date => Date.parse("06/06/2013"),
+          :township => @township
+        )
+        @lien.receipts[0].deposit_date = Date.parse("06/06/2013")
+        @lien.receipts[1].deposit_date = Date.parse("06/06/2015")
+        @lien.receipts[0].save!
+        @lien.receipts[1].save!
+      end
 
       describe "Exports" do
         render_views
 
         describe "receipts" do
-          it "should export all of the receipts" do
+          it "should export only the receipts in the selected range" do
             data = {
               :from => "18/06/2010",
-              :to =>   "06/06/2015"
+              :to =>   "06/06/2014"
             }
             get :export_receipts, data.merge(:format => "xlsx")
             expect( response ).to have_http_status(200)
             File.open('/tmp/axlsx_temp.xlsx', 'w') {|f| f.write(response.body) }
             wb = nil
             expect{ wb = Roo::Excelx.new('/tmp/axlsx_temp.xlsx') }.to_not raise_error
+            expect(wb.cell(2,2)).to eq("Atlantic City")
+            expect(wb.cell(3,2)).to eq(nil)
+          end
+          it "should export a row for each receipt" do
+            data = {
+              :from => "18/06/2010",
+              :to =>   "06/06/2016"
+            }
+            get :export_receipts, data.merge(:format => "xlsx")
+            expect( response ).to have_http_status(200)
+            File.open('/tmp/axlsx_temp.xlsx', 'w') {|f| f.write(response.body) }
+            wb = nil
+            expect{ wb = Roo::Excelx.new('/tmp/axlsx_temp.xlsx') }.to_not raise_error
+            expect(wb.cell(2,2)).to eq("Atlantic City")
             expect(wb.cell(3,2)).to eq("Atlantic City")
           end
         end
@@ -101,7 +130,7 @@ RSpec.describe LiensController, type: :controller do
             File.open('/tmp/axlsx_temp.xlsx', 'w') {|f| f.write(response.body) }
             wb = nil
             expect{ wb = Roo::Excelx.new('/tmp/axlsx_temp.xlsx') }.to_not raise_error
-            expect(wb.cell(3,2)).to eq("Atlantic City")
+            expect(wb.cell(2,2)).to eq("Atlantic City")
           end
         end
       end

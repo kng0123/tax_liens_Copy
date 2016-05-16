@@ -45,11 +45,11 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
 
   @liens.each do |lien, index|
-    township = lien.township.name
-    owner = lien.llcs[0].name
+    township = lien.township.name if lien.township
+    owner = lien.llcs[0].name if lien.llcs.count != 0
     receipts = lien.receipts
 
-    mua_account = lien.mua_accounts[0].account_number
+    mua_account = lien.mua_accounts[0].account_number if lien.mua_accounts.count != 0
     receipts.each do |receipt|
       row = [
         lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
@@ -68,6 +68,4 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     end
 
   end
-
-  puts max_number_receipt
 end

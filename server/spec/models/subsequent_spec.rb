@@ -1,5 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Subsequent, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'subsequent' do
+    before :each do
+      @subsequent = create :subsequent
+    end
+
+    describe 'amount_calc' do
+    end
+    describe 'interest' do
+    end
+  end
 end

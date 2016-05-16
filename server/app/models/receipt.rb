@@ -4,6 +4,10 @@ class Receipt < ActiveRecord::Base
   belongs_to :subsequent
   has_and_belongs_to_many :notes
 
+  validates :check_amount, presence: true
+  validates :deposit_date, presence: true
+  validates :receipt_type, presence: true
+
   def amount
     if self.void
       return 0
@@ -79,9 +83,6 @@ class Receipt < ActiveRecord::Base
     end
   end
   def actual_interest
-    puts "WHOOO"
-    puts self.amount
-    puts self.principal_paid
     type = self.receipt_type.downcase
     if (type == 'legal')
       return 0

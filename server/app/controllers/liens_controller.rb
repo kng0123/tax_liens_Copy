@@ -69,7 +69,6 @@ class LiensController < ApplicationController
     from = Date.parse(params[:from])
     to = Date.parse(params[:to])
     @liens =  Lien.includes(:township, :subsequents, :receipts, :owners).where('receipts.deposit_date' => from.beginning_of_day..to.end_of_day)
-
     render xlsx: "export_receipts", :include => [:township, :subsequents, :receipts, :owners]
     # respond_with @liens, :template => 'liens/export_receipts', :include => [:township, :subsequents, :receipts, :owners]
   end

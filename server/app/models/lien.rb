@@ -184,7 +184,7 @@ class Lien < ActiveRecord::Base
     case File.extname(file.original_filename)
     when ".csv" then Csv.new(file.path, nil, :ignore)
     when ".xls" then Roo::Excel.new(file.path, nil, :ignore)
-    when ".xlsx" then Roo::Spreadsheet.open file.path, extension: :xlsx 
+    when ".xlsx" then Roo::Spreadsheet.open file.path, extension: :xlsx
     else raise "Unknown file type: #{file.original_filename}"
     end
   end
@@ -247,7 +247,7 @@ class Lien < ActiveRecord::Base
       return 0
     end
     cert_fv = self.cert_fv
-    rate = 0.06 #If fv >=1000
+    rate = 0.06
     if ( cert_fv < 500000)
       rate = 0.02
     elsif (cert_fv >= 500000 and cert_fv < 1000000)

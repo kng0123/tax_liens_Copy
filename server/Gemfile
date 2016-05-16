@@ -59,7 +59,9 @@ end
 gem 'devise', '3.4.1'
 gem 'bootstrap-sass'
 gem 'jsonapi-resources'
-gem 'factory_girl_rails'
+group :development, :test do
+  gem 'factory_girl_rails', '4.7.0'
+end
 gem 'roo'
 gem 'roo-xls'
 # gem 'csv'

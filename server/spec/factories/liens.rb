@@ -1,5 +1,25 @@
 FactoryGirl.define do
   factory :lien do
+    #These have to be listed first?
+    transient do
+      receipt_count 0
+      subsequent_count 0
+    end
+
+    #This has to be listed right after transient???
+    after(:create) do |lien, evaluator|
+      create_list(:receipt, evaluator.receipt_count, lien: lien)
+      create_list(:subsequent, evaluator.subsequent_count, lien: lien)
+    end
+
+    trait :has_sub do
+      subsequent_count 1
+    end
+
+    trait :has_receipt do
+      receipt_count 1
+    end
+
     county "Atlantic City"
     search_fee 1200
     yep_interest nil

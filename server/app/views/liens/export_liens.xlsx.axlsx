@@ -67,15 +67,16 @@ wb.add_worksheet(name: "Buttons") do |sheet|
   sheet.add_row header
 
   @liens.each do |lien|
-    township = lien.township.name
-    owner = lien.llcs[0].name
+    township = lien.township.name if lien.township
+    owner = lien.llcs[0].name if lien.llcs.count != 0
     receipts = lien.receipts
     subs = lien.subsequents
     if lien.redemption_date.nil?
       lien.redemption_date = @redemption_date
     end
 
-    mua_account = lien.mua_accounts[0].account_number
+    mua_account = lien.mua_accounts[0].account_number if lien.mua_accounts.count != 0
+
     recording_fee = 0
     if !lien.recording_date.nil? and lien.recording_date > @start_date and lien.recording_date < @end_date
       recording_fee = lien.recording_fee
@@ -121,5 +122,4 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     sheet.add_row row, :style => header_styles
   end
 
-  puts max_number_receipt
 end
