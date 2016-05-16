@@ -571,8 +571,7 @@ const LienNotes = React.createClass({
         <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
           <div style={{width:'100%'}}>
             <div className="form-group row">
-              <label htmlFor="type" className="col-sm-3 form-control-label">Note</label>
-              <div className="col-sm-9">
+              <div className="col-sm-12">
                 <Styleguide.Molecules.Forms.TextArea name="text_pad" rows={5} value={this.props.lien.get('text_pad')}/>
               </div>
             </div>
