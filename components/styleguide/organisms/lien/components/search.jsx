@@ -29,7 +29,7 @@ var SearchHelper = React.createBackboneClass({
   },
 
   clearFields: function() {
-    this.setState({data: Object.assign( {}, this.props.search)})
+    this.setState({data: {}})
   },
 
   townshipSelect: function() {
