@@ -57,7 +57,7 @@ class LiensController < ApplicationController
   end
 
   def export_liens
-    @effective_date = Date.parse(params[:sale_date])
+    @effective_date = Date.parse(params[:end_date])
     @start_date = Date.parse(params[:start_date])
     @end_date = Date.parse(params[:end_date])
 
