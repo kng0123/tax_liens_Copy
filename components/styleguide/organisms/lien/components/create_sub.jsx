@@ -90,7 +90,7 @@ const CreateSub = React.createClass({
 
     return (
       <div style={paperStyle}>
-        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+        <Formsy.Form onValidSubmit={this.submitForm} onChange={this.updateFormState}  autoComplete="off">
         <div>
           <div style={{width:'45%', float:'left'}}>
             {form_body}

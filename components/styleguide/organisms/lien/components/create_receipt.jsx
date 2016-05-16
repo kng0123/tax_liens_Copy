@@ -187,7 +187,7 @@ const CreateReceipt = React.createClass({
 
     return (
       <div style={paperStyle}>
-        <Formsy.Form ref="form" onValidSubmit={this.submitForm} onChange={this.updateFormState}>
+        <Formsy.Form ref="form" onValidSubmit={this.submitForm} onChange={this.updateFormState} autoComplete="off" >
           <div>
             <div style={{width:'45%', float:'left'}}>
               {form_body}
