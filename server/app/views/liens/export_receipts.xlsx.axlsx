@@ -56,7 +56,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
         lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
         lien.list_item, lien.id, lien.longitude, lien.latitude, display_currency(lien.assessed_value),
         display_currency(lien.tax_amount), lien.status, lien.address, display_currency(lien.cert_fv), lien.winning_bid, display_currency(lien.premium),
-        display_currency(lien.total_cash_out_calc()), lien.sale_date
+        display_currency(lien.total_paid_calc()), lien.sale_date
       ]
 
       diff = receipt.total_with_interest(receipt.redeem_date) - receipt.check_amount
