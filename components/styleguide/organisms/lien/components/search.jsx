@@ -1,3 +1,4 @@
+var _ = require('underscore')
 var Search = React.createClass({
   getInitialState: function(){
     var ts = new BackboneApp.Collections.TownshipCollection()
@@ -24,12 +25,16 @@ var SearchHelper = React.createBackboneClass({
 
   getInitialState: function(){
     return {
-      data: Object.assign( {}, this.props.search)
+      data: Object.assign( {r:Date.now()}, this.props.search)
     }
   },
 
   clearFields: function() {
-    this.setState({data: {}})
+    var data = this.state.data;
+    data = _.mapObject(data, function(val, key) {
+      return "";
+    });
+    this.setState({data: data})
   },
 
   townshipSelect: function() {
@@ -40,7 +45,7 @@ var SearchHelper = React.createBackboneClass({
 
   componentWillReceiveProps: function(props){
     var self = this
-    this.setState({data: props.search})
+    // this.setState({data: props.search})
   },
 
   onChange: function(event) {

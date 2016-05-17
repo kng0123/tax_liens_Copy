@@ -5,7 +5,7 @@ def display_currency(number)
 end
 
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
                             :border=>Axlsx::STYLE_THIN_BORDER)
 
   header = [
@@ -64,7 +64,9 @@ wb.add_worksheet(name: "Buttons") do |sheet|
         receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number,
         receipt.receipt_type, display_currency(receipt.check_amount), display_currency(receipt.total_with_interest(receipt.redeem_date)), display_currency(diff), display_currency(receipt.principal_paid), display_currency(receipt.actual_interest), receipt.text_pad
       ])
-      sheet.add_row row, :style => header_styles
+      if !receipt.void
+        sheet.add_row row, :style => header_styles
+      end
     end
 
   end

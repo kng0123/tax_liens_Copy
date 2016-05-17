@@ -40,7 +40,7 @@ def display_currency(number)
 end
 
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
                           :border=>Axlsx::STYLE_THIN_BORDER)
   header = info_header
   header_styles = [
@@ -86,7 +86,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
       lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100),
       lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
-      lien.total_cash_out_calc().try('/', 100), lien.sale_date,
+      lien.total_paid_calc().try('/', 100), lien.sale_date,
       recording_fee.try('/', 100), lien.recording_date, lien.search_fee.try('/', 100), 0, lien.flat_rate.try('/', 100), lien.cert_interest.try('/', 100)
     ]
 
@@ -113,10 +113,12 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     ]
 
     lien.subsequents.each do |sub|
-      row.concat [
-        sub.sub_type, sub.sub_date, sub.interest.try('/', 100), sub.interest_eight.try('/', 100), sub.interest_eighteen.try('/', 100),
-        "", sub.amount_calc.try('/', 100), sub.text_pad
-      ]
+      if !sub.void
+        row.concat [
+          sub.sub_type, sub.sub_date, sub.interest.try('/', 100), sub.interest_eight.try('/', 100), sub.interest_eighteen.try('/', 100),
+          "", sub.amount_calc.try('/', 100), sub.text_pad
+        ]
+      end
     end
 
     sheet.add_row row, :style => header_styles

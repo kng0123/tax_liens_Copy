@@ -72,7 +72,7 @@ class Receipt < ActiveRecord::Base
       return self.lien.premium
     when 'sub_only'
       sub = self.subsequent
-      return sub.amount + sub.interest(self.redeem_date) if sub
+      return sub.amount  if sub
       return 0
     when 'misc'
       return self.misc_principal

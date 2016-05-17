@@ -451,7 +451,7 @@ class Receipt extends Backbone.RelationalModel {
     } else if (type == 'sub_only') {
       var sub = this.get('subsequent')
       if(sub) {
-        return sub.amount() + sub.interest(this.get('redeem_date'))
+        return sub.amount()
       } else {
         return 0
       }

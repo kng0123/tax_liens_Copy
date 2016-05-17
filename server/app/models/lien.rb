@@ -269,6 +269,13 @@ class Lien < ActiveRecord::Base
     return subs_paid
   end
 
+  def total_paid_calc(effective_date = nil)
+    cert_fv = self.cert_fv || 0
+    premium = self.premium || 0
+
+    return cert_fv+premium
+  end
+
   def total_cash_out_calc(effective_date = nil)
     cert_fv = self.cert_fv || 0
     premium = self.premium || 0
