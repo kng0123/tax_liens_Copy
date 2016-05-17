@@ -5,7 +5,7 @@ def display_currency(number)
 end
 
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
                             :border=>Axlsx::STYLE_THIN_BORDER)
 
   header = [
@@ -54,9 +54,9 @@ wb.add_worksheet(name: "Buttons") do |sheet|
       row = [
         lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
         lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
-        lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100.0),
-        lien.tax_amount.try('/', 100.0), lien.status, lien.address, lien.cert_fv.try('/', 100.0), lien.winning_bid, lien.premium.try('/', 100.0),
-        lien.total_cash_out_calc().try('/', 100.0), lien.sale_date
+        lien.list_item, lien.id, lien.longitude, lien.latitude, display_currency(lien.assessed_value),
+        display_currency(lien.tax_amount), lien.status, lien.address, display_currency(lien.cert_fv), lien.winning_bid, display_currency(lien.premium),
+        display_currency(lien.total_cash_out_calc()), lien.sale_date
       ]
 
       diff = receipt.total_with_interest(receipt.redeem_date) - receipt.check_amount

@@ -40,7 +40,7 @@ def display_currency(number)
 end
 
 wb.add_worksheet(name: "Buttons") do |sheet|
-  currency = sheet.styles.add_style(:format_code=>"$#,###.##;[Red]$-#,###.##",
+  currency = sheet.styles.add_style(:format_code=>"$#,###.00;[Red]$-#,###.00",
                           :border=>Axlsx::STYLE_THIN_BORDER)
   header = info_header
   header_styles = [
@@ -84,10 +84,10 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     row = [
       lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
       lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
-      lien.list_item, lien.id, lien.longitude, lien.latitude, lien.assessed_value.try('/', 100),
-      lien.tax_amount.try('/', 100), lien.status, lien.address, lien.cert_fv.try('/', 100), lien.winning_bid, lien.premium.try('/', 100),
-      lien.total_paid_calc().try('/', 100), lien.sale_date,
-      recording_fee.try('/', 100), lien.recording_date, lien.search_fee.try('/', 100), 0, lien.flat_rate.try('/', 100), lien.cert_interest.try('/', 100)
+      lien.list_item, lien.id, lien.longitude, lien.latitude, display_currency(lien.assessed_value),
+      display_currency(lien.tax_amount), lien.status, lien.address, display_currency(lien.cert_fv), lien.winning_bid, display_currency(lien.premium),
+      display_currency(lien.total_paid_calc()), lien.sale_date,
+      display_currency(recording_fee), lien.recording_date, display_currency(lien.search_fee), 0, display_currency(lien.flat_rate), display_currency(lien.cert_interest)
     ]
 
     last_sub = nil
@@ -106,17 +106,17 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     end
 
     row.concat [
-      lien.total_subs_before_sub(nil, @start_date, @end_date).try('/', 100),
-      lien.total_cash_out_calc(@effective_date).try('/', 100),
-      lien.total_check_calc().try('/', 100), lien.total_principal_paid(@effective_date).try('/', 100),
-      lien.total_actual_interest(@effective_date).try('/', 100), lien.total_legal_paid_calc(@effective_date).try('/', 100), lien.principal_balance(@effective_date).try('/',100)
+      display_currency(lien.total_subs_before_sub(nil, @start_date, @end_date)),
+      display_currency(lien.total_cash_out_calc(@effective_date)),
+      display_currency(lien.total_check_calc()), display_currency(lien.total_principal_paid(@effective_date)),
+      display_currency(lien.total_actual_interest(@effective_date)), display_currency(lien.total_legal_paid_calc(@effective_date)), display_currency(lien.principal_balance(@effective_date))
     ]
 
     lien.subsequents.each do |sub|
       if !sub.void
         row.concat [
-          sub.sub_type, sub.sub_date, sub.interest.try('/', 100), sub.interest_eight.try('/', 100), sub.interest_eighteen.try('/', 100),
-          "", sub.amount_calc.try('/', 100), sub.text_pad
+          sub.sub_type, sub.sub_date, display_currency(sub.interest),display_currency( sub.interest_eight), display_currency(sub.interest_eighteen),
+          "", display_currency(sub.amount_calc), sub.text_pad
         ]
       end
     end
