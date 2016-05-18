@@ -23,9 +23,18 @@ const SubsequentBatchHelper = React.createClass( {
   contextTypes: {
     router: React.PropTypes.object
   },
+  getInitialState: function() {
+    return {
+      add_columns:0
+    }
+  },
   mixins: [
     React.BackboneMixin('batch', 'change add remove')
   ],
+
+  addColumn: function() {
+    this.setState({add_columns:this.state.add_columns+1})
+  },
 
   onChange: function(lien, type, sub){
     var self = this
@@ -90,6 +99,32 @@ const SubsequentBatchHelper = React.createClass( {
     }
     var RaisedButton = MUI.RaisedButton
     var sub_headers = ["TOWNSHIP", "BLOCK", "LOT", "QUALIFIER", "MUA ACCT 1", "CERTIFICATE #", "ADDRESS", "SALE DATE", "TAX", "UTILITY", "OTHER"]
+
+    //Count number of misc subs
+    var num_misc = 0
+    var self = this;
+    this.props.batch.get('liens').map(function(lien, k) {
+      var subs = []
+      if( lien.get('subsequents')) {
+        subs = lien.get('subsequents').models
+      }
+      let misc_count_local = 0
+      subs.map(function(sub){
+        if( sub && sub.get('sub_date') ==  self.props.batch.get('sub_date')) {
+          var sub_date = sub.get('sub_date')
+          if(sub.get('sub_type') == 'misc') {
+            misc_count_local++
+          }
+        }
+      })
+      if ( misc_count_local > num_misc ) {
+        num_misc = misc_count_local
+      }
+    })
+    num_misc = num_misc + this.state.add_columns
+    sub_headers = sub_headers.concat(Array.apply(null, Array(num_misc)).map(function () {
+      return 'MISC';
+    }))
     // editable = React.createFactory PlainEditable
     var self = this
     var sub_rows = this.props.batch.get('liens').map(function(lien, k) {
@@ -102,10 +137,15 @@ const SubsequentBatchHelper = React.createClass( {
           return sub
         })
       }
+      var misc_count = 0
       subs = subs.reduce(function(m, sub){
         if( sub && sub.get('sub_date') ==  self.props.batch.get('sub_date')) {
           var sub_date = sub.get('sub_date')
-          m[sub.get('sub_type')] = sub
+          if(sub.get('sub_type') == 'misc') {
+            m[misc_count++] = sub
+          } else {
+            m[sub.get('sub_type')] = sub
+          }
         }
         return m
       }, {})
@@ -117,7 +157,7 @@ const SubsequentBatchHelper = React.createClass( {
       var util_amount = accounting.formatMoney(utility_sub.get('amount')/100, acc_format)
       var other_amount = accounting.formatMoney(other_sub.get('amount')/100, acc_format)
 
-      return [
+      var base = [
         <div onClick={self.goToLien} data-id={lien.get('id')}>{lien.get('county')}</div>,
         lien.get('block'),
         lien.get('lot'),
@@ -134,11 +174,21 @@ const SubsequentBatchHelper = React.createClass( {
         </div>,
         <div style={{border:'1px solid black'}}>
           <PlainEditable onBlur={self.onChange(lien, 'other', other_sub)} value={((other_sub.get('amount')) ? other_amount :undefined )} />
-        </div>,
+        </div>
       ]
+      return base.concat(Array.apply(null, Array(num_misc)).map(function (item, index) {
+        let misc_sub = subs[index] || new BackboneApp.Models.Subsequent({sub_type:'misc', sub_date:sub_date})
+        let misc_amount = accounting.formatMoney(misc_sub.get('amount')/100, acc_format)
+        return <div style={{border:'1px solid black'}}>
+          <PlainEditable onBlur={self.onChange(lien, 'misc', misc_sub)} value={((misc_sub.get('amount')) ? misc_amount :undefined )} />
+        </div>
+      }))
     })
 
     var widths = ['40px', '20px','20px','30px','50px','50px','50px','50px','50px','50px','50px','50px','50px']
+    widths = widths.concat(Array.apply(null, Array(num_misc)).map(function () {
+      return '50px';
+    }))
     var sub_table = React.Factory.table({ widths:widths, selectable:false, headers: sub_headers, rows: sub_rows})
     var void_label = "Void"
 
@@ -153,6 +203,7 @@ const SubsequentBatchHelper = React.createClass( {
         <div className='col-lg-12'>
           <RaisedButton label="Export Excel" onClick={this.exportXLSX} type='button' primary={true} />
           <RaisedButton label={void_label} onClick={this.toggleVoid} type='button' primary={false} />
+          <RaisedButton label="Add column" onClick={this.addColumn} type='button' primary={false} />
           {sub_table}
         </div>
       </div>
