@@ -105,7 +105,7 @@ const CreateReceipt = React.createClass({
         principal_balance = current_values.misc_principal
         expected_amount = accounting.formatMoney(principal_balance, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
       } else {
-        principal_balance = this.props.lien.receipt_expected_amount(current_values.receipt_type) / 100
+        principal_balance = this.props.lien.receipt_expected_amount(current_values.receipt_type, current_values.sub) / 100
         expected_amount = accounting.formatMoney(principal_balance, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
       }
 

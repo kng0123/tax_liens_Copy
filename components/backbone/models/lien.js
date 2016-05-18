@@ -87,7 +87,7 @@ class Lien extends Backbone.RelationalModel {
   expected_amount(redeem_date) {
     return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
   }
-  receipt_expected_amount(type, sub_index) {
+  receipt_expected_amount(type, sub) {
     //TODO Sub Payment Only
     //TODO MISC
     //TODO SOLD
@@ -97,6 +97,8 @@ class Lien extends Backbone.RelationalModel {
       return this.expected_amount() - this.get('premium')
     } else if (type == 'premium') {
       return this.get('premium')
+    } else if (type == 'sub_only' && sub) {
+      return sub.amount()
     }
     return 0
   }
