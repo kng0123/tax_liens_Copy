@@ -434,6 +434,7 @@ const LienSubs = React.createBackboneClass({
       amt: accounting.formatMoney(amount/100, acc_format) ,
       int: accounting.formatMoney(sub.interest()/100, acc_format) ,
       number: "",
+      note: (sub.get('text_pad')||"").slice(0,20),
       actions: <LienSubActions {...props} />
     }
   },
@@ -443,10 +444,10 @@ const LienSubs = React.createBackboneClass({
     var columns = [
       {name:"TYPE", key:'type'},
       {name:"Sub date", key:'date'},
-      {name:"Check #", key:'number'},
       {name:"Date paid", key:'date'},
       {name:"Amount", key:'amt'},
       {name:"Interest", key:'int'},
+      {name:"Note", key:'note'},
       {name:"Actions", key:'actions'}
     ]
 
@@ -745,6 +746,7 @@ const LienReceipts = React.createBackboneClass({
       ,principal_bal: accounting.formatMoney((receipt.principal_paid())/100, acc_format)
       ,interest_amt: accounting.formatMoney(receipt.actual_interest()/100, acc_format)
       ,total_amt: accounting.formatMoney(receipt.total_with_interest()/100, acc_format)
+      ,note: (receipt.get('text_pad') || "").slice(0,20)
       // ,dif: accounting.formatMoney((receipt.expected_amount() - receipt.amount())/100, acc_format)
       ,actions: <LienReceiptActions {...props} />
     }
@@ -762,6 +764,7 @@ const LienReceipts = React.createBackboneClass({
       ,{name:"Expected Amt", key:'total_amt'}
       ,{name:"Principal Paid", key:'principal_bal'}
       ,{name:"Actual Interest", key:'interest_amt'}
+      ,{name:"Note", key:'note'}
       ,{name:"Actions", key:'actions'}
     ]
   },
