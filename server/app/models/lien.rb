@@ -281,6 +281,9 @@ class Lien < ActiveRecord::Base
     premium = self.premium || 0
     recording_fee = self.recording_fee || 0
     subs_paid = self.subsequents.reduce(0) {|total, sub |
+      if sub.void
+        total
+      end
       if effective_date.nil? or sub.sub_date < effective_date
         total+ sub.amount_calc
       else
@@ -293,6 +296,9 @@ class Lien < ActiveRecord::Base
 
   def total_legal_paid_calc(effective_date = nil)
     return self.receipts.reduce(0) {|total, receipt |
+      if check.void
+        total
+      end
       if receipt.receipt_type != 'legal'
         total
       elsif effective_date.nil? or receipt.deposit_date < effective_date
@@ -311,7 +317,7 @@ class Lien < ActiveRecord::Base
   end
 
   def principal_balance(effective_date = nil)
-    return self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) - (self.search_fee || 0))
+    return self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) - (self.search_fee || 0)) - self.total_principal_paid(effective_date)
   end
   def expected_amount(redeem_date = nil, effective_date = nil)
     return self.total_cash_out_calc(effective_date)  + self.total_interest_due_calc(redeem_date) + (self.search_fee_calc || 0)
@@ -334,6 +340,9 @@ class Lien < ActiveRecord::Base
 
   def total_check_calc(effective_date = nil)
     return self.receipts.reduce(0) {|total, check|
+      if check.void
+        total
+      end
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.amount()
       else
@@ -344,6 +353,9 @@ class Lien < ActiveRecord::Base
 
   def total_principal_paid(effective_date = nil)
     return self.receipts.reduce(0) {|total, check|
+      if check.void || check.receipt_type == 'legal'
+        total
+      end
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.principal_paid()
       else
@@ -354,6 +366,9 @@ class Lien < ActiveRecord::Base
 
   def total_actual_interest(effective_date = nil)
     return self.receipts.reduce(0) {|total, check|
+      if check.void
+        total
+      end
       if effective_date.nil? or effective_date > check.deposit_date
         total + check.actual_interest()
       else

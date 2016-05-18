@@ -41,6 +41,9 @@ class Lien extends Backbone.RelationalModel {
 
   subs_paid() {
     var subs_paid = this.get('subsequents').models.reduce((total, sub)=>{
+      if(sub.get('void')){
+        return total
+      }
       return total+sub.amount()
     }, 0)
     return subs_paid
@@ -61,6 +64,9 @@ class Lien extends Backbone.RelationalModel {
   }
   total_legal_paid() {
     var legal_paid = this.get('receipts').models.reduce((total, receipt)=>{
+      if(receipt.get('void')){
+        return total
+      }
       if(receipt.get('receipt_type') == 'legal') {
         return total+receipt.amount()
       } else {
@@ -78,11 +84,14 @@ class Lien extends Backbone.RelationalModel {
   }
   principal_paid() {
     return this.get('receipts').models.reduce((total, receipt) => {
+      if(receipt.get('void') || receipt.get('receipt_type') == 'legal') {
+        return total
+      }
       return total + receipt.principal_paid()
     }, 0)
   }
   principal_balance() {
-    return this.total_cash_out() - this.principal_paid()
+    return this.total_cash_out() - this.principal_paid() - this.total_legal_paid()
   }
   expected_amount(redeem_date) {
     return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
@@ -104,6 +113,9 @@ class Lien extends Backbone.RelationalModel {
   }
   total_check() {
     return this.get('receipts').reduce((total, check) =>{
+      if(check.get('void')){
+        return total
+      }
       return total + check.amount()
     }, 0)
   }
@@ -120,6 +132,9 @@ class Lien extends Backbone.RelationalModel {
   sub_interest(redeem_date) {
     redeem_date = redeem_date || this.get('redemption_date')
     return this.get('subsequents').models.reduce((total, sub) => {
+      if(sub.get('void')){
+        return total
+      }
       return total + sub.interest(redeem_date)
     }, 0)
   }
@@ -159,7 +174,7 @@ class Lien extends Backbone.RelationalModel {
     var subs = this.get('subsequents').models
     var total = subs.reduce((prev, curr)=>{
       if(curr.get('void')) {
-        return 0
+        return prev
       }
       var sub_date = moment(curr.get('date'))
       if(sub_date < base_date) {
