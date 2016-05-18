@@ -63,9 +63,13 @@ const LienHelper = React.createBackboneClass({
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
 
-    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={customContentStyle}>
-      {modal}
-    </Dialog>
+    if(this.state.open) {
+      return <div open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={customContentStyle}>
+        {modal}
+      </div>
+    } else {
+      return <div></div>
+    }
   },
 
   onChange: function(item) {
@@ -418,10 +422,13 @@ const LienSubs = React.createBackboneClass({
   getDialog: function() {
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
-
-    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
-      {modal}
-    </Dialog>
+    if(this.state.open) {
+      return <div open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={customContentStyle}>
+        {modal}
+      </div>
+    } else {
+      return <div></div>
+    }
   },
   rowGetter: function(i) {
     var sub = this.props.lien.get('subsequents').models[i]
@@ -719,10 +726,13 @@ const LienReceipts = React.createBackboneClass({
   getDialog: function() {
     var modal = this.state.modal
     var Dialog = MUI.Libs.Dialog
-
-    return <Dialog open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={{width:'800px'}}>
-      {modal}
-    </Dialog>
+    if(this.state.open) {
+      return <div open={this.state.open} autoScrollBodyContent={true} actions={this.state.modal_actions} onRequestClose={this.handleClose} contentStyle={customContentStyle}>
+        {modal}
+      </div>
+    } else {
+      return <div></div>
+    }
   },
 
   rowGetter: function(i){
