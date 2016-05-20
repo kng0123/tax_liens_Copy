@@ -1,0 +1,58 @@
+wb = xlsx_package.workbook
+
+def display_currency(number)
+  number_with_precision(number.try('/', 100.0), :precision => 2)
+end
+wb.add_worksheet(name: "Buttons") do |sheet|
+  sheet.add_row ["Sub Request"], :style => []
+  sheet.add_row ["Interest Date: " + @batches.sub_date.strftime('%m/%d/%Y')], :style => []
+
+  headers = [
+    "Township", "Block", "Lot", "Qualifier", "Mua Account",
+    "Certificate #", "Address", "Sale Date", "Tax Amount", "Utility Amount",
+    "Other Amount"
+  ]
+  header_styles = []
+  sheet.add_row headers, header_styles
+
+  lien_subs = {}
+  @batches.liens.each do |lien|
+    lien_subs[lien.id] = {}
+  end
+
+  @batches.subsequents.each do |sub|
+    lien_subs[sub.lien_id][sub.sub_type] = sub
+  end
+  @batches.liens.each do |lien|
+    subs = lien_subs[lien.id]
+    account = nil
+    township = nil
+    if !lien.township.nil?
+      township = lien.township.name
+    end
+    if lien.mua_accounts.count > 0
+      account = lien.mua_accounts.first.account_number
+    end
+    row = [
+      township, lien.block, lien.lot, lien.qualifier,
+      account, lien.cert_number, lien.address, lien.sale_date
+    ]
+    if subs['tax']
+      row.push display_currency(subs['tax'].amount)
+    else
+      row.push nil
+    end
+    if subs['utility']
+      row.push display_currency(subs['utility'].amount)
+    else
+      row.push nil
+    end
+    if subs['other']
+      row.push display_currency(subs['other'].amount)
+    else
+      row.push nil
+    end
+    row_styles = []
+    sheet.add_row row, row_styles
+  end
+end

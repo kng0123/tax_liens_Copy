@@ -1,5 +1,6 @@
 class SubsequentBatchController < ApplicationController
-  respond_to :json, :xls
+  respond_to :json, :xlsx
+  before_action :authenticate_user!
 
   # GET /api/lists/:list_id/todos
   def index
@@ -30,13 +31,7 @@ class SubsequentBatchController < ApplicationController
   # GET /api/lists/:list_id/todos/:id
   def show
     @batches =  SubsequentBatch.includes(:township, :subsequents, :liens).find(params[:id])#, :include => [:township, :subsequents, :liens]
-    # respond_to do |format|
-    #   format.html
-    #   format.csv { send_data @products.to_csv }
-    #   format.xls # { send_data @products.to_csv(col_sep: "\t") }
-    # end
-    #https://msdn.microsoft.com/en-us/library/aa140066(v=office.10).aspx#odc_xmlss_ss:numberformat
-    respond_with @batches, :template => 'subsequents_batch/show', :include => [:township, :subsequents, :liens]
+    respond_with @batches, :template => 'subsequents_batch/export', :include => [:township, :subsequents, :liens]
 
   end
 
