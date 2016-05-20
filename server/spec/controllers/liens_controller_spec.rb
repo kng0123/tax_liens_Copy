@@ -84,7 +84,12 @@ RSpec.describe LiensController, type: :controller do
         @lien.receipts[0].deposit_date = Date.parse("06/06/2013")
         @lien.receipts[1].deposit_date = Date.parse("06/06/2015")
         @lien.receipts[0].save!
+
+        @lien.receipts[1].receipt_type = 'legal'
+        @lien.receipts[1].check_amount = 4200
         @lien.receipts[1].save!
+
+
       end
 
       describe "Exports" do
