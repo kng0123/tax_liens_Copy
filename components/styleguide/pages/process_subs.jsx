@@ -146,7 +146,7 @@ const ProcessSubsHelper = React.createClass( {
               <div style={{float:'left'}}>
                 <Select name='township' style={{width:'200px'}} value={val} options={this.townships()} onChange={this.onChange} valueRenderer={this.valueRenderer} />
               </div>
-              <RaisedButton label="Create new batch" onClick={this.logout} type='submit' disabled={!(val && this.state.batch_date)} primary={true} />
+              <RaisedButton label="Create new batch" onTouchTap={this.logout} type='submit' disabled={!(val && this.state.batch_date)} primary={true} />
             </div>
           </Formsy.Form>
         </div>

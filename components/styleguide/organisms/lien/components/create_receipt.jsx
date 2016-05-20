@@ -203,7 +203,7 @@ const CreateReceipt = React.createClass({
           </div>
           <div style={{clear:'both'}}>
             <MUI.RaisedButton key={"end"} label={"Create receipt"} type={"submit"} primary={true} />
-            <MUI.RaisedButton onClick={this.props.callback} label={"Close"} type={"button"} />
+            <MUI.RaisedButton onTouchTap={this.props.callback} label={"Close"} type={"button"} />
           </div>
         </Formsy.Form>
       </div>

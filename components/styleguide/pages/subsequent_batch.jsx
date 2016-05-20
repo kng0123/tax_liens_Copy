@@ -61,7 +61,7 @@ const SubsequentBatchHelper = React.createClass( {
   },
 
   exportXLSX: function() {
-    window.location.assign("/subsequent_batch/"+this.props.batch.get('id')+".xls");
+    window.location.assign("/subsequent_batch/"+this.props.batch.get('id')+".xlsx");
     // this.window.location =
   },
 
@@ -201,9 +201,9 @@ const SubsequentBatchHelper = React.createClass( {
           <p>Interest for {moment(this.props.batch.get('sub_date')).format('MM/DD/YYYY')}</p>
         </div>
         <div className='col-lg-12'>
-          <RaisedButton label="Export Excel" onClick={this.exportXLSX} type='button' primary={true} />
-          <RaisedButton label={void_label} onClick={this.toggleVoid} type='button' primary={false} />
-          <RaisedButton label="Add column" onClick={this.addColumn} type='button' primary={false} />
+          <RaisedButton label="Export Excel" onTouchTap={this.exportXLSX} type='button' primary={true} />
+          <RaisedButton label={void_label} onTouchTap={this.toggleVoid} type='button' primary={false} />
+          <RaisedButton label="Add column" onTouchTap={this.addColumn} type='button' primary={false} />
           {sub_table}
         </div>
       </div>
