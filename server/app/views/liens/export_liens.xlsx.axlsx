@@ -21,7 +21,7 @@ info_header = [
 
   "Recording Fee", "Recording Date", "Search fee", "Year end penalty", "Flat rate", "Cert int"
 ]
-sub_header = ["Sub Type", "Sub Date", "Interest", "8%", "18%", "Check", "Total", "Notes"]
+sub_header = ["Sub Type", "Sub Date", "Total"]
 
 sub_sum_header = [
   "Total subs paid",
@@ -60,7 +60,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
 
   (0..max_number_subs).each do | i|
     header = header.concat sub_header
-    header_styles.concat [nil, nil, currency, currency, currency, nil, currency, nil]
+    header_styles.concat [nil, nil, currency]
   end
 
 
@@ -115,8 +115,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     lien.subsequents.each do |sub|
       if !sub.void
         row.concat [
-          sub.sub_type, sub.sub_date, display_currency(sub.interest),display_currency( sub.interest_eight), display_currency(sub.interest_eighteen),
-          "", display_currency(sub.amount_calc), sub.text_pad
+          sub.sub_type, sub.sub_date, display_currency(sub.amount_calc)
         ]
       end
     end
