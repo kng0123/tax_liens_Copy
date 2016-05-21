@@ -15,6 +15,8 @@ var ReactSelect = React.createClass({
           value={val}
           options={this.props.options}
           onChange={this.changeValue}
+          matchPos={"start"}
+          ignoreCase={true}
           valueRenderer={this.props.renderValue}
       />
     </div>)
