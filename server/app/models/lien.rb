@@ -10,6 +10,14 @@ class Lien < ActiveRecord::Base
   has_and_belongs_to_many :llcs
   has_many :notes
 
+  before_save :set_bid
+
+  def set_bid
+    if self.winning_bid.nil?
+      self.winning_bid = 0
+    end
+  end
+
   def note_text
     notes = self.notes
     if notes.count != 0
