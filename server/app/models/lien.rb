@@ -189,11 +189,19 @@ class Lien < ActiveRecord::Base
   end
 
   def self.open_spreadsheet(file)
-    case File.extname(file.original_filename)
+    filename = file.path
+    ext = File.extname(file.path)
+    begin
+      filename = file.original_filename
+      ext = File.extname(file.original_filename)
+    rescue
+    end
+
+    case ext
     when ".csv" then Csv.new(file.path, nil, :ignore)
     when ".xls" then Roo::Excel.new(file.path, nil, :ignore)
     when ".xlsx" then Roo::Spreadsheet.open file.path, extension: :xlsx
-    else raise "Unknown file type: #{file.original_filename}"
+    else raise "Unknown file type: #{filename}"
     end
   end
 
@@ -325,7 +333,7 @@ class Lien < ActiveRecord::Base
   end
 
   def principal_balance(effective_date = nil)
-    return self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) - (self.search_fee || 0)) - self.total_principal_paid(effective_date)
+    return -1 * (self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) ) - self.total_principal_paid(effective_date))
   end
   def expected_amount(redeem_date = nil, effective_date = nil)
     return self.total_cash_out_calc(effective_date)  + self.total_interest_due_calc(redeem_date) + (self.search_fee_calc || 0)

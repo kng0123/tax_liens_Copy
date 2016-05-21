@@ -1,6 +1,26 @@
 require 'rails_helper'
 
 RSpec.describe Lien, type: :model do
+  describe 'lien_import data' do
+    before :each do
+      @file = File.open("spec/fixtures/files/sample.xlsx", "r")
+      @liens = Lien.import(@file)[:liens]
+    end
+    describe 'Lien 4' do
+      before :each do
+        @lien = @liens[3]
+      end
+      it 'should verify total subs paid' do
+        expect(@lien.subs_paid).to eq(1204377)
+      end
+      it 'should verify total cash out' do
+        expect(@lien.total_cash_out_calc).to eq(1935876)
+      end
+      it 'should verify principal balance' do
+        expect(@lien.principal_balance).to eq(1935876)
+      end
+    end
+  end
   describe 'lien' do
     before :each do
       @cert_fv = 499999
