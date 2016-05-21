@@ -76,6 +76,8 @@ const LienHelper = React.createBackboneClass({
     var self = this
     return function(data) {
       var val
+      console.log(data);
+      console.log(item);
       if(item.type == 'date') {
         val = moment(data.target.value).toDate()
       } else if (item.type == 'bool') {
@@ -87,7 +89,7 @@ const LienHelper = React.createBackboneClass({
           val = data.value
         }
       }else if (item.type == 'money') {
-        val = Math.round(accounting.unformat($(data.target).html()) * 100)
+        val = Math.round(accounting.unformat(data) * 100)
       } else {
         val = arguments[1]
       }
@@ -209,7 +211,6 @@ const LienInfo = React.createBackboneClass({
       ]
     ]
 
-    var editable = PlainEditable
     var date_picker = DatePicker
     var checkbox = MUI.Checkbox
     var gen_editable = function(key, item, val) {
@@ -224,7 +225,7 @@ const LienInfo = React.createBackboneClass({
         val = accounting.formatMoney(val/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
         if (item.editable){
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-            <PlainEditable style={{backgroundColor:'red'}} onBlur={self.props.onChange(item)} value={val} />
+            <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val} />
           </span>
         } else {
           edit = <span style={{paddingRight:'15px'}}> {val}</span>
@@ -233,7 +234,7 @@ const LienInfo = React.createBackboneClass({
         val = accounting.toFixed(val, 2)
         if(item.editable) {
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-              <PlainEditable onBlur={self.props.onChange(item)} value={val} />
+              <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val} />
             </span>
         } else {
           edit = <span style={{paddingRight:'15px'}}>{val}</span>
@@ -241,7 +242,7 @@ const LienInfo = React.createBackboneClass({
       } else {
         if(item.editable) {
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-            <PlainEditable onBlur={self.props.onChange(item)} value={val} />
+            <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val} />
           </span>
         } else {
           edit = <small className='text-muted'>{val || "Empty"}</small>
@@ -316,7 +317,6 @@ const LienCash = React.createBackboneClass({
         {label: "Total check", key:"total_check", is_function:true, type:'money'}
       ]
     ]
-    var editable = PlainEditable
     var date_picker = DatePicker
     var checkbox = MUI.Checkbox
     var gen_editable = function(key, item, val) {
@@ -331,7 +331,7 @@ const LienCash = React.createBackboneClass({
         val = accounting.formatMoney(val/100, {symbol : "$", decimal : ".", precision : 2, format: "%s%v"})
         if (item.editable){
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-            <PlainEditable style={{backgroundColor:'red'}} onBlur={self.props.onChange(item)} value={val} />
+            <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val} />
           </span>
         } else {
           edit = <span style={{paddingRight:'15px'}}> {val}</span>
@@ -340,7 +340,7 @@ const LienCash = React.createBackboneClass({
         val = accounting.toFixed(val, 2)
         if(item.editable) {
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-              <PlainEditable onBlur={self.props.onChange(item)} value={val.toString()} />
+            <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val.toString()} />
             </span>
         } else {
           edit = <span style={{paddingRight:'15px'}}>{val.toString()}</span>
@@ -348,7 +348,7 @@ const LienCash = React.createBackboneClass({
       } else {
         if(item.editable) {
           edit = <span style={{display:'inline-block', minWidth:'100px', paddingRight:'10px'}}>
-            <PlainEditable onBlur={self.props.onChange(item)} value={val.toString()} />
+            <Styleguide.Molecules.Forms.Editable onBlur={self.props.onChange(item)} value={val.toString()} />
           </span>
         } else {
           edit = <small className='text-muted'>{val || "Empty"}</small>

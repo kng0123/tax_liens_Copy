@@ -124,16 +124,6 @@ const ProcessSubsHelper = React.createClass( {
     return <div className='container'>
       {this.state.error}
       <div className='row'>
-        <div className='col-md-offset-4 col-md-4'>
-          <h3 className='strong text-center text-grey'>Specify sub list</h3>
-          <div style={paperStyle}>
-            <form>
-              <Select name='township' style={{width:'360px'}} value={val} options={this.townships()} onChange={this.onChange} valueRenderer={this.valueRenderer} />
-            </form>
-          </div>
-        </div>
-      </div>
-      <div className='row'>
         <div className='col-sm-12'>
           <p>Recent Subsequents</p>
           <Formsy.Form className='form-inline' onValidSubmit={this.createBatch}>
