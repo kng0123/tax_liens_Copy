@@ -53,17 +53,15 @@ var LienListHelper = React.createClass({
     })
   },
 
-  componentWillMount: function() {
-    this.queryLiens(this.props)
-  },
-
   componentWillReceiveProps: function(props) {
     this.queryLiens(props)
   },
 
   queryLiens: function(props){
     var query_params = props.search
-    props.json.fetch(query_params)
+    if( query_params ){
+      props.json.fetch(query_params)
+    }
   },
 
   goToLien: function(indices) {
