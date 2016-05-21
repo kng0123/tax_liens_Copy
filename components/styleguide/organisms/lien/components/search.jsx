@@ -82,24 +82,25 @@ var SearchHelper = React.createBackboneClass({
 
   render: function() {
     var inputs = [
-      {label: "Block", type:'text', key:'block'}
-      , {label: "Lot", type:'text', key:'lot'}
-      , {label: "Qual", type:'text', key:'qualifier'}
-       ,{label: "Certificate #", type:'text', key:'cert'}
-      ,{label: "Sale year", type:'text', key:'sale_year'}
-      ,{  label: "Township", type:'text', key:'township'}
-      ,{label: "Case #", type:'text', key:'case'}
-      ,{label: "Lien ID", type:'text', key:'id'}
+      {label: "Block", type:'text', key:'block', width:'100px'}
+      , {label: "Lot", type:'text', key:'lot', width:'100px'}
+      , {label: "Qual", type:'text', key:'qualifier', width:'100px'}
+      , {label: "Certificate #", type:'text', key:'cert', width:'100px'}
+      , {label: "Sale year", type:'text', key:'sale_year', width:'100px'}
+      , {label: "Township", type:'text', key:'township', width:'130px'}
+      , {label: "Case #", type:'text', key:'case', width:'100px'}
+      , {label: "Lien ID", type:'text', key:'id', width:'100px'}
+      , {label: "Address", type:'text', key:'address', width:'150px'}
     ]
 
     var self = this
     var input_els = inputs.map(function(item, index) {
-      var el = <input onChange={self.onChange} style={{width:'130px'}} type={item.type} name={item.key} value={self.state.data[item.key]} className='form-control' />
+      var el = <input onChange={self.onChange} style={{width:'100%'}} type={item.type} name={item.key} value={self.state.data[item.key]} className='form-control' />
       if(item.key == 'township') {
         el = <Select style={{width:'130px'}} value={self.state.data[item.key]} name={item.key} options={self.townshipSelect()} onChange={self.onChange} />
       }
       return <div key={index} className='form-group'>
-        <div style={{display:'block'}}>
+        <div style={{display:'block', width:item.width}}>
           <div>
             <span>{item.label}</span>
           </div>

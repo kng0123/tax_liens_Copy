@@ -26,6 +26,9 @@ class LiensController < ApplicationController
       if !(params[:cert].nil? or params[:cert].empty?)
         data = data.where('cert_number LIKE ?', '%' + params[:cert] + '%')
       end
+      if !(params[:address].nil? or params[:address].empty?)
+        data = data.where('address LIKE ?', '%' + params[:address] + '%')
+      end
       if !(params[:sale_year].nil? or params[:sale_year].empty?)
         year = params[:sale_year].to_i
         year_begin = Date.new(year, 1, 1)
