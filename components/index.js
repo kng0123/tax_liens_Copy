@@ -4,18 +4,12 @@ global.$ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 require('babel-polyfill')
-// global._ = require('underscore')
 global.React = React;
 global.ReactDOM = ReactDOM;
-// let {FactoryPanda, FactoryDefinition} = require('factory-panda');
-// global.FactoryPanda = FactoryPanda
-// global.FactoryDefinition=FactoryDefinition
 
 global.Redux = require("redux")
 global.ReactRedux = require("react-redux")
-// global.ReduxDevtools = require("redux-devtools")
-// global.ReduxRouter = require("redux-router")
-// global.ReactHistory = require("history")
+
 global.ReduxRx = require('redux-rx')
 global.Select = require('react-select')
 global.classNames = require('classnames');
@@ -46,8 +40,8 @@ MUI.Libs = {
   Dialog: require('material-ui/lib/dialog')
 };
 
+
 global.ReactRouter = require("react-router");
-//TODO: If we require inside an object we're not picking up changes
 
 global.App = {
 }

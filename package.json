@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.0.1",
   "scripts": {
-    "start": "BROWSER=true watchify components/index.js -v -t  browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o server/public/js/bundle.js",
+    "start": "BROWSER=true watchify components/index.js --debug -v -t  browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o server/public/js/bundle.js",
     "prod": "BROWSER=true browserify components/index.js -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]   | uglifyjs > server/public/js/bundle.js ",
     "cloud": "browserify components/cloud.coffee -t browserify-css -t babelify -t coffeeify -t [ reactify --es6 --target es5 --extension coffee ]     -o cloud/main.js"
   },
