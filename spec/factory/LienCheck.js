@@ -1,7 +1,8 @@
 'use strict';
-let LienCheck = App.Models.LienCheck
-FactoryPanda.define('lien_check', LienCheck, class LienCheckFactory extends FactoryDefinition {
+let id = 0
+Factory.define('lien_check', BackboneApp.Models.Receipt, class LienCheckFactory extends FactoryDefinition {
   static build(instance, traits=[], options={}) {
+    instance.set("id", ++id)
     instance.set("deposit_date", moment().subtract(options.past_days || 0, 'days').toDate());
     instance.set("type", 'combined');
     instance.set("dif", undefined);

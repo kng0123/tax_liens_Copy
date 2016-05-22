@@ -25,6 +25,9 @@ global.Recompose = require('recompose')
 global.moment = require('moment')
 global.PlainEditable = require('react-plain-editable');
 global.DatePicker = require('react-datepicker');
+global.FactoryPanda = require('factory-panda');
+global.FactoryDefinition = FactoryPanda.FactoryDefinition
+global.Factory = FactoryPanda.FactoryPanda
 
 // if (process.env.BROWSER) {
 //TODO: HOw do we parse this only for the browser builds?
@@ -55,5 +58,9 @@ global.Styleguide = require('./styleguide')
 require('./root')(App)
 
 injectTapEventPlugin()
-var element = React.createElement(App.Root)
-ReactDOM.render(element, $("#content")[0]);
+
+if(!window.__karma__) {
+  var element = React.createElement(App.Root)
+  ReactDOM.render(element, $("#content")[0]);
+}
+global.faker = require('faker');

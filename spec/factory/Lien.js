@@ -1,8 +1,8 @@
 'use strict';
-let Lien = App.Models.Lien
-FactoryPanda.define('lien', Lien, class LienFactory extends FactoryDefinition {
+var id = 0
+Factory.define('lien', BackboneApp.Models.Lien, class LienFactory extends FactoryDefinition {
   static build(instance, traits=[], options={}) {
-    instance.set("id", '14AtlanticCity1');
+    instance.set("id", ++id);
     // instance.set("unique_id", '14AtlanticCity1');
     instance.set("county", 'Atlantic City');
     instance.set("year", '2014');
@@ -48,7 +48,7 @@ FactoryPanda.define('lien', Lien, class LienFactory extends FactoryDefinition {
         amount: amount,
         past_days: options.sub_amounts.length-key
       }
-      var sub = FactoryPanda.build('lien_sub', [], sub_options)
+      var sub = Factory.build('lien_sub', [], sub_options)
       sub.set('lien', instance)
       return sub
     }))

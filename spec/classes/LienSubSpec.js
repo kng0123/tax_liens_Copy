@@ -1,8 +1,9 @@
 'use strict';
+
 describe('LienSub', function() {
 
   it('should be able to build a lien sub', function() {
-    var lien_sub = FactoryPanda.build('lien_sub')
+    var lien_sub = Factory.build('lien_sub')
     expect(lien_sub).toBeTruthy()
   })
 
@@ -18,7 +19,7 @@ describe('LienSub', function() {
           sub_amounts: [500, 2000, 1000]
         };
 
-        lien = FactoryPanda.build('lien', ['with_subs'], options)
+        lien = Factory.build('lien', ['with_subs'], options)
       })
       it('should be 8% if Amount of sub (or portion of sub) * (Redemption date – Sale date)/365 < $1500', function() {
         expect(lien.get('subs')[0].interest()).toBe(40)
