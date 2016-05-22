@@ -263,7 +263,7 @@ class Subsequent extends Backbone.RelationalModel {
     if (sub_total_before + cert_fv >= 150000) {
       interest = this.amount() * (days/365) * 0.18
     } else {
-      if (sub_total_before + cert_fv + sub_amount <= 1500) {
+      if (sub_total_before + cert_fv + sub_amount <= 150000) {
         interest = this.amount() * (days/365) * 0.08
       } else {
         var low_interest = 150000 - (cert_fv + sub_total_before)
