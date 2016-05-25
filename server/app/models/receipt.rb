@@ -50,7 +50,7 @@ class Receipt < ActiveRecord::Base
 
   def principal_paid
     if self.is_principal_paid_override
-      self.paid_principal
+      return self.paid_principal
     end
     due = principal_balance - amount
     if due < 0

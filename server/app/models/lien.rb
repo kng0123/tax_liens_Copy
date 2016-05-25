@@ -307,7 +307,7 @@ class Lien < ActiveRecord::Base
       end
     } || 0
 
-    return cert_fv+premium+recording_fee+subs_paid+total_legal_paid_calc(effective_date)
+    return cert_fv+premium+recording_fee+subs_paid
   end
 
   def total_legal_paid_calc(effective_date = nil)
@@ -333,7 +333,7 @@ class Lien < ActiveRecord::Base
   end
 
   def principal_balance(effective_date = nil)
-    return -1 * (self.total_principal_paid(effective_date) - (self.total_cash_out_calc(effective_date) ) - self.total_principal_paid(effective_date))
+    return self.total_cash_out_calc(effective_date) - self.total_principal_paid(effective_date)
   end
   def expected_amount(redeem_date = nil, effective_date = nil)
     return self.total_cash_out_calc(effective_date)  + self.total_interest_due_calc(redeem_date) + (self.search_fee_calc || 0)
@@ -342,7 +342,7 @@ class Lien < ActiveRecord::Base
   def receipt_expected_amount(type, sub_index = 0)
     case type
     when 'combined'
-      self.expected_amount - self.total_legal_paid_calc
+      self.expected_amount
     when 'cert_w_interest'
       self.expected_amount - self.premium
     when 'premium'
@@ -356,7 +356,7 @@ class Lien < ActiveRecord::Base
 
   def total_check_calc(effective_date = nil)
     return self.receipts.reduce(0) {|total, check|
-      if check.void
+      if check.void || check.receipt_type == 'legal'
         total
       end
       if effective_date.nil? or effective_date > check.deposit_date
@@ -382,7 +382,7 @@ class Lien < ActiveRecord::Base
 
   def total_actual_interest(effective_date = nil)
     return self.receipts.reduce(0) {|total, check|
-      if check.void
+      if check.void || check.receipt_type == 'legal'
         total
       end
       if effective_date.nil? or effective_date > check.deposit_date

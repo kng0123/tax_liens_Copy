@@ -60,7 +60,7 @@ class Lien extends Backbone.RelationalModel {
         return total
       }
     }, 0)
-    return cert_fv+premium+recording_fee+subs_paid+this.total_legal_paid()
+    return cert_fv+premium+recording_fee+subs_paid
   }
   total_legal_paid() {
     var legal_paid = this.get('receipts').models.reduce((total, receipt)=>{
@@ -91,7 +91,7 @@ class Lien extends Backbone.RelationalModel {
     }, 0)
   }
   principal_balance() {
-    return this.total_cash_out() - this.principal_paid() - this.total_legal_paid()
+    return this.total_cash_out() - this.principal_paid()
   }
   expected_amount(redeem_date) {
     return this.total_cash_out()  + this.total_interest_due(redeem_date) + this.get('search_fee')
@@ -113,7 +113,7 @@ class Lien extends Backbone.RelationalModel {
   }
   total_check() {
     return this.get('receipts').reduce((total, check) =>{
-      if(check.get('void')){
+      if(check.get('void')  || check.get('receipt_type') == 'legal' ){
         return total
       }
       return total + check.amount()
@@ -419,7 +419,7 @@ class Receipt extends Backbone.RelationalModel {
       return this.get('misc_principal')
     }
     if(type == 'combined') {
-      return this.get('lien').total_cash_out() - this.get('lien').total_legal_paid()
+      return this.get('lien').total_cash_out()
     } else if (type == 'cert_w_interest') {
       return 0
     } else if (type == 'premium') {
@@ -460,9 +460,9 @@ class Receipt extends Backbone.RelationalModel {
   total_with_interest() {
     var type = (this.get('receipt_type') || "").toLowerCase()
     if(type == 'combined') {
-      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').total_legal_paid()
+      return this.get('lien').expected_amount(this.get('redeem_date'))
     } else if (type == 'cert_w_interest') {
-      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').get('premium') - this.get('lien').total_legal_paid()
+      return this.get('lien').expected_amount(this.get('redeem_date')) - this.get('lien').get('premium')
     } else if (type == 'premium') {
       return this.get('lien').get('premium')
     } else if (type == 'sub_only') {
