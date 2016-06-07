@@ -108,7 +108,7 @@ wb.add_worksheet(name: "Buttons") do |sheet|
     row.concat [
       display_currency(lien.total_subs_before_sub(nil, @start_date, @end_date)),
       display_currency(lien.total_cash_out_calc(@effective_date)),
-      display_currency(lien.total_check_calc()), display_currency(lien.total_principal_paid(@effective_date)),
+      display_currency(lien.total_check_calc(@effective_date))), display_currency(lien.total_principal_paid(@effective_date)),
       display_currency(lien.total_actual_interest(@effective_date)), display_currency(lien.total_legal_paid_calc(@effective_date)), display_currency(lien.principal_balance(@effective_date))
     ]
 
