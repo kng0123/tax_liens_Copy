@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   devise_for :users, :controllers => { :registrations => "users/registrations" }
-
+  resources :liens do
+    collection { post :import }
+  end
   authenticate :user do
     resources :liens, defaults: {format: :json}, only: [:index, :create, :show, :update] do
       collection { post :import }

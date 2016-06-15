@@ -1,8 +1,9 @@
 
 class LiensController < ApplicationController
   respond_to :json, :xls
-  before_action :authenticate_user!
-  skip_before_action :verify_authenticity_token
+  # before_action :authenticate_user!
+  # protect_from_forgery :except => :import
+  skip_before_action :authenticate_user
 
   # GET /api/lists/:list_id/todos
   def index
@@ -53,6 +54,7 @@ class LiensController < ApplicationController
   end
 
   def import
+    puts params
     liens = Lien.import(params[:file], params[:test])
     d = {:data => liens}
     render json: d

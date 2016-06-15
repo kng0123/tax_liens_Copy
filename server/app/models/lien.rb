@@ -213,8 +213,10 @@ class Lien < ActiveRecord::Base
       return 'premium'
     elsif input == 'cert only'
       return 'cert_w_interest'
+    elsif input == 'misc'
+      return 'misc'
     else
-      raise 'Undefined check type'
+      raise 'Undefined check type ' + input
     end
   end
 
