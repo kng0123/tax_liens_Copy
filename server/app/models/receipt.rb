@@ -69,13 +69,13 @@ class Receipt < ActiveRecord::Base
     when 'cert_w_interest'
       return self.lien.expected_amount(self.redeem_date) - self.lien.premium
     when 'premium'
-      return self.lien.premium
+      return self.lien.premium || 0
     when 'sub_only'
       sub = self.subsequent
-      return sub.amount  if sub
+      return (sub.amount || 0) if sub
       return 0
     when 'misc'
-      return self.misc_principal
+      return self.misc_principal || 0
     when 'legal'
       return 0
     else
