@@ -30,17 +30,17 @@ class Receipt < ActiveRecord::Base
     end
     case type
     when 'combined'
-      return self.lien.total_cash_out_calc
+      return self.lien.total_cash_out_calc || 0 
     when 'cert_w_interest'
       return 0
     when 'premium'
-      return self.lien.premium
+      return self.lien.premium || 0
     when 'sub_only'
       sub = self.subsequent
       return sub.amount if sub
       return 0
     when 'misc'
-      return self.misc_principal
+      return self.misc_principal || 0
     when 'legal'
       return 0
     else
