@@ -26,7 +26,7 @@ const ExportReceipts = React.createClass({
     var from = model.from
     var to = model.to
 
-    window.location.assign("/lien/export_receipts.xlsx?"+$.param(model));
+    window.location.assign("/lien/export_receipts.csv?"+$.param(model));
     this.props.callback()
   },
 

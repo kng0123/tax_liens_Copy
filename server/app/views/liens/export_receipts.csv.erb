@@ -1,0 +1,55 @@
+<%-
+
+header = [
+  "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+  "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+  "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+  "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+  "Total Paid","Sale Date"
+]
+max_number_receipt = 0
+@liens.each do |lien|
+  num_receipts = lien.receipts.count
+  if num_receipts > max_number_receipt
+    max_number_receipt = num_receipts
+  end
+end
+
+header = header.concat [
+  "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #",
+  "Code", "Check Amount", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+]
+
+def display_currency(number)
+  number_with_precision(number.try('/', 100.0), :precision => 2)
+end
+
+-%>
+<%= CSV.generate_line header %>
+<%-
+@liens.each do |lien, index|
+  township = lien.township.name if lien.township
+  owner = lien.llcs[0].name if lien.llcs.count != 0
+  receipts = lien.receipts
+
+  mua_account = lien.mua_accounts[0].account_number if lien.mua_accounts.count != 0
+  receipts.each do |receipt|
+    row = [
+      lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
+      lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
+      lien.list_item, lien.id, lien.longitude, lien.latitude, display_currency(lien.assessed_value),
+      display_currency(lien.tax_amount), lien.status, lien.address, display_currency(lien.cert_fv), lien.winning_bid, display_currency(lien.premium),
+      display_currency(lien.total_paid_calc()), lien.sale_date
+    ]
+    puts receipt.id
+    diff = receipt.total_with_interest(receipt.redeem_date) - (receipt.check_amount || 0)
+
+    row = row.concat([
+      receipt.deposit_date, receipt.check_date, receipt.redeem_date, receipt.account_type, receipt.check_number,
+      receipt.receipt_type, display_currency(receipt.check_amount), display_currency(receipt.total_with_interest(receipt.redeem_date)), display_currency(diff), display_currency(receipt.principal_paid), display_currency(receipt.actual_interest), receipt.text_pad
+    ])
+    if !receipt.void
+      CSV.generate_line(row)
+    end
+  end
+end -%>

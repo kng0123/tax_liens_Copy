@@ -1,0 +1,107 @@
+<%-
+max_number_receipt = 0
+max_number_subs = 0
+@liens.each do |lien|
+  num_receipts = lien.receipts.count
+  if num_receipts > max_number_receipt
+    max_number_receipt = num_receipts
+  end
+
+  num_subs = lien.subsequents.count
+  if num_subs > max_number_subs
+    max_number_subs = num_subs
+  end
+end
+
+info_header = [
+  "Unique ID", "County", "Year", "LLC", "Block/Lot", "Block", "Lot",
+  "Qualifier", "Adv #", "MUA Acct # / Parcel ID", "Cert #", "Lien Type",
+  "List Item", "Current Owner", "Longitude", "Latitude", "Assessed Value",
+  "Tax Amount", "Status", "Address", "Cert FV", "Winning Bid","Premium",
+  "Total Paid","Sale Date",
+
+  "Recording Fee", "Recording Date", "Search fee", "Year end penalty", "Flat rate", "Cert int"
+]
+sub_header = ["Sub Type", "Sub Date", "Total"]
+
+sub_sum_header = [
+  "Total subs paid",
+  "Total Cash Out",
+  "Total cash received", "Total principal paid",  "Total actual interest", "Total legal fees", "Principal balance"
+]
+receipt_header = [
+  "Deposit Date", "Check Date", "Redemption Date", "Account", "Check #", "Check Amount",
+  "Code", "Expected Amount", "Dif", "Check Principal", "Check Actual Interest", "Notes"
+]
+
+
+header = info_header
+header = header.concat sub_sum_header
+(0..max_number_subs).each do | i|
+  header = header.concat sub_header
+end
+
+def display_currency(number)
+  number_with_precision(number.try('/', 100.0), :precision => 2)
+end
+
+-%>
+<%= CSV.generate_line header %>
+<%-
+
+@liens.each do |lien|
+  township = lien.township.name if lien.township
+  owner = lien.llcs[0].name if lien.llcs.count != 0
+  receipts = lien.receipts
+  subs = lien.subsequents
+  if lien.redemption_date.nil?
+    lien.redemption_date = @redemption_date
+  end
+
+  mua_account = lien.mua_accounts[0].account_number if lien.mua_accounts.count != 0
+
+  recording_fee = 0
+  if !lien.recording_date.nil? and lien.recording_date > @start_date and lien.recording_date < @end_date
+    recording_fee = lien.recording_fee
+  end
+  row = [
+    lien.id, township, lien.year, owner, lien.block_lot, lien.block, lien.lot,
+    lien.qualifier, lien.adv_number, mua_account, lien.cert_number, lien.lien_type,
+    lien.list_item, lien.id, lien.longitude, lien.latitude, display_currency(lien.assessed_value),
+    display_currency(lien.tax_amount), lien.status, lien.address, display_currency(lien.cert_fv), lien.winning_bid, display_currency(lien.premium),
+    display_currency(lien.total_paid_calc()), lien.sale_date,
+    display_currency(recording_fee), lien.recording_date, display_currency(lien.search_fee), 0, display_currency(lien.flat_rate), display_currency(lien.cert_interest)
+  ]
+
+  last_sub = nil
+  lien.subsequents.each do |sub|
+    if sub.sub_date.nil? or sub.void
+      next
+    end
+    if (sub.sub_date < @start_date or sub.sub_date > @end_date)
+      next
+    end
+    if last_sub.nil?
+      last_sub = sub.sub_date
+    elsif sub.sub_date > last_sub
+      last_sub = sub.sub_date
+    end
+  end
+
+  row.concat [
+    display_currency(lien.total_subs_before_sub(nil, @start_date, @end_date)),
+    display_currency(lien.total_cash_out_calc(@effective_date)),
+    display_currency(lien.total_check_calc(@effective_date)), display_currency(lien.total_principal_paid(@effective_date)),
+    display_currency(lien.total_actual_interest(@effective_date)), display_currency(lien.total_legal_paid_calc(@effective_date)), display_currency(lien.principal_balance(@effective_date))
+  ]
+
+  lien.subsequents.each do |sub|
+    if !sub.void
+      row.concat [
+        sub.sub_type, sub.sub_date, display_currency(sub.amount_calc)
+      ]
+    end
+  end
+  CSV.generate_line(row)
+end
+-%>

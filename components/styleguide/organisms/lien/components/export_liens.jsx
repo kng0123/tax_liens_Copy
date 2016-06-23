@@ -24,7 +24,7 @@ const ExportReceipts = React.createClass({
     var liens = this.props.liens
     var redemption_date = model.redemption_date
 
-    window.location.assign("/lien/export_liens.xlsx?"+$.param(model));
+    window.location.assign("/lien/export_liens.csv?"+$.param(model));
     this.props.callback()
     return
 
