@@ -54,10 +54,25 @@ class LiensController < ApplicationController
   end
 
   def import
-    puts params
-    liens = Lien.import(params[:file], params[:test])
+    if params[:liens]
+      liens = Lien.import_json(params, false)
+    else
+      begin
+        liens = Lien.import(params[:file], params[:test])
+      rescue Exception => e
+        puts e.message
+        stacktrace =  e.backtrace
+        stacktrace.each { |line| puts line }
+        render json: {:foo => "boo"}, :status => 500
+        return
+      end
+    end
     d = {:data => liens}
-    render json: d
+    if liens.is_a? String
+      render json: d, :status => 404
+    else
+      render json: d
+    end
     # redirect_to root_url, notice: "Liens imported."
   end
 

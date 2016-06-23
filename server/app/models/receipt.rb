@@ -30,7 +30,7 @@ class Receipt < ActiveRecord::Base
     end
     case type
     when 'combined'
-      return self.lien.total_cash_out_calc || 0 
+      return self.lien.total_cash_out_calc || 0
     when 'cert_w_interest'
       return 0
     when 'premium'
@@ -67,7 +67,7 @@ class Receipt < ActiveRecord::Base
     when 'combined'
       return self.lien.expected_amount(self.redeem_date) - self.lien.total_legal_paid_calc(redeem_date)
     when 'cert_w_interest'
-      return self.lien.expected_amount(self.redeem_date) - self.lien.premium
+      return self.lien.expected_amount(self.redeem_date) - (self.lien.premium || 0)
     when 'premium'
       return self.lien.premium || 0
     when 'sub_only'
